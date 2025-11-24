@@ -1,228 +1,263 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import {
-  ArrowRight,
+  Briefcase,
+  CheckCircle,
+  Shield,
   Sparkles,
   FileText,
   MessageSquare,
   Mail,
   Target,
-  Zap,
-  Shield,
   TrendingUp,
-  CheckCircle2,
   Users,
+  Zap,
+  Clock,
   Brain,
-  Rocket
+  Smile
 } from 'lucide-react';
-import { useRef } from 'react';
 
 export default function Home() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-
   return (
-    <div ref={containerRef} className="relative bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-1/2 -right-1/4 w-[800px] h-[800px] rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-400/20 blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, 30, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute top-1/3 -left-1/4 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-purple-400/15 to-pink-400/15 blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            x: [0, -30, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+    <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] relative overflow-hidden">
+      {/* Subtle gradient orbs - very soft */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none opacity-40">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-purple-200 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-200 rounded-full blur-[100px]" />
       </div>
 
       {/* Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="relative z-50 border-b border-slate-200/60 bg-white/60 backdrop-blur-xl sticky top-0"
-      >
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-display font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              AI Job Master
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" asChild className="text-slate-700 hover:text-blue-600">
-              <Link href="/auth/login">Login</Link>
-            </Button>
-            <Button
-              asChild
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg shadow-blue-500/30"
+      <nav className="relative z-50 pt-6 pb-4 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between">
+            {/* Logo Card - Exact match */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/90 backdrop-blur-sm rounded-[24px] px-6 py-3 shadow-lg"
             >
-              <Link href="/auth/signup">
-                Get Started
-                <ArrowRight className="ml-2 w-4 h-4" />
+              <div className="flex items-center gap-2">
+                <div className="bg-slate-900 rounded-xl px-3 py-1.5">
+                  <Briefcase className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[17px] font-bold text-slate-900 leading-tight">AI Job</span>
+                  <span className="text-[17px] font-bold text-slate-900 leading-tight">Master</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Nav Links - Exact spacing and style */}
+            <div className="hidden md:flex items-center gap-12">
+              <Link href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                Features
               </Link>
-            </Button>
+              <Link href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                How It Works
+              </Link>
+              <Link href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                About
+              </Link>
+              <Link href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                Pricing
+              </Link>
+            </div>
+
+            {/* CTA Button - Dark navy, exact rounded style */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <Link
+                href="/auth/signup"
+                className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-[15px] font-semibold px-8 py-3.5 rounded-[20px] shadow-lg transition-all duration-200"
+              >
+                Get Started
+              </Link>
+            </motion.div>
           </div>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Hero Section */}
-      <motion.section
-        style={{ y: heroY, opacity: heroOpacity }}
-        className="relative z-10 min-h-[90vh] flex items-center justify-center px-6 py-20"
-      >
-        <div className="max-w-7xl mx-auto text-center">
-          {/* Social Proof Badge */}
+      <section className="relative z-10 pt-12 pb-20 px-6">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Social Proof with Avatars */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm border border-blue-200/60 shadow-lg mb-8"
+            className="inline-flex items-center gap-3 mb-8"
           >
-            <Users className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium text-slate-700">
-              Trusted by <span className="text-blue-600 font-bold">10,000+</span> job seekers
-            </span>
+            {/* Avatar circles */}
+            <div className="flex -space-x-2">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-300 to-orange-400 border-[3px] border-white shadow-md" />
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-300 to-pink-400 border-[3px] border-white shadow-md" />
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-300 to-green-400 border-[3px] border-white shadow-md" />
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 to-purple-400 border-[3px] border-white shadow-md" />
+            </div>
+            <p className="text-[15px] text-slate-700 font-medium">
+              <span className="text-teal-600 font-bold">10,000+</span> job seekers trust us
+            </p>
           </motion.div>
 
-          <motion.h1
+          {/* Main Headline with Icon - Exact match */}
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-6xl md:text-7xl lg:text-8xl font-display font-bold tracking-tight mb-6"
+            transition={{ delay: 0.3 }}
+            className="mb-8"
           >
-            <span className="block text-slate-900">Land Your</span>
-            <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent animate-gradient">
-              Dream Job
-            </span>
-          </motion.h1>
+            <h1 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1] mb-0">
+              Find{' '}
+              <span className="inline-flex items-center justify-center align-middle">
+                <span className="inline-block bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-[28px] shadow-2xl mx-3 mb-2">
+                  <Briefcase className="w-[52px] h-[52px] text-white" strokeWidth={2.5} />
+                </span>
+              </span>
+              Your Dream Job
+            </h1>
+            <h2 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1]">
+              Our Career Test
+            </h2>
+          </motion.div>
 
+          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto mb-12 leading-relaxed"
+            className="text-[17px] text-slate-700 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Transform your job search with AI-powered applications.
-            <span className="block mt-2 font-medium text-slate-700">
-              Craft personalized cover letters, emails, and LinkedIn messages in seconds.
-            </span>
+            Transform your job search with our AI-powered platform. Beyond revealing your ideal work environment,
+            <br />
+            it spotlights tailor-made opportunities for you. With our guidance
           </motion.p>
 
+          {/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+            transition={{ delay: 0.6 }}
+            className="mb-20"
           >
-            <Button
-              asChild
-              size="lg"
-              className="text-lg px-8 py-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-2xl shadow-blue-500/40 transition-all duration-300 hover:scale-105"
+            <Link
+              href="/auth/signup"
+              className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-[16px] font-semibold px-10 py-4 rounded-[22px] shadow-2xl transition-all duration-200"
             >
-              <Link href="/auth/signup">
-                Start Free Now
-                <Rocket className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="text-lg px-8 py-6 border-2 border-slate-300 hover:border-blue-600 hover:bg-blue-50 transition-all duration-300"
-            >
-              <Link href="#how-it-works">
-                See How It Works
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
+              Start For Free
+            </Link>
           </motion.div>
 
-          {/* Stats */}
+          {/* Stats Cards - Tilted like in reference */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mt-20 grid grid-cols-3 gap-8 max-w-3xl mx-auto"
+            transition={{ delay: 0.8 }}
+            className="flex items-center justify-center gap-8 max-w-3xl mx-auto relative"
           >
-            {[
-              { value: "3x", label: "Faster Applications" },
-              { value: "85%", label: "Time Saved" },
-              { value: "10k+", label: "Happy Users" }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-display font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  {stat.value}
+            {/* Left Card - Student Success Metrics */}
+            <div
+              className="bg-white/80 backdrop-blur-sm rounded-[32px] p-8 shadow-2xl border border-white/60 w-[340px]"
+              style={{ transform: 'rotate(-4deg)' }}
+            >
+              <div className="flex items-start gap-4 mb-6">
+                <div className="bg-gradient-to-br from-orange-300 to-orange-400 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <Smile className="w-8 h-8 text-white" strokeWidth={2} />
                 </div>
-                <div className="text-sm text-slate-600 mt-1">{stat.label}</div>
+                <div className="text-left">
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Student Success</h3>
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Metrics</h3>
+                </div>
               </div>
-            ))}
+              <div className="text-left space-y-2">
+                <p className="text-[32px] font-bold text-slate-900 leading-none">78%</p>
+                <p className="text-[15px] font-semibold text-slate-700">Got a Job Within 3 Months</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">Our certifications open doors. 78% of</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">students land jobs within three months</p>
+              </div>
+            </div>
+
+            {/* Arrow decoration */}
+            <div className="text-purple-300 opacity-50">
+              <svg width="100" height="60" viewBox="0 0 100 60" fill="none" className="rotate-12">
+                <path
+                  d="M 10 30 Q 50 10, 85 25"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeDasharray="4 4"
+                  fill="none"
+                />
+                <path
+                  d="M 85 25 L 80 20 M 85 25 L 80 30"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+            </div>
+
+            {/* Right Card - Students Certified */}
+            <div
+              className="bg-white/80 backdrop-blur-sm rounded-[32px] p-8 shadow-2xl border border-white/60 w-[340px]"
+              style={{ transform: 'rotate(3deg)' }}
+            >
+              <div className="flex items-start gap-4 mb-6">
+                <div className="bg-gradient-to-br from-emerald-400 to-green-500 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
+                  <CheckCircle className="w-8 h-8 text-white" strokeWidth={2.5} />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Students Certified</h3>
+                </div>
+              </div>
+              <div className="text-left space-y-2">
+                <p className="text-[32px] font-bold text-slate-900 leading-none">12K+</p>
+                <p className="text-[15px] font-semibold text-slate-700">Certified In Single Month</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">In just the past month, over 12,000</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">students earned certifications</p>
+              </div>
+            </div>
           </motion.div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Story Section: The Problem */}
-      <section className="relative z-10 py-32 px-6 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+      {/* Problem Section */}
+      <section className="relative z-10 py-24 px-6 bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-display font-bold text-white mb-6">
-              The Job Hunt Struggle Is <span className="text-red-400">Real</span>
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              We Understand Your <span className="text-red-400">Challenges</span>
             </h2>
-            <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-              You're talented. You're qualified. But you're stuck in an endless cycle of...
+            <p className="text-xl text-purple-200 max-w-3xl mx-auto">
+              The job search journey can be overwhelming. You're qualified and talented, yet...
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                icon: "😓",
-                title: "Repetitive Writing",
-                description: "Spending hours crafting the same cover letter for different companies, changing just a few words each time."
+                emoji: "😓",
+                title: "Endless Applications",
+                description: "Spending countless hours writing the same cover letter repeatedly, making small tweaks for each company. Your time deserves better."
               },
               {
-                icon: "😰",
-                title: "Application Anxiety",
-                description: "Worrying if your message stands out or if it's just another generic application in the pile."
+                emoji: "😰",
+                title: "Lost in the Crowd",
+                description: "Applications disappearing into the void. Does your message stand out among hundreds? The uncertainty is exhausting."
               },
               {
-                icon: "😤",
-                title: "Tracking Chaos",
-                description: "Losing track of who you've contacted, what you sent them, and when to follow up."
+                emoji: "😤",
+                title: "Tracking Nightmare",
+                description: "Which companies did you contact? What message did you send? When to follow up? Managing everything manually is chaos."
               }
             ].map((problem, index) => (
               <motion.div
@@ -230,14 +265,14 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 hover:bg-white/15 transition-all duration-300"
+                transition={{ delay: index * 0.15 }}
+                className="bg-white/10 backdrop-blur-lg rounded-[28px] p-8 border border-white/20 hover:bg-white/15 transition-all"
               >
-                <div className="text-5xl mb-4">{problem.icon}</div>
-                <h3 className="text-2xl font-display font-bold text-white mb-3">
+                <div className="text-6xl mb-5">{problem.emoji}</div>
+                <h3 className="text-2xl font-bold text-white mb-4">
                   {problem.title}
                 </h3>
-                <p className="text-slate-300 leading-relaxed">
+                <p className="text-purple-200 leading-relaxed">
                   {problem.description}
                 </p>
               </motion.div>
@@ -246,8 +281,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Story Section: The Solution */}
-      <section id="how-it-works" className="relative z-10 py-32 px-6 bg-white">
+      {/* Solution Section */}
+      <section className="relative z-10 py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -255,136 +290,169 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-display font-bold text-slate-900 mb-6">
-              Meet Your <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">AI Assistant</span>
+            <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+              Your Personal AI <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Career Assistant</span>
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Imagine having a personal assistant who knows exactly what to say, how to say it, and keeps everything organized.
+              Imagine having an assistant who crafts perfect messages, knows what to say, and keeps everything organized. That's us.
             </p>
           </motion.div>
 
-          {/* Feature Timeline */}
           <div className="space-y-24">
-            {/* Feature 1 */}
-            <motion.div
-              initial={{ opacity: 0, x: -60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="grid md:grid-cols-2 gap-12 items-center"
-            >
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-700 font-medium mb-6">
-                  <FileText className="w-4 h-4" />
-                  Step 1
+            {/* Step 1 */}
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-100 text-purple-700 font-bold mb-6 shadow-lg">
+                  <span className="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+                  Upload Resume
                 </div>
-                <h3 className="text-4xl font-display font-bold text-slate-900 mb-4">
-                  Upload Your Resume
+                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                  Start With Your Experience
                 </h3>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                  Drop in your resume (or up to 3 versions). Our AI analyzes your experience, skills, and achievements to create personalized content.
+                  Upload your resume (PDF or DOCX). Our AI analyzes your skills, experience, and achievements instantly. Manage up to 3 versions for different roles.
                 </p>
                 <ul className="space-y-3">
-                  {["PDF, DOCX support", "Manage multiple versions", "Secure encrypted storage"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-slate-700">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      {item}
+                  {["Fast upload process", "Bank-level encryption", "Multiple resume versions"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="relative">
-                <div className="aspect-square rounded-2xl bg-gradient-to-br from-blue-100 to-indigo-100 p-8 shadow-2xl">
-                  <div className="w-full h-full bg-white rounded-xl shadow-lg flex items-center justify-center">
-                    <FileText className="w-24 h-24 text-blue-600 animate-float" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="bg-gradient-to-br from-purple-200 to-blue-200 rounded-[32px] p-12 shadow-2xl">
+                  <div className="bg-white rounded-[24px] p-10 shadow-xl">
+                    <FileText className="w-28 h-28 text-purple-600 mx-auto mb-6" strokeWidth={1.5} />
+                    <div className="space-y-3">
+                      <div className="h-3 bg-purple-200 rounded-full w-3/4 mx-auto" />
+                      <div className="h-3 bg-blue-200 rounded-full w-full mx-auto" />
+                      <div className="h-3 bg-purple-200 rounded-full w-2/3 mx-auto" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
-            {/* Feature 2 */}
-            <motion.div
-              initial={{ opacity: 0, x: 60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="grid md:grid-cols-2 gap-12 items-center"
-            >
-              <div className="md:order-2">
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 font-medium mb-6">
-                  <Brain className="w-4 h-4" />
-                  Step 2
+            {/* Step 2 */}
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="md:order-2"
+              >
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-100 text-blue-700 font-bold mb-6 shadow-lg">
+                  <span className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+                  AI Generation
                 </div>
-                <h3 className="text-4xl font-display font-bold text-slate-900 mb-4">
-                  Generate Tailored Content
+                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                  Let AI Work Its Magic
                 </h3>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                  Paste the job description. Choose your AI model (OpenAI, Claude, or Gemini). Get a perfectly crafted cover letter, email, or LinkedIn message in seconds.
+                  Paste the job description. Select your AI (OpenAI, Claude, Gemini). Get perfectly tailored content in seconds that highlights your fit.
                 </p>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-4">
                   {[
-                    { icon: FileText, label: "Cover Letters" },
-                    { icon: Mail, label: "Emails" },
-                    { icon: MessageSquare, label: "LinkedIn" }
+                    { icon: FileText, label: "Cover Letters", color: "from-blue-500 to-cyan-500" },
+                    { icon: Mail, label: "Emails", color: "from-orange-500 to-red-500" },
+                    { icon: MessageSquare, label: "LinkedIn", color: "from-purple-500 to-pink-500" }
                   ].map((item, i) => (
-                    <div key={i} className="text-center p-4 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors">
-                      <item.icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                      <div className="text-xs font-medium text-slate-700">{item.label}</div>
+                    <div key={i} className="bg-white rounded-2xl p-5 shadow-lg border border-slate-200">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} p-2.5 mx-auto mb-3 shadow-md`}>
+                        <item.icon className="w-full h-full text-white" />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-700 text-center">{item.label}</p>
                     </div>
                   ))}
                 </div>
-              </div>
-              <div className="md:order-1 relative">
-                <div className="aspect-square rounded-2xl bg-gradient-to-br from-purple-100 to-pink-100 p-8 shadow-2xl">
-                  <div className="w-full h-full bg-white rounded-xl shadow-lg flex items-center justify-center">
-                    <Sparkles className="w-24 h-24 text-purple-600 animate-pulse-glow" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="md:order-1"
+              >
+                <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded-[32px] p-12 shadow-2xl">
+                  <div className="bg-white rounded-[24px] p-10 shadow-xl relative overflow-hidden">
+                    <Sparkles className="w-28 h-28 text-blue-600 mx-auto mb-6 animate-pulse" strokeWidth={1.5} />
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 animate-pulse" />
+                    <div className="relative space-y-3">
+                      <div className="h-2.5 bg-blue-200 rounded-full w-full" />
+                      <div className="h-2.5 bg-purple-200 rounded-full w-5/6" />
+                      <div className="h-2.5 bg-blue-200 rounded-full w-4/6" />
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
-            {/* Feature 3 */}
-            <motion.div
-              initial={{ opacity: 0, x: -60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="grid md:grid-cols-2 gap-12 items-center"
-            >
-              <div>
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-100 text-green-700 font-medium mb-6">
-                  <Target className="w-4 h-4" />
-                  Step 3
+            {/* Step 3 */}
+            <div className="grid md:grid-cols-2 gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-green-100 text-green-700 font-bold mb-6 shadow-lg">
+                  <span className="w-7 h-7 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">3</span>
+                  Track Progress
                 </div>
-                <h3 className="text-4xl font-display font-bold text-slate-900 mb-4">
-                  Track & Follow Up
+                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                  Stay Organized & Follow Up
                 </h3>
                 <p className="text-lg text-slate-600 mb-6 leading-relaxed">
-                  Never lose track again. See all your applications in one place. Mark statuses (Sent, Draft, Done, Ghost). Know exactly when to follow up.
+                  All applications in one dashboard. Track statuses, schedule follow-ups, and watch your progress. Never miss an opportunity.
                 </p>
                 <ul className="space-y-3">
-                  {["Centralized history", "Status tracking", "Export your data"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-2 text-slate-700">
-                      <CheckCircle2 className="w-5 h-5 text-green-600" />
-                      {item}
+                  {["Complete history", "Status tracking (Sent, Draft, Done, Ghost)", "Export anytime"].map((item, i) => (
+                    <li key={i} className="flex items-center gap-3 text-slate-700">
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="font-medium">{item}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-              <div className="relative">
-                <div className="aspect-square rounded-2xl bg-gradient-to-br from-green-100 to-emerald-100 p-8 shadow-2xl">
-                  <div className="w-full h-full bg-white rounded-xl shadow-lg flex items-center justify-center">
-                    <TrendingUp className="w-24 h-24 text-green-600 animate-float" />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 60 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+              >
+                <div className="bg-gradient-to-br from-green-200 to-emerald-200 rounded-[32px] p-12 shadow-2xl">
+                  <div className="bg-white rounded-[24px] p-10 shadow-xl">
+                    <TrendingUp className="w-28 h-28 text-green-600 mx-auto mb-6" strokeWidth={1.5} />
+                    <div className="space-y-4">
+                      {[
+                        { color: 'bg-green-500', width: 'w-full' },
+                        { color: 'bg-blue-500', width: 'w-4/5' },
+                        { color: 'bg-orange-500', width: 'w-3/5' }
+                      ].map((bar, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className={`w-2.5 h-2.5 rounded-full ${bar.color}`} />
+                          <div className={`h-2.5 ${bar.color} bg-opacity-20 rounded-full ${bar.width}`} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits Grid */}
-      <section className="relative z-10 py-32 px-6 bg-gradient-to-br from-slate-50 to-blue-50">
+      {/* Benefits */}
+      <section className="relative z-10 py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -392,47 +460,50 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-display font-bold text-slate-900 mb-6">
-              Why Job Seekers Love Us
+            <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+              Why Choose AI Job Master
             </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              More than software—your competitive advantage
+            </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 icon: Zap,
-                title: "Lightning Fast",
-                description: "Generate professional content in seconds, not hours. Apply to more jobs with less effort.",
-                color: "from-yellow-500 to-orange-500"
+                title: "85% Time Saved",
+                description: "What took hours now takes seconds. Apply to more opportunities without exhaustion.",
+                color: "from-yellow-400 to-orange-500"
               },
               {
                 icon: Brain,
-                title: "AI-Powered",
-                description: "Choose from OpenAI, Anthropic Claude, or Google Gemini. Use your own API keys for full control.",
+                title: "Best AI Models",
+                description: "OpenAI, Claude, or Gemini. Your API keys, your control, complete privacy.",
                 color: "from-purple-500 to-pink-500"
               },
               {
                 icon: Shield,
-                title: "Secure & Private",
-                description: "Your data is encrypted and secure. We never store your API keys in plain text.",
-                color: "from-blue-500 to-indigo-500"
+                title: "Military-Grade Security",
+                description: "AES-256 encryption. Your data stays encrypted. We never see your keys.",
+                color: "from-blue-500 to-indigo-600"
               },
               {
                 icon: Target,
-                title: "Highly Personalized",
-                description: "Every application is tailored to the specific job and company. No more generic templates.",
+                title: "100% Personalized",
+                description: "Every message tailored to the role and company. Zero generic templates.",
                 color: "from-green-500 to-emerald-500"
               },
               {
-                icon: FileText,
-                title: "Custom Prompts",
-                description: "Create your own AI prompts for each content type. Make it sound exactly like you.",
+                icon: Users,
+                title: "10,000+ Community",
+                description: "Join thousands of successful job seekers achieving their goals.",
                 color: "from-red-500 to-rose-500"
               },
               {
-                icon: TrendingUp,
-                title: "Track Progress",
-                description: "See all your applications in one dashboard. Export your history anytime.",
+                icon: Clock,
+                title: "3x Faster Applications",
+                description: "Quality applications at speed. More applications equal more chances.",
                 color: "from-cyan-500 to-blue-500"
               }
             ].map((benefit, index) => (
@@ -441,13 +512,13 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-slate-200 hover:border-blue-300 hover:-translate-y-2"
+                transition={{ delay: index * 0.1 }}
+                className="group bg-gradient-to-br from-slate-50 to-purple-50/50 rounded-[28px] p-8 border border-slate-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
               >
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.color} p-3 mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <benefit.icon className="w-full h-full text-white" />
+                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${benefit.color} p-3.5 mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <benefit.icon className="w-full h-full text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-xl font-display font-bold text-slate-900 mb-3">
+                <h3 className="text-xl font-bold text-slate-900 mb-3">
                   {benefit.title}
                 </h3>
                 <p className="text-slate-600 leading-relaxed">
@@ -459,72 +530,72 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="relative z-10 py-32 px-6 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-600 overflow-hidden">
-        <div className="absolute inset-0 overflow-hidden opacity-10">
-          <div className="absolute -top-1/2 -left-1/2 w-full h-full bg-white rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-white rounded-full blur-3xl"></div>
+      {/* Final CTA */}
+      <section className="relative z-10 py-28 px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-full h-full bg-white rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-full h-full bg-white rounded-full blur-[150px] translate-x-1/2 translate-y-1/2" />
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="relative z-10 max-w-4xl mx-auto text-center"
+          className="relative max-w-4xl mx-auto text-center"
         >
-          <h2 className="text-5xl md:text-6xl font-display font-bold text-white mb-6">
-            Ready to Transform Your Job Search?
+          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            Your Dream Job Awaits
           </h2>
-          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto">
-            Join thousands of job seekers who are landing more interviews with AI-powered applications.
+          <p className="text-xl text-purple-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Stop wasting hours on repetitive work. Let AI handle the writing while you focus on what matters—landing interviews and getting hired.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              asChild
-              size="lg"
-              className="text-lg px-10 py-7 bg-white text-blue-600 hover:bg-slate-50 shadow-2xl transition-all duration-300 hover:scale-105"
+          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-12">
+            <Link
+              href="/auth/signup"
+              className="inline-block bg-white text-purple-600 hover:bg-slate-50 text-lg font-bold px-12 py-4 rounded-[22px] shadow-2xl transition-all"
             >
-              <Link href="/auth/signup">
-                Start Free Today
-                <Rocket className="ml-2 w-5 h-5" />
-              </Link>
-            </Button>
-            <p className="text-blue-100 text-sm">
-              No credit card required • Free forever
+              Start Free Today
+            </Link>
+            <p className="text-purple-100 text-sm font-medium">
+              No credit card • Free forever • 2-minute setup
             </p>
           </div>
 
-          {/* Trust Indicators */}
-          <div className="mt-16 flex flex-wrap items-center justify-center gap-8 opacity-80">
-            <div className="flex items-center gap-2 text-white">
+          <div className="flex flex-wrap items-center justify-center gap-10 opacity-90">
+            <div className="flex items-center gap-2.5 text-white">
               <Shield className="w-5 h-5" />
-              <span className="text-sm">Secure & Encrypted</span>
+              <span className="text-sm font-medium">Secure & Encrypted</span>
             </div>
-            <div className="flex items-center gap-2 text-white">
+            <div className="flex items-center gap-2.5 text-white">
               <Users className="w-5 h-5" />
-              <span className="text-sm">10,000+ Users</span>
+              <span className="text-sm font-medium">10,000+ Users</span>
             </div>
-            <div className="flex items-center gap-2 text-white">
+            <div className="flex items-center gap-2.5 text-white">
               <Zap className="w-5 h-5" />
-              <span className="text-sm">Instant Setup</span>
+              <span className="text-sm font-medium">Instant Results</span>
             </div>
           </div>
         </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-12 px-6 bg-slate-900 text-slate-400">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+      <footer className="relative z-10 py-12 px-6 bg-slate-900">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-2.5 shadow-lg">
+                <Briefcase className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <span className="text-lg font-bold text-white">AI Job Master</span>
+                <p className="text-xs text-slate-400">AI-powered career success</p>
+              </div>
             </div>
-            <span className="text-lg font-display font-bold text-white">AI Job Master</span>
+            <p className="text-sm text-slate-400">
+              © 2025 AI Job Master. Empowering careers worldwide.
+            </p>
           </div>
-          <p className="text-sm">
-            &copy; 2025 AI Job Master. Empowering job seekers with AI.
-          </p>
         </div>
       </footer>
     </div>
