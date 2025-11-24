@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import pdf from 'pdf-parse';
+import mammoth from 'mammoth';
 
 // GET - Fetch all resumes for the user
 export async function GET(req: NextRequest) {
@@ -180,24 +182,36 @@ export async function DELETE(req: NextRequest) {
 // Helper function to extract text from file
 async function extractTextFromFile(file: File): Promise<string> {
   const buffer = await file.arrayBuffer();
-  const text = Buffer.from(buffer).toString('utf-8');
-
+  
   // For TXT files, return as-is
   if (file.type === 'text/plain') {
-    return text;
+    const text = Buffer.from(buffer).toString('utf-8');
+    return text.trim();
   }
 
-  // For PDF and DOCX, we'll need additional libraries
-  // For now, return a placeholder that indicates we need to implement this
+  // For PDF files, use pdf-parse
   if (file.type === 'application/pdf') {
-    // TODO: Implement PDF text extraction using pdf-parse
-    return text; // Temporary - will need proper PDF parsing
+    try {
+      const pdfBuffer = Buffer.from(buffer);
+      const data = await pdf(pdfBuffer);
+      return data.text.trim();
+    } catch (error) {
+      console.error('PDF parsing error:', error);
+      throw new Error('Failed to parse PDF file. Please ensure it is a valid PDF document.');
+    }
   }
 
+  // For DOCX files, use mammoth
   if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-    // TODO: Implement DOCX text extraction using mammoth
-    return text; // Temporary - will need proper DOCX parsing
+    try {
+      const docxBuffer = Buffer.from(buffer);
+      const result = await mammoth.extractRawText({ buffer: docxBuffer });
+      return result.value.trim();
+    } catch (error) {
+      console.error('DOCX parsing error:', error);
+      throw new Error('Failed to parse DOCX file. Please ensure it is a valid Word document.');
+    }
   }
 
-  return text;
+  throw new Error('Unsupported file type. Please upload a .txt, .pdf, or .docx file.');
 }

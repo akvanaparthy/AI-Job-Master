@@ -32,13 +32,13 @@ export default function Home() {
       {/* Navigation */}
       <nav className="relative z-50 pt-6 pb-4 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between">
-            {/* Logo Card - Exact match */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white/90 backdrop-blur-sm rounded-[24px] px-6 py-3 shadow-lg"
-            >
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white/90 backdrop-blur-sm rounded-[32px] px-8 py-4 shadow-lg"
+          >
+            <div className="flex items-center justify-between">
+              {/* Logo - Left side */}
               <div className="flex items-center gap-2">
                 <div className="bg-slate-900 rounded-xl px-3 py-1.5">
                   <Briefcase className="w-5 h-5 text-white" />
@@ -48,44 +48,38 @@ export default function Home() {
                   <span className="text-[17px] font-bold text-slate-900 leading-tight">Master</span>
                 </div>
               </div>
-            </motion.div>
 
-            {/* Nav Links - Exact spacing and style */}
-            <div className="hidden md:flex items-center gap-12">
-              <Link href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                Features
-              </Link>
-              <Link href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                How It Works
-              </Link>
-              <Link href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                About
-              </Link>
-              <Link href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                Pricing
-              </Link>
-            </div>
+              {/* Nav Links - Center */}
+              <div className="hidden md:flex items-center gap-12">
+                <Link href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                  Features
+                </Link>
+                <Link href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                  How It Works
+                </Link>
+                <Link href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                  About
+                </Link>
+                <Link href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                  Pricing
+                </Link>
+              </div>
 
-            {/* CTA Button - Dark navy, exact rounded style */}
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
+              {/* CTA Button - Right side */}
               <Link
                 href="/auth/signup"
                 className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-[15px] font-semibold px-8 py-3.5 rounded-[20px] shadow-lg transition-all duration-200"
               >
                 Get Started
               </Link>
-            </motion.div>
-          </div>
+            </div>
+          </motion.div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-12 pb-20 px-6">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="relative z-10 min-h-[calc(100vh-100px)] flex items-center px-6 pb-32">
+        <div className="max-w-5xl mx-auto text-center w-full">
           {/* Social Proof with Avatars */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -105,7 +99,7 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Main Headline with Icon - Exact match */}
+          {/* Main Headline with Icon */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -113,7 +107,7 @@ export default function Home() {
             className="mb-8"
           >
             <h1 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1] mb-0">
-              Find{' '}
+              Land{' '}
               <span className="inline-flex items-center justify-center align-middle">
                 <span className="inline-block bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-[28px] shadow-2xl mx-3 mb-2">
                   <Briefcase className="w-[52px] h-[52px] text-white" strokeWidth={2.5} />
@@ -122,7 +116,7 @@ export default function Home() {
               Your Dream Job
             </h1>
             <h2 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1]">
-              Our Career Test
+              With AI-Powered Apps
             </h2>
           </motion.div>
 
@@ -133,9 +127,9 @@ export default function Home() {
             transition={{ delay: 0.5 }}
             className="text-[17px] text-slate-700 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            Transform your job search with our AI-powered platform. Beyond revealing your ideal work environment,
+            Generate personalized cover letters, emails, and LinkedIn messages in seconds.
             <br />
-            it spotlights tailor-made opportunities for you. With our guidance
+            Track every application and never miss a follow-up. AI does the heavy lifting.
           </motion.p>
 
           {/* CTA Button */}
@@ -160,25 +154,25 @@ export default function Home() {
             transition={{ delay: 0.8 }}
             className="flex items-center justify-center gap-8 max-w-3xl mx-auto relative"
           >
-            {/* Left Card - Student Success Metrics */}
+            {/* Left Card - Application Success */}
             <div
               className="bg-white/80 backdrop-blur-sm rounded-[32px] p-8 shadow-2xl border border-white/60 w-[340px]"
               style={{ transform: 'rotate(-4deg)' }}
             >
               <div className="flex items-start gap-4 mb-6">
                 <div className="bg-gradient-to-br from-orange-300 to-orange-400 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                  <Smile className="w-8 h-8 text-white" strokeWidth={2} />
+                  <TrendingUp className="w-8 h-8 text-white" strokeWidth={2} />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Student Success</h3>
-                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Metrics</h3>
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Application</h3>
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Success Rate</h3>
                 </div>
               </div>
               <div className="text-left space-y-2">
-                <p className="text-[32px] font-bold text-slate-900 leading-none">78%</p>
-                <p className="text-[15px] font-semibold text-slate-700">Got a Job Within 3 Months</p>
-                <p className="text-[13px] text-slate-500 leading-relaxed">Our certifications open doors. 78% of</p>
-                <p className="text-[13px] text-slate-500 leading-relaxed">students land jobs within three months</p>
+                <p className="text-[32px] font-bold text-slate-900 leading-none">3x</p>
+                <p className="text-[15px] font-semibold text-slate-700">More Interview Callbacks</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">Users applying with AI-generated content</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">get 3x more responses from recruiters</p>
               </div>
             </div>
 
@@ -201,24 +195,24 @@ export default function Home() {
               </svg>
             </div>
 
-            {/* Right Card - Students Certified */}
+            {/* Right Card - Time Saved */}
             <div
               className="bg-white/80 backdrop-blur-sm rounded-[32px] p-8 shadow-2xl border border-white/60 w-[340px]"
               style={{ transform: 'rotate(3deg)' }}
             >
               <div className="flex items-start gap-4 mb-6">
                 <div className="bg-gradient-to-br from-emerald-400 to-green-500 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg flex-shrink-0">
-                  <CheckCircle className="w-8 h-8 text-white" strokeWidth={2.5} />
+                  <Clock className="w-8 h-8 text-white" strokeWidth={2.5} />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Students Certified</h3>
+                  <h3 className="text-[19px] font-bold text-slate-900 leading-tight">Time Saved</h3>
                 </div>
               </div>
               <div className="text-left space-y-2">
-                <p className="text-[32px] font-bold text-slate-900 leading-none">12K+</p>
-                <p className="text-[15px] font-semibold text-slate-700">Certified In Single Month</p>
-                <p className="text-[13px] text-slate-500 leading-relaxed">In just the past month, over 12,000</p>
-                <p className="text-[13px] text-slate-500 leading-relaxed">students earned certifications</p>
+                <p className="text-[32px] font-bold text-slate-900 leading-none">85%</p>
+                <p className="text-[15px] font-semibold text-slate-700">Faster Application Process</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">What used to take hours now takes</p>
+                <p className="text-[13px] text-slate-500 leading-relaxed">minutes. Apply to more jobs effortlessly</p>
               </div>
             </div>
           </motion.div>
