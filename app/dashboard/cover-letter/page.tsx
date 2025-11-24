@@ -1,23 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, Download } from 'lucide-react';
+import { Loader2, Copy, Download, Sparkles, FileText, Briefcase } from 'lucide-react';
+
+interface Resume {
+  id: string;
+  title: string;
+}
 
 export default function CoverLetterPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [loadingResumes, setLoadingResumes] = useState(true);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState('');
+  const [llmModel, setLlmModel] = useState('gpt-4o');
   const [jobDescription, setJobDescription] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [positionTitle, setPositionTitle] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [length, setLength] = useState<'CONCISE' | 'MEDIUM' | 'LONG'>('MEDIUM');
   const [generatedLetter, setGeneratedLetter] = useState('');
+
+  useEffect(() => {
+    loadResumes();
+  }, []);
+
+  const loadResumes = async () => {
+    try {
+      const response = await fetch('/api/settings/resumes');
+      if (response.ok) {
+        const data = await response.json();
+        setResumes(data.resumes);
+        const defaultResume = data.resumes.find((r: any) => r.isDefault);
+        if (defaultResume) {
+          setSelectedResumeId(defaultResume.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load resumes:', error);
+    } finally {
+      setLoadingResumes(false);
+    }
+  };
 
   const handleGenerate = async () => {
     if (!jobDescription) {
@@ -31,34 +63,36 @@ export default function CoverLetterPage() {
 
     setLoading(true);
     try {
-      // TODO: Implement actual API call
-      // For now, simulate generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/generate/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeId: selectedResumeId || undefined,
+          jobDescription,
+          companyDescription: companyDescription || undefined,
+          positionTitle: positionTitle || undefined,
+          companyName: companyName || undefined,
+          length,
+          llmModel,
+        }),
+      });
 
-      const mockLetter = `Dear Hiring Manager,
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate cover letter');
+      }
 
-I am writing to express my strong interest in the ${positionTitle || 'position'} at ${companyName || 'your company'}. With my background and experience, I believe I would be an excellent fit for this role.
+      const data = await response.json();
+      setGeneratedLetter(data.content);
 
-${companyDescription ? `I am particularly drawn to ${companyName} because ${companyDescription.substring(0, 100)}...` : ''}
-
-The job description outlines requirements that align perfectly with my skills and experience. ${jobDescription.substring(0, 150)}...
-
-I am excited about the opportunity to contribute to your team and would welcome the chance to discuss how my background and skills would benefit ${companyName || 'your organization'}.
-
-Thank you for considering my application.
-
-Sincerely,
-[Your Name]`;
-
-      setGeneratedLetter(mockLetter);
       toast({
         title: 'Success',
         description: 'Cover letter generated successfully!',
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'Failed to generate cover letter',
+        description: error.message || 'Failed to generate cover letter',
         variant: 'destructive',
       });
     } finally {
@@ -75,133 +109,230 @@ Sincerely,
   };
 
   return (
-    <div className="max-w-6xl">
+    <div className="max-w-7xl mx-auto">
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Cover Letter Generator</h1>
-        <p className="text-muted-foreground mt-2">
-          Generate personalized cover letters based on job descriptions
-        </p>
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg">
+            <FileText className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-display font-bold text-slate-900">Cover Letter Generator</h1>
+            <p className="text-slate-600 mt-1">
+              Generate personalized cover letters powered by AI
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Input Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Job Details</CardTitle>
-            <CardDescription>
-              Enter the job information to generate a tailored cover letter
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="position">Position Title (Optional)</Label>
-              <input
-                id="position"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="e.g., Senior Software Engineer"
-                value={positionTitle}
-                onChange={(e) => setPositionTitle(e.target.value)}
-              />
-            </div>
+        <div className="space-y-6">
+          <Card className="border-slate-200 shadow-lg">
+            <CardHeader className="border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/30">
+              <CardTitle className="flex items-center gap-2">
+                <Briefcase className="w-5 h-5 text-blue-600" />
+                Job Details
+              </CardTitle>
+              <CardDescription>
+                Fill in the information below to generate your cover letter
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5 pt-6">
+              {/* Resume Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="resume" className="text-sm font-medium text-slate-700">
+                  Resume
+                </Label>
+                <Select
+                  value={selectedResumeId}
+                  onValueChange={setSelectedResumeId}
+                  disabled={loadingResumes}
+                >
+                  <SelectTrigger id="resume" className="bg-white">
+                    <SelectValue placeholder={loadingResumes ? "Loading..." : "Select a resume"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resumes.map((resume) => (
+                      <SelectItem key={resume.id} value={resume.id}>
+                        {resume.title}
+                      </SelectItem>
+                    ))}
+                    {resumes.length === 0 && (
+                      <SelectItem value="none" disabled>No resumes uploaded</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-slate-500">
+                  Upload resumes in Settings
+                </p>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="company">Company Name (Optional)</Label>
-              <input
-                id="company"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                placeholder="e.g., Tech Corp"
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-              />
-            </div>
+              {/* AI Model */}
+              <div className="space-y-2">
+                <Label htmlFor="model" className="text-sm font-medium text-slate-700">
+                  AI Model
+                </Label>
+                <Select value={llmModel} onValueChange={setLlmModel}>
+                  <SelectTrigger id="model" className="bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4o">GPT-4o (OpenAI)</SelectItem>
+                    <SelectItem value="gpt-4o-mini">GPT-4o Mini (OpenAI)</SelectItem>
+                    <SelectItem value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet</SelectItem>
+                    <SelectItem value="claude-3-5-haiku-20241022">Claude 3.5 Haiku</SelectItem>
+                    <SelectItem value="gemini-2.0-flash-exp">Gemini 2.0 Flash</SelectItem>
+                    <SelectItem value="gemini-exp-1206">Gemini Exp</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="jobDescription">Job Description *</Label>
-              <Textarea
-                id="jobDescription"
-                placeholder="Paste the full job description here..."
-                className="min-h-[200px]"
-                value={jobDescription}
-                onChange={(e) => setJobDescription(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="companyDescription">Company Description (Optional)</Label>
-              <Textarea
-                id="companyDescription"
-                placeholder="What do you know about the company?"
-                className="min-h-[100px]"
-                value={companyDescription}
-                onChange={(e) => setCompanyDescription(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Length</Label>
-              <Select value={length} onValueChange={(value: any) => setLength(value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="CONCISE">Concise</SelectItem>
-                  <SelectItem value="MEDIUM">Medium</SelectItem>
-                  <SelectItem value="LONG">Long</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Button
-              onClick={handleGenerate}
-              disabled={loading || !jobDescription}
-              className="w-full"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                'Generate Cover Letter'
-              )}
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Output */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Generated Cover Letter</CardTitle>
-            <CardDescription>
-              Your AI-generated cover letter will appear here
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {generatedLetter ? (
-              <div className="space-y-4">
-                <Textarea
-                  value={generatedLetter}
-                  onChange={(e) => setGeneratedLetter(e.target.value)}
-                  className="min-h-[500px] font-mono text-sm"
-                />
-                <div className="flex gap-2">
-                  <Button onClick={copyToClipboard} variant="outline" className="flex-1">
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy
-                  </Button>
-                  <Button variant="outline" className="flex-1">
-                    <Download className="mr-2 h-4 w-4" />
-                    Save
-                  </Button>
+              {/* Position & Company */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="position" className="text-sm font-medium text-slate-700">
+                    Position Title
+                  </Label>
+                  <Input
+                    id="position"
+                    placeholder="Senior Engineer"
+                    value={positionTitle}
+                    onChange={(e) => setPositionTitle(e.target.value)}
+                    className="bg-white"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="company" className="text-sm font-medium text-slate-700">
+                    Company Name
+                  </Label>
+                  <Input
+                    id="company"
+                    placeholder="Tech Corp"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="bg-white"
+                  />
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center justify-center h-[500px] text-muted-foreground">
-                Fill in the job details and click generate
+
+              {/* Job Description */}
+              <div className="space-y-2">
+                <Label htmlFor="jobDescription" className="text-sm font-medium text-slate-700">
+                  Job Description <span className="text-red-500">*</span>
+                </Label>
+                <Textarea
+                  id="jobDescription"
+                  placeholder="Paste the full job description here..."
+                  className="min-h-[160px] bg-white resize-none"
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                />
               </div>
-            )}
-          </CardContent>
-        </Card>
+
+              {/* Company Description */}
+              <div className="space-y-2">
+                <Label htmlFor="companyDescription" className="text-sm font-medium text-slate-700">
+                  Company Description
+                </Label>
+                <Textarea
+                  id="companyDescription"
+                  placeholder="What do you know about the company? (Optional)"
+                  className="min-h-[80px] bg-white resize-none"
+                  value={companyDescription}
+                  onChange={(e) => setCompanyDescription(e.target.value)}
+                />
+              </div>
+
+              {/* Length */}
+              <div className="space-y-2">
+                <Label htmlFor="length" className="text-sm font-medium text-slate-700">
+                  Length
+                </Label>
+                <Select value={length} onValueChange={(value: any) => setLength(value)}>
+                  <SelectTrigger id="length" className="bg-white">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="CONCISE">Concise (~250 words)</SelectItem>
+                    <SelectItem value="MEDIUM">Medium (~400 words)</SelectItem>
+                    <SelectItem value="LONG">Long (~600 words)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Generate Button */}
+              <Button
+                onClick={handleGenerate}
+                disabled={loading || !jobDescription}
+                className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg shadow-blue-500/30 h-12"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Generate Cover Letter
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Output */}
+        <div className="space-y-6">
+          <Card className="border-slate-200 shadow-lg">
+            <CardHeader className="border-b border-slate-100 bg-gradient-to-br from-slate-50 to-blue-50/30">
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-blue-600" />
+                Generated Cover Letter
+              </CardTitle>
+              <CardDescription>
+                Your AI-generated cover letter will appear here
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6">
+              {generatedLetter ? (
+                <div className="space-y-4">
+                  <Textarea
+                    value={generatedLetter}
+                    onChange={(e) => setGeneratedLetter(e.target.value)}
+                    className="min-h-[580px] bg-white font-sans text-sm leading-relaxed resize-none"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      onClick={copyToClipboard}
+                      variant="outline"
+                      className="border-blue-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                    >
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="border-green-200 hover:bg-green-50 hover:border-green-300 hover:text-green-700"
+                    >
+                      <Download className="mr-2 h-4 w-4" />
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center h-[580px] text-slate-400">
+                  <FileText className="w-20 h-20 mb-4 opacity-20" />
+                  <p className="text-center">
+                    Fill in the job details and click generate<br />
+                    <span className="text-sm">Your cover letter will appear here</span>
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

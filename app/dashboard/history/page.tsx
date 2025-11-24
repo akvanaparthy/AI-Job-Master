@@ -1,57 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Filter, Download, Eye } from 'lucide-react';
+import { Search, Filter, Download, Eye, Loader2 } from 'lucide-react';
 
-// Mock data
-const mockHistory = [
-  {
-    id: '1',
-    type: 'Cover Letter',
-    company: 'Tech Corp',
-    position: 'Senior Engineer',
-    status: 'SENT',
-    createdAt: '2024-01-15',
-  },
-  {
-    id: '2',
-    type: 'LinkedIn',
-    company: 'StartupXYZ',
-    position: 'Product Manager',
-    status: 'DRAFT',
-    createdAt: '2024-01-14',
-  },
-  {
-    id: '3',
-    type: 'Email',
-    company: 'BigCo Inc',
-    position: 'Data Scientist',
-    status: 'SENT',
-    createdAt: '2024-01-13',
-  },
-  {
-    id: '4',
-    type: 'LinkedIn',
-    company: 'InnovateLabs',
-    position: 'UX Designer',
-    status: 'GHOST',
-    createdAt: '2024-01-10',
-  },
-  {
-    id: '5',
-    type: 'Cover Letter',
-    company: 'Enterprise Solutions',
-    position: 'DevOps Engineer',
-    status: 'DONE',
-    createdAt: '2024-01-08',
-  },
-];
+interface HistoryItem {
+  id: string;
+  type: 'Cover Letter' | 'LinkedIn' | 'Email';
+  company: string;
+  position: string;
+  status: string;
+  createdAt: string;
+  content?: string;
+  subject?: string;
+  body?: string;
+  messageType?: string;
+}
 
 const statusColors = {
   DRAFT: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20',
@@ -61,18 +30,55 @@ const statusColors = {
 };
 
 export default function HistoryPage() {
+  const [loading, setLoading] = useState(true);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
 
-  const filteredHistory = mockHistory.filter((item) => {
-    const matchesSearch =
-      item.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.position.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesType = filterType === 'ALL' || item.type === filterType;
-    const matchesStatus = filterStatus === 'ALL' || item.status === filterStatus;
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  useEffect(() => {
+    loadHistory();
+  }, []);
+
+  const loadHistory = async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (filterType !== 'ALL') params.append('type', filterType);
+      if (filterStatus !== 'ALL') params.append('status', filterStatus);
+      if (searchQuery) params.append('search', searchQuery);
+
+      const response = await fetch(`/api/history?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setHistory(data.history);
+      }
+    } catch (error) {
+      console.error('Failed to load history:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reload when filters change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadHistory();
+    }, 300); // Debounce search
+    return () => clearTimeout(timer);
+  }, [searchQuery, filterType, filterStatus]);
+
+  const filteredHistory = history;
+
+  const handleExportCSV = () => {
+    const params = new URLSearchParams();
+    if (filterType !== 'ALL') params.append('type', filterType);
+    if (filterStatus !== 'ALL') params.append('status', filterStatus);
+    if (searchQuery) params.append('search', searchQuery);
+
+    // Open in new tab to trigger download
+    window.open(`/api/history/export?${params.toString()}`, '_blank');
+  };
 
   return (
     <div className="max-w-7xl">
@@ -125,7 +131,7 @@ export default function HistoryPage() {
               </SelectContent>
             </Select>
 
-            <Button variant="outline" className="gap-2">
+            <Button variant="outline" className="gap-2" onClick={handleExportCSV}>
               <Download className="h-4 w-4" />
               Export CSV
             </Button>
@@ -146,55 +152,63 @@ export default function HistoryPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Company</TableHead>
-                  <TableHead>Position</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredHistory.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                      No applications found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  filteredHistory.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.type}</TableCell>
-                      <TableCell>{item.company}</TableCell>
-                      <TableCell>{item.position}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className={statusColors[item.status as keyof typeof statusColors]}>
-                          {item.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(item.createdAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {filteredHistory.length > 0 && (
-            <div className="mt-4 text-sm text-muted-foreground">
-              Showing {filteredHistory.length} of {mockHistory.length} total applications
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
+          ) : (
+            <>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Company</TableHead>
+                      <TableHead>Position</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredHistory.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                          No applications found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredHistory.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">{item.type}</TableCell>
+                          <TableCell>{item.company}</TableCell>
+                          <TableCell>{item.position}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={statusColors[item.status as keyof typeof statusColors]}>
+                              {item.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground">
+                            {new Date(item.createdAt).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="sm">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {filteredHistory.length > 0 && (
+                <div className="mt-4 text-sm text-muted-foreground">
+                  Showing {filteredHistory.length} total applications
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

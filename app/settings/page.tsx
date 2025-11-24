@@ -1,6 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, FileText, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
 import ApiKeyManager from '@/components/settings/ApiKeyManager';
+import ResumeManager from '@/components/settings/ResumeManager';
+import CustomPromptsManager from '@/components/settings/CustomPromptsManager';
+import UserPreferencesManager from '@/components/settings/UserPreferencesManager';
 
 export default function SettingsPage() {
   return (
@@ -37,21 +40,15 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="resumes">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Resume management coming soon...</p>
-          </div>
+          <ResumeManager />
         </TabsContent>
 
         <TabsContent value="prompts">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Custom prompts coming soon...</p>
-          </div>
+          <CustomPromptsManager />
         </TabsContent>
 
         <TabsContent value="preferences">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">User preferences coming soon...</p>
-          </div>
+          <UserPreferencesManager />
         </TabsContent>
       </Tabs>
     </div>

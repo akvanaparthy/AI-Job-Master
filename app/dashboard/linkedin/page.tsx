@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,9 +11,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Copy, Send } from 'lucide-react';
 
+interface Resume {
+  id: string;
+  title: string;
+}
+
 export default function LinkedInPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [loadingResumes, setLoadingResumes] = useState(true);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState('');
+  const [llmModel, setLlmModel] = useState('gpt-4o-mini');
   const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP'>('NEW');
 
   // Form fields
@@ -27,6 +36,28 @@ export default function LinkedInPage() {
   const [status, setStatus] = useState<'DRAFT' | 'SENT'>('SENT');
   const [generatedMessage, setGeneratedMessage] = useState('');
 
+  useEffect(() => {
+    loadResumes();
+  }, []);
+
+  const loadResumes = async () => {
+    try {
+      const response = await fetch('/api/settings/resumes');
+      if (response.ok) {
+        const data = await response.json();
+        setResumes(data.resumes);
+        const defaultResume = data.resumes.find((r: any) => r.isDefault);
+        if (defaultResume) {
+          setSelectedResumeId(defaultResume.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load resumes:', error);
+    } finally {
+      setLoadingResumes(false);
+    }
+  };
+
   const handleGenerate = async () => {
     if (!positionTitle || !companyName) {
       toast({
@@ -39,41 +70,39 @@ export default function LinkedInPage() {
 
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/generate/linkedin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeId: selectedResumeId || undefined,
+          messageType,
+          linkedinUrl: linkedinUrl || undefined,
+          recipientName: recipientName || undefined,
+          positionTitle,
+          companyName,
+          jobDescription: jobDescription || undefined,
+          companyDescription: companyDescription || undefined,
+          length,
+          llmModel,
+        }),
+      });
 
-      const mockMessage = messageType === 'NEW'
-        ? `Hi ${recipientName || 'there'},
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate message');
+      }
 
-I hope this message finds you well! I came across the ${positionTitle} position at ${companyName} and was immediately drawn to it.
+      const data = await response.json();
+      setGeneratedMessage(data.content);
 
-${companyDescription ? `What excites me most about ${companyName} is ${companyDescription.substring(0, 80)}...` : ''}
-
-With my background in ${jobDescription.substring(0, 50) || 'the field'}..., I believe I could bring valuable expertise to your team.
-
-Would you be open to a brief conversation about this opportunity?
-
-Best regards,
-[Your Name]`
-        : `Hi ${recipientName || 'there'},
-
-I wanted to follow up on my previous message about the ${positionTitle} role at ${companyName}.
-
-I remain very interested in this opportunity and would love to discuss how my experience aligns with your needs.
-
-Would you have time for a quick call this week?
-
-Thanks for your consideration!
-[Your Name]`;
-
-      setGeneratedMessage(mockMessage);
       toast({
         title: 'Success',
         description: 'LinkedIn message generated successfully!',
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'Failed to generate message',
+        description: error.message || 'Failed to generate message',
         variant: 'destructive',
       });
     } finally {
@@ -116,6 +145,46 @@ Thanks for your consideration!
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Resume</Label>
+                <Select
+                  value={selectedResumeId}
+                  onValueChange={setSelectedResumeId}
+                  disabled={loadingResumes}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingResumes ? "Loading..." : "Select a resume"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resumes.map((resume) => (
+                      <SelectItem key={resume.id} value={resume.id}>
+                        {resume.title}
+                      </SelectItem>
+                    ))}
+                    {resumes.length === 0 && (
+                      <SelectItem value="none" disabled>No resumes uploaded</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>AI Model</Label>
+                <Select value={llmModel} onValueChange={setLlmModel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4o">GPT-4o (OpenAI)</SelectItem>
+                    <SelectItem value="gpt-4o-mini">GPT-4o Mini (OpenAI)</SelectItem>
+                    <SelectItem value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (Anthropic)</SelectItem>
+                    <SelectItem value="claude-3-5-haiku-20241022">Claude 3.5 Haiku (Anthropic)</SelectItem>
+                    <SelectItem value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Google)</SelectItem>
+                    <SelectItem value="gemini-exp-1206">Gemini Exp (Google)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {messageType === 'NEW' && (
                 <>
                   <div className="space-y-2">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,9 +11,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Copy, Send } from 'lucide-react';
 
+interface Resume {
+  id: string;
+  title: string;
+}
+
 export default function EmailPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [loadingResumes, setLoadingResumes] = useState(true);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [selectedResumeId, setSelectedResumeId] = useState('');
+  const [llmModel, setLlmModel] = useState('gpt-4o');
   const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP'>('NEW');
 
   const [recipientEmail, setRecipientEmail] = useState('');
@@ -27,6 +36,28 @@ export default function EmailPage() {
   const [generatedSubject, setGeneratedSubject] = useState('');
   const [generatedBody, setGeneratedBody] = useState('');
 
+  useEffect(() => {
+    loadResumes();
+  }, []);
+
+  const loadResumes = async () => {
+    try {
+      const response = await fetch('/api/settings/resumes');
+      if (response.ok) {
+        const data = await response.json();
+        setResumes(data.resumes);
+        const defaultResume = data.resumes.find((r: any) => r.isDefault);
+        if (defaultResume) {
+          setSelectedResumeId(defaultResume.id);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load resumes:', error);
+    } finally {
+      setLoadingResumes(false);
+    }
+  };
+
   const handleGenerate = async () => {
     if (!recipientEmail || !positionTitle || !companyName) {
       toast({
@@ -39,50 +70,40 @@ export default function EmailPage() {
 
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/generate/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeId: selectedResumeId || undefined,
+          messageType,
+          recipientEmail,
+          recipientName: recipientName || undefined,
+          positionTitle,
+          companyName,
+          jobDescription: jobDescription || undefined,
+          companyDescription: companyDescription || undefined,
+          length,
+          llmModel,
+        }),
+      });
 
-      if (messageType === 'NEW') {
-        setGeneratedSubject(`Application for ${positionTitle} Position at ${companyName}`);
-        setGeneratedBody(`Dear ${recipientName || 'Hiring Manager'},
-
-I am writing to express my strong interest in the ${positionTitle} position at ${companyName}. With my background and skills, I am confident I would be a valuable addition to your team.
-
-${companyDescription ? `I am particularly impressed by ${companyName}'s ${companyDescription.substring(0, 100)}...` : ''}
-
-${jobDescription ? `The requirements outlined in the job description align well with my experience in ${jobDescription.substring(0, 100)}...` : ''}
-
-I have attached my resume for your review. I would welcome the opportunity to discuss how my skills and experience can contribute to ${companyName}'s continued success.
-
-Thank you for considering my application. I look forward to hearing from you.
-
-Best regards,
-[Your Name]
-[Your Phone]
-[Your LinkedIn]`);
-      } else {
-        setGeneratedSubject(`Following up: ${positionTitle} Application`);
-        setGeneratedBody(`Dear ${recipientName || 'Hiring Manager'},
-
-I wanted to follow up on my application for the ${positionTitle} position at ${companyName}, which I submitted on [date].
-
-I remain very interested in this opportunity and believe my qualifications would make me a strong fit for your team.
-
-If you need any additional information or would like to schedule a conversation, please don't hesitate to reach out.
-
-Thank you for your time and consideration.
-
-Best regards,
-[Your Name]`);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to generate email');
       }
+
+      const data = await response.json();
+      setGeneratedSubject(data.subject);
+      setGeneratedBody(data.body);
 
       toast({
         title: 'Success',
         description: 'Email generated successfully!',
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'Failed to generate email',
+        description: error.message || 'Failed to generate email',
         variant: 'destructive',
       });
     } finally {
@@ -124,6 +145,46 @@ Best regards,
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label>Resume</Label>
+                <Select
+                  value={selectedResumeId}
+                  onValueChange={setSelectedResumeId}
+                  disabled={loadingResumes}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loadingResumes ? "Loading..." : "Select a resume"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {resumes.map((resume) => (
+                      <SelectItem key={resume.id} value={resume.id}>
+                        {resume.title}
+                      </SelectItem>
+                    ))}
+                    {resumes.length === 0 && (
+                      <SelectItem value="none" disabled>No resumes uploaded</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label>AI Model</Label>
+                <Select value={llmModel} onValueChange={setLlmModel}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4o">GPT-4o (OpenAI)</SelectItem>
+                    <SelectItem value="gpt-4o-mini">GPT-4o Mini (OpenAI)</SelectItem>
+                    <SelectItem value="claude-3-5-sonnet-20241022">Claude 3.5 Sonnet (Anthropic)</SelectItem>
+                    <SelectItem value="claude-3-5-haiku-20241022">Claude 3.5 Haiku (Anthropic)</SelectItem>
+                    <SelectItem value="gemini-2.0-flash-exp">Gemini 2.0 Flash (Google)</SelectItem>
+                    <SelectItem value="gemini-exp-1206">Gemini Exp (Google)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="recipientEmail">Recipient Email *</Label>
                 <Input

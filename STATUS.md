@@ -99,13 +99,13 @@
 - [ ] Display configured keys status
 
 #### 2. Settings - Resume Management
-- [ ] Resume upload component (PDF/DOCX)
-- [ ] File upload to Supabase Storage
-- [ ] Text extraction from PDF/DOCX
-- [ ] Display all resumes (max 3)
-- [ ] Set default resume
-- [ ] Delete resume functionality
-- [ ] Validation: Block upload if 3 exist
+- [x] Resume upload component (UI is there, but extraction is broken)
+- [ ] File upload to Supabase Storage (Not implemented; text saved to DB)
+- [ ] Text extraction from PDF/DOCX (Broken; needs `pdf-parse` and `mammoth`)
+- [x] Display all resumes (max 3)
+- [x] Set default resume
+- [x] Delete resume functionality
+- [x] Validation: Block upload if 3 exist
 
 #### 3. Settings - Custom Prompts
 - [ ] Create/edit custom prompt forms
@@ -132,8 +132,8 @@
 - [ ] Save generated cover letters
 - [ ] Save LinkedIn messages (with 2-message limit)
 - [ ] Save email messages
-- [ ] Load history from database
-- [ ] Update status functionality
+- [x] Load history from database (partial: resume display is working)
+- [x] Update status functionality (partial: resume deletion/default is working)
 - [ ] Follow-up message logic
 
 #### 7. Resume Integration
@@ -212,7 +212,7 @@
 - **API Routes**: 10% Complete 🔄
 - **AI Integration**: 5% Complete 🔄
 - **Settings Features**: 0% Complete ❌
-- **Database Integration**: 0% Complete ❌
+- **Database Integration**: 10% Complete 🔄
 
 **Overall Progress: ~40%**
 
@@ -227,6 +227,8 @@
 5. **Testing**: No tests written yet
 6. **Security**: API key encryption in place, needs audit
 7. **Performance**: No optimization done yet
+8. **Resume Text Extraction**: PDF/DOCX text extraction is currently broken (needs `pdf-parse` and `mammoth` implementation).
+9. **Resume Storage Strategy**: Resume content is stored directly in the database as text; initial schema implies file upload to Supabase Storage. A decision is needed to either fix text extraction or re-architect to use Supabase Storage.
 
 ---
 
@@ -246,11 +248,11 @@
 
 ## 📝 Notes
 
-- Database is fully connected and ready
+- Database is fully connected and ready for basic operations (user, resume display/delete).
 - All UI pages are responsive and animated
 - Authentication flow is complete
 - Glassmorphism design implemented throughout
 - Prisma schema supports all required features
 - AI provider libraries are ready for integration
 
-**The app is visually complete and structurally sound. Main work remaining is connecting the UI to the database and implementing the actual AI generation logic.**
+**The app is visually complete and structurally sound. Main work remaining is connecting the UI to the database for content saving and implementing the actual AI generation logic.**
