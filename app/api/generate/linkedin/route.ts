@@ -43,33 +43,35 @@ export async function POST(req: NextRequest) {
     }
 
     // Check 2-message limit per recipient
-    if (linkedinUrl) {
-      const existingMessages = await prisma.linkedInMessage.count({
+    if (linkedinUrl && messageType === 'FOLLOW_UP') {
+      // For follow-ups, verify an initial message exists and we haven't exceeded limit
+      const existingMessages = await prisma.linkedInMessage.findMany({
         where: {
           userId: user.id,
           linkedinUrl,
         },
+        orderBy: {
+          createdAt: 'asc',
+        },
       });
 
-      if (messageType === 'NEW' && existingMessages >= 1) {
+      if (existingMessages.length === 0) {
         return NextResponse.json(
-          { error: 'Already sent initial message to this recipient' },
+          { error: 'No initial message found. Send a NEW message first.' },
           { status: 400 }
         );
       }
 
-      if (messageType === 'FOLLOW_UP' && existingMessages >= 2) {
+      if (existingMessages.length >= 2) {
         return NextResponse.json(
-          { error: 'Already sent follow-up message to this recipient' },
+          { error: 'Already sent 2 messages to this recipient (1 initial + 1 follow-up)' },
           { status: 400 }
         );
       }
 
-      if (messageType === 'FOLLOW_UP' && existingMessages === 0) {
-        return NextResponse.json(
-          { error: 'No initial message found for follow-up' },
-          { status: 400 }
-        );
+      // For follow-ups without explicit parentMessageId, use the most recent message
+      if (!parentMessageId) {
+        body.parentMessageId = existingMessages[existingMessages.length - 1].id;
       }
     }
 

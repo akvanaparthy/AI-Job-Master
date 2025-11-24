@@ -145,26 +145,36 @@ export async function POST(req: NextRequest) {
     });
 
     // Parse subject and body from generated content
-    // Expected format: "Subject: ...\n\nBody: ..."
+    // Expected format: "Subject: ...\n\nBody: ..." or just "Subject: ...\n\n<email content>"
     const lines = generatedContent.split('\n');
     let subject = '';
     let body = '';
 
-    const subjectLine = lines.find(line => line.toLowerCase().startsWith('subject:'));
-    if (subjectLine) {
-      subject = subjectLine.replace(/^subject:\s*/i, '').trim();
-    }
-
-    const bodyStartIndex = lines.findIndex(line => line.toLowerCase().startsWith('subject:'));
-    if (bodyStartIndex !== -1) {
-      body = lines.slice(bodyStartIndex + 1)
-        .filter(line => !line.toLowerCase().startsWith('body:'))
+    const subjectLineIndex = lines.findIndex(line => line.toLowerCase().startsWith('subject:'));
+    
+    if (subjectLineIndex !== -1) {
+      // Extract subject
+      subject = lines[subjectLineIndex].replace(/^subject:\s*/i, '').trim();
+      
+      // Extract body - everything after subject line, skipping "Body:" label if present
+      body = lines.slice(subjectLineIndex + 1)
+        .filter((line, index) => {
+          // Skip the first line if it says "Body:" or is empty
+          if (index === 0 && (line.toLowerCase().startsWith('body:') || line.trim() === '')) {
+            return false;
+          }
+          return true;
+        })
         .join('\n')
         .trim();
-    } else {
-      // If no subject line found, treat entire content as body
-      body = generatedContent;
-      subject = `Application for ${positionTitle} at ${companyName}`;
+    }
+    
+    // Fallback: if no subject found or body is empty, use entire content as body
+    if (!subject || !body) {
+      body = generatedContent.replace(/^subject:\s*.+\n*/i, '').trim() || generatedContent;
+      if (!subject) {
+        subject = `Application for ${positionTitle} at ${companyName}`;
+      }
     }
 
     // Save to database
