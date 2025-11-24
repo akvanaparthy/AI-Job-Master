@@ -126,10 +126,10 @@ model LinkedInMessage {
   createdAt           DateTime        @default(now())
   updatedAt           DateTime        @updatedAt
 
-  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume              Resume?         @relation(fields: [resumeId], references: [id], onDelete: SetNull)
-  parentMessage       LinkedInMessage? @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
-  followUpMessage     LinkedInMessage? @relation("LinkedInFollowUp")
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resume              Resume?           @relation(fields: [resumeId], references: [id], onDelete: SetNull)
+  parentMessage       LinkedInMessage?  @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
+  followUpMessages    LinkedInMessage[] @relation("LinkedInFollowUp")
 
   @@map("linkedin_messages")
   @@index([userId, status])
