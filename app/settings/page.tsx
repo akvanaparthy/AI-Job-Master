@@ -1,0 +1,60 @@
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Key, FileText, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
+
+export default function SettingsPage() {
+  return (
+    <div className="max-w-6xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold">Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your API keys, resumes, prompts, and preferences
+        </p>
+      </div>
+
+      <Tabs defaultValue="api-keys" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="api-keys" className="flex items-center gap-2">
+            <Key className="h-4 w-4" />
+            API Keys
+          </TabsTrigger>
+          <TabsTrigger value="resumes" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Resumes
+          </TabsTrigger>
+          <TabsTrigger value="prompts" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Prompts
+          </TabsTrigger>
+          <TabsTrigger value="preferences" className="flex items-center gap-2">
+            <SettingsIcon className="h-4 w-4" />
+            Preferences
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="api-keys">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">API Keys management coming soon...</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="resumes">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Resume management coming soon...</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="prompts">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Custom prompts coming soon...</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="preferences">
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">User preferences coming soon...</p>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}

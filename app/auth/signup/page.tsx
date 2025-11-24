@@ -60,7 +60,7 @@ export default function SignupPage() {
       } else {
         toast({
           title: 'Success',
-          description: 'Account created! Please check your email to verify your account.',
+          description: 'Account created! Check your email to verify.',
         });
         router.push('/auth/login');
       }
@@ -76,18 +76,20 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Sign Up</CardTitle>
-          <CardDescription>
-            Create an account to get started with AI Job Master
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 p-4">
+      <Card className="w-full max-w-md border-slate-800 bg-slate-900/40 backdrop-blur-xl">
+        <CardHeader className="space-y-1 text-center">
+          <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+            Create Account
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            Sign up to start using AI Job Master
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSignup}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-slate-300">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -96,10 +98,11 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="bg-slate-800/50 border-slate-700 text-slate-100"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-slate-300">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -108,10 +111,11 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                className="bg-slate-800/50 border-slate-700 text-slate-100"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className="text-slate-300">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -120,20 +124,21 @@ export default function SignupPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 disabled={loading}
+                className="bg-slate-800/50 border-slate-700 text-slate-100"
               />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               disabled={loading}
             >
               {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
-            <p className="text-sm text-center text-muted-foreground">
+            <p className="text-sm text-center text-slate-400">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-primary hover:underline">
+              <Link href="/auth/login" className="text-blue-400 hover:text-blue-300">
                 Login
               </Link>
             </p>
