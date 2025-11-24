@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, FileText, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
+import ApiKeyManager from '@/components/settings/ApiKeyManager';
 
 export default function SettingsPage() {
   return (
@@ -32,9 +33,7 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="api-keys">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">API Keys management coming soon...</p>
-          </div>
+          <ApiKeyManager />
         </TabsContent>
 
         <TabsContent value="resumes">
