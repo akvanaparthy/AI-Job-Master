@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { ensureUserExists } from '@/lib/auth-helpers';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 
@@ -49,6 +50,9 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    // Ensure user exists in database
+    await ensureUserExists(user);
 
     // Check current resume count
     const resumeCount = await prisma.resume.count({

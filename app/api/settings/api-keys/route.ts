@@ -14,19 +14,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user's API key status (don't return actual keys)
-    const dbUser = await prisma.user.findUnique({
+    // Ensure user exists in database
+    const dbUser = await prisma.user.upsert({
       where: { id: user.id },
+      update: {},
+      create: {
+        id: user.id,
+        email: user.email!,
+      },
       select: {
         openaiApiKey: true,
         anthropicApiKey: true,
         geminiApiKey: true,
       },
     });
-
-    if (!dbUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
 
     return NextResponse.json({
       hasOpenaiKey: !!dbUser.openaiApiKey,
