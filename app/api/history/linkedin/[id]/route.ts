@@ -3,6 +3,46 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 
+// GET - Fetch a single LinkedIn message
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Fetch the LinkedIn message
+    const message = await prisma.linkedInMessage.findFirst({
+      where: {
+        id: params.id,
+        userId: user.id,
+      },
+    });
+
+    if (!message) {
+      return NextResponse.json(
+        { error: 'LinkedIn message not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message });
+  } catch (error: any) {
+    console.error('Fetch LinkedIn message error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch LinkedIn message' },
+      { status: 500 }
+    );
+  }
+}
+
 // PATCH - Update LinkedIn message status
 export async function PATCH(
   req: NextRequest,

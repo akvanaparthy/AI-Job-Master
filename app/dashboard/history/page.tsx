@@ -8,14 +8,21 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2 } from 'lucide-react';
+import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2, Eye, Trash2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface HistoryItem {
   id: string;
   type: 'Cover Letter' | 'LinkedIn' | 'Email';
   company: string;
   position: string;
-  status: string;
+  status?: string;
   createdAt: string;
   content?: string;
   subject?: string;
@@ -59,6 +66,9 @@ export default function HistoryPage() {
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [exporting, setExporting] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [loadingItem, setLoadingItem] = useState(false);
 
   useEffect(() => {
     loadHistory();
@@ -131,6 +141,53 @@ export default function HistoryPage() {
       toast({ title: 'Error', description: 'Failed to export history', variant: 'destructive' });
     } finally {
       setExporting(false);
+    }
+  };
+
+  const handleViewItem = async (item: HistoryItem) => {
+    setLoadingItem(true);
+    setViewDialogOpen(true);
+    try {
+      const endpoint =
+        item.type === 'Cover Letter'
+          ? `/api/history/cover-letter/${item.id}`
+          : item.type === 'LinkedIn'
+          ? `/api/history/linkedin/${item.id}`
+          : `/api/history/email/${item.id}`;
+
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error('Failed to fetch item');
+
+      const data = await response.json();
+      setSelectedItem(data.coverLetter || data.message);
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to load content', variant: 'destructive' });
+      setViewDialogOpen(false);
+    } finally {
+      setLoadingItem(false);
+    }
+  };
+
+  const handleDeleteItem = async (item: HistoryItem) => {
+    if (!confirm(`Are you sure you want to delete this ${item.type.toLowerCase()}?`)) {
+      return;
+    }
+
+    try {
+      const endpoint =
+        item.type === 'Cover Letter'
+          ? `/api/history/cover-letter/${item.id}`
+          : item.type === 'LinkedIn'
+          ? `/api/history/linkedin/${item.id}`
+          : `/api/history/email/${item.id}`;
+
+      const response = await fetch(endpoint, { method: 'DELETE' });
+      if (!response.ok) throw new Error('Failed to delete item');
+
+      toast({ title: 'Success', description: `${item.type} deleted successfully` });
+      await loadHistory();
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to delete item', variant: 'destructive' });
     }
   };
 
@@ -235,7 +292,7 @@ export default function HistoryPage() {
           <div className="bg-gradient-to-br from-slate-50 to-gray-50 border-b border-slate-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-slate-900">
-                All Applications
+                Generated Content
               </h2>
               <Badge variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-100">
                 {filteredHistory.length} {filteredHistory.length === 1 ? 'item' : 'items'}
@@ -264,7 +321,6 @@ export default function HistoryPage() {
               filteredHistory.map((item, index) => {
                 const config = TYPE_CONFIG[item.type];
                 const Icon = config.icon;
-                const statusConfig = STATUS_CONFIG[item.status];
 
                 return (
                   <motion.div
@@ -291,24 +347,47 @@ export default function HistoryPage() {
                           </div>
 
                           <div className="flex items-center gap-3 flex-shrink-0">
-                            <Badge variant="secondary" className={statusConfig.color}>
-                              {statusConfig.label}
-                            </Badge>
+                            {item.status && STATUS_CONFIG[item.status] && (
+                              <Badge variant="secondary" className={STATUS_CONFIG[item.status].color}>
+                                {STATUS_CONFIG[item.status].label}
+                              </Badge>
+                            )}
                             <Badge variant="outline" className={`${config.textColor} ${config.borderColor}`}>
                               {item.type}
                             </Badge>
                           </div>
                         </div>
 
-                        <p className="text-xs text-slate-500">
-                          {new Date(item.createdAt).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-slate-500">
+                            {new Date(item.createdAt).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewItem(item)}
+                              className="h-8 px-3"
+                            >
+                              <Eye className="w-3.5 h-3.5 mr-1.5" />
+                              View
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteItem(item)}
+                              className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </motion.div>
@@ -318,6 +397,95 @@ export default function HistoryPage() {
           </div>
         </Card>
       </motion.div>
+
+      {/* View Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {selectedItem?.position || 'Loading...'}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedItem?.company}
+            </DialogDescription>
+          </DialogHeader>
+
+          {loadingItem ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+            </div>
+          ) : selectedItem ? (
+            <div className="space-y-4">
+              {selectedItem.content && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Content</h3>
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                      {selectedItem.content}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {selectedItem.subject && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Subject</h3>
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <p className="text-sm text-slate-700">
+                      {selectedItem.subject}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {selectedItem.body && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Body</h3>
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                      {selectedItem.body}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {selectedItem.message && (
+                <div>
+                  <h3 className="text-sm font-semibold text-slate-900 mb-2">Message</h3>
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                      {selectedItem.message}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                <div className="text-xs text-slate-500">
+                  Created: {selectedItem.createdAt && new Date(selectedItem.createdAt).toLocaleDateString('en-US', {
+                    month: 'long',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const content = selectedItem.content || selectedItem.message || selectedItem.body || '';
+                    navigator.clipboard.writeText(content);
+                    toast({ title: 'Success', description: 'Content copied to clipboard!' });
+                  }}
+                >
+                  Copy to Clipboard
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

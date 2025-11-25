@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
-import { ApplicationStatus } from '@prisma/client';
 
-// PATCH - Update cover letter status
-export async function PATCH(
+// GET - Fetch a single cover letter
+export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
@@ -18,17 +17,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { status } = body;
-
-    if (!status || !Object.values(ApplicationStatus).includes(status)) {
-      return NextResponse.json(
-        { error: 'Valid status is required (DRAFT, SENT, DONE, GHOST)' },
-        { status: 400 }
-      );
-    }
-
-    // Verify ownership and update
+    // Fetch the cover letter
     const coverLetter = await prisma.coverLetter.findFirst({
       where: {
         id: params.id,
@@ -43,23 +32,11 @@ export async function PATCH(
       );
     }
 
-    const updated = await prisma.coverLetter.update({
-      where: { id: params.id },
-      data: { status: status as ApplicationStatus },
-    });
-
-    return NextResponse.json({
-      success: true,
-      coverLetter: {
-        id: updated.id,
-        status: updated.status,
-        updatedAt: updated.updatedAt,
-      },
-    });
+    return NextResponse.json({ coverLetter });
   } catch (error: any) {
-    console.error('Update cover letter status error:', error);
+    console.error('Fetch cover letter error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update cover letter status' },
+      { error: error.message || 'Failed to fetch cover letter' },
       { status: 500 }
     );
   }

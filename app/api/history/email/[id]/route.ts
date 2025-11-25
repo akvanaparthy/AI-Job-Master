@@ -3,6 +3,46 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 
+// GET - Fetch a single email message
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Fetch the email message
+    const message = await prisma.emailMessage.findFirst({
+      where: {
+        id: params.id,
+        userId: user.id,
+      },
+    });
+
+    if (!message) {
+      return NextResponse.json(
+        { error: 'Email message not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message });
+  } catch (error: any) {
+    console.error('Fetch email message error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch email message' },
+      { status: 500 }
+    );
+  }
+}
+
 // PATCH - Update email message status
 export async function PATCH(
   req: NextRequest,

@@ -8,186 +8,143 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// User model (linked to Supabase Auth)
 model User {
-  id                String    @id @default(uuid())
-  email             String    @unique
-  userType          UserType  @default(FREE)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  // Encrypted API keys
-  openaiApiKey      String?
-  anthropicApiKey   String?
-  geminiApiKey      String?
-
-  // Available models (fetched from API providers)
-  openaiModels      String[]  @default([])
-  anthropicModels   String[]  @default([])
-  geminiModels      String[]  @default([])
-
-  // User preferences
-  defaultResumeId   String?
-  defaultLlmModel   String?
-  defaultLength     Length    @default(MEDIUM)
-  autoSave          Boolean   @default(true)
-  defaultStatus     String?   @default("SENT")
-
-  // Relations
-  resumes           Resume[]
-  customPrompts     CustomPrompt[]
-  coverLetters      CoverLetter[]
-  linkedinMessages  LinkedInMessage[]
-  emailMessages     EmailMessage[]
+  id               String            @id @default(uuid())
+  email            String            @unique
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  openaiApiKey     String?
+  anthropicApiKey  String?
+  geminiApiKey     String?
+  defaultResumeId  String?
+  defaultLlmModel  String?
+  defaultLength    Length            @default(MEDIUM)
+  autoSave         Boolean           @default(true)
+  defaultStatus    String?           @default("SENT")
+  anthropicModels  String[]          @default([])
+  geminiModels     String[]          @default([])
+  openaiModels     String[]          @default([])
+  userType         UserType          @default(FREE)
+  coverLetters     CoverLetter[]
+  customPrompts    CustomPrompt[]
+  emailMessages    EmailMessage[]
+  linkedinMessages LinkedInMessage[]
+  resumes          Resume[]
 
   @@map("users")
 }
 
-// Resume model (max 3 per user)
 model Resume {
-  id              String    @id @default(uuid())
-  userId          String
-  title           String    // User-friendly title for the resume
-  fileName        String
-  fileUrl         String    // Supabase Storage URL
-  content         String    @db.Text
-  isDefault       Boolean   @default(false)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  coverLetters    CoverLetter[]
+  id               String            @id @default(uuid())
+  userId           String
+  title            String
+  fileName         String
+  fileUrl          String
+  content          String
+  isDefault        Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  coverLetters     CoverLetter[]
+  emailMessages    EmailMessage[]
   linkedinMessages LinkedInMessage[]
-  emailMessages   EmailMessage[]
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("resumes")
   @@index([userId])
+  @@map("resumes")
 }
 
-// Custom prompts (tab-specific)
 model CustomPrompt {
-  id          String      @id @default(uuid())
-  userId      String
-  name        String
-  content     String      @db.Text
-  tabType     TabType
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  content   String
+  tabType   TabType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("custom_prompts")
-  @@index([userId, tabType])
   @@unique([userId, name, tabType])
+  @@index([userId, tabType])
+  @@map("custom_prompts")
 }
 
-// Cover Letter Archive
 model CoverLetter {
-  id                  String              @id @default(uuid())
-  userId              String
-  resumeId            String?
-  companyName         String?
-  positionTitle       String?
-  jobDescription      String?             @db.Text
-  companyDescription  String?             @db.Text
-  content             String              @db.Text
-  length              Length              @default(MEDIUM)
-  llmModel            String?
-  status              ApplicationStatus   @default(SENT)
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  id                 String   @id @default(uuid())
+  userId             String
+  resumeId           String?
+  companyName        String?
+  positionTitle      String?
+  jobDescription     String?
+  companyDescription String?
+  content            String
+  length             Length   @default(MEDIUM)
+  llmModel           String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  resume             Resume?  @relation(fields: [resumeId], references: [id])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume              Resume?             @relation(fields: [resumeId], references: [id], onDelete: SetNull)
-
-  @@map("cover_letters")
   @@index([userId, createdAt])
+  @@map("cover_letters")
 }
 
-// LinkedIn Message tracking
 model LinkedInMessage {
-  id                  String                @id @default(uuid())
-  userId              String
-  resumeId            String?
+  id                 String              @id @default(uuid())
+  userId             String
+  resumeId           String?
+  linkedinUrl        String?
+  recipientName      String?
+  positionTitle      String
+  companyName        String
+  content            String
+  messageType        LinkedInMessageType @default(NEW)
+  parentMessageId    String?
+  jobDescription     String?
+  companyDescription String?
+  length             Length              @default(MEDIUM)
+  llmModel           String?
+  status             ApplicationStatus   @default(SENT)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  parentMessage      LinkedInMessage?    @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
+  followUpMessages   LinkedInMessage[]   @relation("LinkedInFollowUp")
+  resume             Resume?             @relation(fields: [resumeId], references: [id])
+  user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Recipient info (linkedinUrl is optional)
-  linkedinUrl         String?
-  recipientName       String?
-  positionTitle       String
-  companyName         String
-
-  // Message details
-  content             String                @db.Text
-  messageType         LinkedInMessageType   @default(NEW)
-  parentMessageId     String?               // For follow-ups
-
-  // Job details
-  jobDescription      String?               @db.Text
-  companyDescription  String?               @db.Text
-
-  // Generation settings
-  length              Length                @default(MEDIUM)
-  llmModel            String?
-
-  // Status tracking
-  status              ApplicationStatus     @default(SENT)
-
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-
-  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume              Resume?               @relation(fields: [resumeId], references: [id], onDelete: SetNull)
-  parentMessage       LinkedInMessage?      @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
-  followUpMessages    LinkedInMessage[]     @relation("LinkedInFollowUp")
-
-  @@map("linkedin_messages")
   @@index([userId, status])
   @@index([userId, linkedinUrl])
+  @@map("linkedin_messages")
 }
 
-// Email Message tracking
 model EmailMessage {
-  id                  String                @id @default(uuid())
-  userId              String
-  resumeId            String?
+  id                 String            @id @default(uuid())
+  userId             String
+  resumeId           String?
+  recipientEmail     String
+  recipientName      String?
+  positionTitle      String
+  companyName        String
+  subject            String
+  body               String
+  messageType        EmailMessageType  @default(NEW)
+  parentMessageId    String?
+  jobDescription     String?
+  companyDescription String?
+  length             Length            @default(MEDIUM)
+  llmModel           String?
+  status             ApplicationStatus @default(SENT)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  parentMessage      EmailMessage?     @relation("EmailFollowUp", fields: [parentMessageId], references: [id])
+  followUpMessages   EmailMessage[]    @relation("EmailFollowUp")
+  resume             Resume?           @relation(fields: [resumeId], references: [id])
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Recipient info
-  recipientEmail      String
-  recipientName       String?
-  positionTitle       String
-  companyName         String
-
-  // Message details
-  subject             String
-  body                String                @db.Text
-  messageType         EmailMessageType      @default(NEW)
-  parentMessageId     String?
-
-  // Job details
-  jobDescription      String?               @db.Text
-  companyDescription  String?               @db.Text
-
-  // Generation settings
-  length              Length                @default(MEDIUM)
-  llmModel            String?
-
-  // Status tracking
-  status              ApplicationStatus     @default(SENT)
-
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-
-  user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  resume              Resume?               @relation(fields: [resumeId], references: [id], onDelete: SetNull)
-  parentMessage       EmailMessage?         @relation("EmailFollowUp", fields: [parentMessageId], references: [id])
-  followUpMessages    EmailMessage[]        @relation("EmailFollowUp")
-
-  @@map("email_messages")
   @@index([userId, status])
   @@index([userId, recipientEmail])
+  @@map("email_messages")
 }
 
-// Enums
 enum UserType {
   FREE
   PLUS

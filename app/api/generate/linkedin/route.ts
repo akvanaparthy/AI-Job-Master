@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       parentMessageId,
       length,
       llmModel,
+      saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
     // Validate required fields
@@ -177,29 +178,34 @@ export async function POST(req: NextRequest) {
       temperature: 0.7,
     });
 
-    // Save to database
-    const linkedInMessage = await prisma.linkedInMessage.create({
-      data: {
-        userId: user.id,
-        resumeId: resumeId || null,
-        messageType: messageType as LinkedInMessageType,
-        linkedinUrl: linkedinUrl || null,
-        recipientName,
-        positionTitle,
-        companyName,
-        jobDescription,
-        companyDescription,
-        content: generatedContent,
-        length: length as Length,
-        llmModel,
-        parentMessageId: parentMessageId || null,
-      },
-    });
+    // Save to database only if requested
+    let linkedInMessageId = null;
+    if (saveToHistory) {
+      const linkedInMessage = await prisma.linkedInMessage.create({
+        data: {
+          userId: user.id,
+          resumeId: resumeId || null,
+          messageType: messageType as LinkedInMessageType,
+          linkedinUrl: linkedinUrl || null,
+          recipientName,
+          positionTitle,
+          companyName,
+          jobDescription,
+          companyDescription,
+          content: generatedContent,
+          length: length as Length,
+          llmModel,
+          parentMessageId: parentMessageId || null,
+        },
+      });
+      linkedInMessageId = linkedInMessage.id;
+    }
 
     return NextResponse.json({
       success: true,
       content: generatedContent,
-      id: linkedInMessage.id,
+      id: linkedInMessageId,
+      saved: saveToHistory,
     });
   } catch (error: any) {
     console.error('LinkedIn message generation error:', error);

@@ -25,7 +25,6 @@ export async function GET(req: NextRequest) {
       prisma.coverLetter.findMany({
         where: {
           userId: user.id,
-          ...(status && status !== 'ALL' ? { status: status as ApplicationStatus } : {}),
           ...(search
             ? {
                 OR: [
@@ -40,7 +39,6 @@ export async function GET(req: NextRequest) {
           id: true,
           companyName: true,
           positionTitle: true,
-          status: true,
           createdAt: true,
           content: true,
         },
@@ -103,7 +101,6 @@ export async function GET(req: NextRequest) {
         type: 'Cover Letter' as const,
         company: item.companyName || 'N/A',
         position: item.positionTitle || 'N/A',
-        status: item.status,
         createdAt: item.createdAt.toISOString(),
         content: item.content,
       })),

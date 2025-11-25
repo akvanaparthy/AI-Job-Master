@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
       parentMessageId,
       length,
       llmModel,
+      saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
     // Validate required fields
@@ -177,31 +178,36 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Save to database
-    const emailMessage = await prisma.emailMessage.create({
-      data: {
-        userId: user.id,
-        resumeId: resumeId || null,
-        messageType: messageType as EmailMessageType,
-        recipientEmail,
-        recipientName,
-        positionTitle,
-        companyName,
-        jobDescription,
-        companyDescription,
-        subject,
-        body: emailBody,
-        length: length as Length,
-        llmModel,
-        parentMessageId: parentMessageId || null,
-      },
-    });
+    // Save to database only if requested
+    let emailMessageId = null;
+    if (saveToHistory) {
+      const emailMessage = await prisma.emailMessage.create({
+        data: {
+          userId: user.id,
+          resumeId: resumeId || null,
+          messageType: messageType as EmailMessageType,
+          recipientEmail,
+          recipientName,
+          positionTitle,
+          companyName,
+          jobDescription,
+          companyDescription,
+          subject,
+          body: emailBody,
+          length: length as Length,
+          llmModel,
+          parentMessageId: parentMessageId || null,
+        },
+      });
+      emailMessageId = emailMessage.id;
+    }
 
     return NextResponse.json({
       success: true,
       subject,
       body: emailBody,
-      id: emailMessage.id,
+      id: emailMessageId,
+      saved: saveToHistory,
     });
   } catch (error: any) {
     console.error('Email generation error:', error);

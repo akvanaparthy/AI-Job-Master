@@ -22,7 +22,7 @@ const navigation = [
   { name: 'History', href: '/dashboard/history', icon: History },
 ];
 
-export default function DashboardLayout({
+export default function SettingsLayout({
   children,
 }: {
   children: React.ReactNode;

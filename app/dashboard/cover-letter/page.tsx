@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, FileText, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Loader2, Copy, FileText, Sparkles, CheckCircle2, Save, Trash2 } from 'lucide-react';
 
 interface Resume {
   id: string;
@@ -38,6 +39,8 @@ export default function CoverLetterPage() {
   const [companyDescription, setCompanyDescription] = useState('');
   const [length, setLength] = useState<'CONCISE' | 'MEDIUM' | 'LONG'>('MEDIUM');
   const [generatedLetter, setGeneratedLetter] = useState('');
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     loadResumes();
@@ -92,6 +95,7 @@ export default function CoverLetterPage() {
     }
 
     setLoading(true);
+    setSavedId(null); // Reset saved state
     try {
       const response = await fetch('/api/generate/cover-letter', {
         method: 'POST',
@@ -104,6 +108,7 @@ export default function CoverLetterPage() {
           companyName: companyName || undefined,
           length,
           llmModel,
+          saveToHistory: false, // Don't auto-save
         }),
       });
 
@@ -127,6 +132,80 @@ export default function CoverLetterPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!generatedLetter) return;
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/generate/cover-letter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resumeId: selectedResumeId || undefined,
+          jobDescription,
+          companyDescription: companyDescription || undefined,
+          positionTitle: positionTitle || undefined,
+          companyName: companyName || undefined,
+          length,
+          llmModel,
+          saveToHistory: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save cover letter');
+      }
+
+      const data = await response.json();
+      setSavedId(data.id);
+
+      toast({
+        title: 'Saved',
+        description: 'Cover letter saved to history!',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to save cover letter',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleUnsave = async () => {
+    if (!savedId) return;
+
+    setSaving(true);
+    try {
+      const response = await fetch(`/api/history/cover-letter/${savedId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to remove from history');
+      }
+
+      setSavedId(null);
+
+      toast({
+        title: 'Removed',
+        description: 'Cover letter removed from history',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to remove from history',
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -198,7 +277,21 @@ export default function CoverLetterPage() {
                       </SelectItem>
                     ))}
                     {resumes.length === 0 && (
-                      <SelectItem value="none" disabled>No resumes - Upload in Settings</SelectItem>
+                      <div className="px-2 py-6 text-center">
+                        <p className="text-sm text-slate-600 mb-3">No resumes uploaded yet</p>
+                        <Link href="/settings?tab=resumes">
+                          <button className="w-full px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                            Upload Resume in Settings
+                          </button>
+                        </Link>
+                      </div>
+                    )}
+                    {resumes.length > 0 && resumes.length < 3 && (
+                      <Link href="/settings?tab=resumes" className="block">
+                        <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                          + Add Another Resume ({resumes.length}/3)
+                        </div>
+                      </Link>
                     )}
                   </SelectContent>
                 </Select>
@@ -218,13 +311,27 @@ export default function CoverLetterPage() {
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
                     {availableModels.length > 0 ? (
-                      availableModels.map((model) => (
-                        <SelectItem key={model.value} value={model.value} className="rounded-md">
-                          {model.label}
-                        </SelectItem>
-                      ))
+                      <>
+                        {availableModels.map((model) => (
+                          <SelectItem key={model.value} value={model.value} className="rounded-md">
+                            {model.label}
+                          </SelectItem>
+                        ))}
+                        <Link href="/settings?tab=api-keys" className="block">
+                          <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                            + Manage API Keys
+                          </div>
+                        </Link>
+                      </>
                     ) : (
-                      <SelectItem value="none" disabled>No models available</SelectItem>
+                      <div className="px-2 py-6 text-center">
+                        <p className="text-sm text-slate-600 mb-3">No API keys configured</p>
+                        <Link href="/settings?tab=api-keys">
+                          <button className="w-full px-3 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
+                            Add API Key in Settings
+                          </button>
+                        </Link>
+                      </div>
                     )}
                   </SelectContent>
                 </Select>
@@ -343,17 +450,51 @@ export default function CoverLetterPage() {
                         <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                         Your Cover Letter
                       </h2>
-                      <p className="text-sm text-slate-600 mt-0.5">Review and customize before using</p>
+                      <p className="text-sm text-slate-600 mt-0.5">
+                        {savedId ? 'Saved to history' : 'Review and save to history if needed'}
+                      </p>
                     </div>
-                    <Button
-                      onClick={copyToClipboard}
-                      size="sm"
-                      variant="outline"
-                      className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
-                    >
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={copyToClipboard}
+                        size="sm"
+                        variant="outline"
+                        className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                      >
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy
+                      </Button>
+                      {savedId ? (
+                        <Button
+                          onClick={handleUnsave}
+                          size="sm"
+                          variant="outline"
+                          disabled={saving}
+                          className="border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800 transition-colors"
+                        >
+                          {saving ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="mr-2 h-4 w-4" />
+                          )}
+                          Remove
+                        </Button>
+                      ) : (
+                        <Button
+                          onClick={handleSave}
+                          size="sm"
+                          disabled={saving}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                        >
+                          {saving ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Save className="mr-2 h-4 w-4" />
+                          )}
+                          Save to History
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
 

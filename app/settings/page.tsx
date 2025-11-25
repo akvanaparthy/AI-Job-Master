@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, FileText, MessageSquare, Settings as SettingsIcon } from 'lucide-react';
@@ -9,6 +11,16 @@ import CustomPromptsManager from '@/components/settings/CustomPromptsManager';
 import UserPreferencesManager from '@/components/settings/UserPreferencesManager';
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState('api-keys');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && ['api-keys', 'resumes', 'prompts', 'preferences'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, [searchParams]);
+
   return (
     <div className="max-w-[1400px] mx-auto">
       <motion.div
@@ -34,7 +46,7 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Tabs defaultValue="api-keys" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="bg-white border border-slate-200 p-1 rounded-lg grid grid-cols-4 gap-1">
             <TabsTrigger
               value="api-keys"
