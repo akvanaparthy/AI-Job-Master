@@ -43,25 +43,20 @@ export default function ApiKeyManager() {
   };
 
   const handleSave = async () => {
-    if (!openaiKey && !anthropicKey && !geminiKey) {
-      toast({
-        title: 'Error',
-        description: 'Please enter at least one API key',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     setSaving(true);
     try {
+      const payload: any = {};
+
+      // Only include keys that were actually entered (non-empty)
+      // Send empty string to remove a key
+      if (openaiKey !== '') payload.openaiApiKey = openaiKey;
+      if (anthropicKey !== '') payload.anthropicApiKey = anthropicKey;
+      if (geminiKey !== '') payload.geminiApiKey = geminiKey;
+
       const response = await fetch('/api/settings/api-keys', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          openaiApiKey: openaiKey || null,
-          anthropicApiKey: anthropicKey || null,
-          geminiApiKey: geminiKey || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -73,18 +68,56 @@ export default function ApiKeyManager() {
 
       toast({
         title: 'Success',
-        description: 'API keys saved successfully!',
+        description: 'API keys saved and models fetched successfully!',
       });
 
-      // Update status
-      if (openaiKey) setHasOpenaiKey(true);
-      if (anthropicKey) setHasAnthropicKey(true);
-      if (geminiKey) setHasGeminiKey(true);
+      // Reload status to reflect changes
+      await loadApiKeyStatus();
 
       // Clear input fields
       setOpenaiKey('');
       setAnthropicKey('');
       setGeminiKey('');
+
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRemoveKey = async (provider: 'openai' | 'anthropic' | 'gemini') => {
+    if (!confirm(`Are you sure you want to remove your ${provider} API key?`)) return;
+
+    setSaving(true);
+    try {
+      const payload: any = {};
+      if (provider === 'openai') payload.openaiApiKey = '';
+      if (provider === 'anthropic') payload.anthropicApiKey = '';
+      if (provider === 'gemini') payload.geminiApiKey = '';
+
+      const response = await fetch('/api/settings/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to remove API key');
+      }
+
+      toast({
+        title: 'Success',
+        description: `${provider} API key removed successfully!`,
+      });
+
+      // Reload status to reflect changes
+      await loadApiKeyStatus();
 
     } catch (error: any) {
       toast({
@@ -119,12 +152,26 @@ export default function ApiKeyManager() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="openai">OpenAI API Key</Label>
-              {hasOpenaiKey && (
-                <div className="flex items-center gap-1 text-sm text-green-600">
-                  <Check className="h-4 w-4" />
-                  Configured
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {hasOpenaiKey && (
+                  <>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <Check className="h-4 w-4" />
+                      Configured
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveKey('openai')}
+                      disabled={saving}
+                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Remove
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             <Input
               id="openai"
@@ -151,12 +198,26 @@ export default function ApiKeyManager() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="anthropic">Anthropic (Claude) API Key</Label>
-              {hasAnthropicKey && (
-                <div className="flex items-center gap-1 text-sm text-green-600">
-                  <Check className="h-4 w-4" />
-                  Configured
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {hasAnthropicKey && (
+                  <>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <Check className="h-4 w-4" />
+                      Configured
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveKey('anthropic')}
+                      disabled={saving}
+                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Remove
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             <Input
               id="anthropic"
@@ -183,12 +244,26 @@ export default function ApiKeyManager() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="gemini">Google Gemini API Key</Label>
-              {hasGeminiKey && (
-                <div className="flex items-center gap-1 text-sm text-green-600">
-                  <Check className="h-4 w-4" />
-                  Configured
-                </div>
-              )}
+              <div className="flex items-center gap-2">
+                {hasGeminiKey && (
+                  <>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <Check className="h-4 w-4" />
+                      Configured
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemoveKey('gemini')}
+                      disabled={saving}
+                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Remove
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
             <Input
               id="gemini"

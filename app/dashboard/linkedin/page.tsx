@@ -17,13 +17,22 @@ interface Resume {
   title: string;
 }
 
+interface ModelOption {
+  value: string;
+  label: string;
+  provider: string;
+}
+
 export default function LinkedInPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingResumes, setLoadingResumes] = useState(true);
+  const [loadingModels, setLoadingModels] = useState(true);
   const [resumes, setResumes] = useState<Resume[]>([]);
+  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
+  const [hasAnyApiKey, setHasAnyApiKey] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState('');
-  const [llmModel, setLlmModel] = useState('gpt-4o-mini');
+  const [llmModel, setLlmModel] = useState('');
   const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP'>('NEW');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [recipientName, setRecipientName] = useState('');
@@ -36,6 +45,7 @@ export default function LinkedInPage() {
 
   useEffect(() => {
     loadResumes();
+    loadAvailableModels();
   }, []);
 
   const loadResumes = async () => {
@@ -51,6 +61,24 @@ export default function LinkedInPage() {
       console.error('Failed to load resumes:', error);
     } finally {
       setLoadingResumes(false);
+    }
+  };
+
+  const loadAvailableModels = async () => {
+    try {
+      const response = await fetch('/api/settings/available-models');
+      if (response.ok) {
+        const data = await response.json();
+        setHasAnyApiKey(data.hasAnyKey);
+        setAvailableModels(data.models);
+        if (data.models.length > 0 && !llmModel) {
+          setLlmModel(data.models[0].value);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load available models:', error);
+    } finally {
+      setLoadingModels(false);
     }
   };
 
@@ -179,23 +207,34 @@ export default function LinkedInPage() {
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-slate-900">AI Model</Label>
-                <Select value={llmModel} onValueChange={setLlmModel}>
+                <Select value={llmModel} onValueChange={setLlmModel} disabled={loadingModels || !hasAnyApiKey}>
                   <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
-                    <SelectValue />
+                    <SelectValue placeholder={
+                      loadingModels
+                        ? "Loading models..."
+                        : !hasAnyApiKey
+                          ? "Please add API key first"
+                          : "Select a model"
+                    } />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
-                    {[
-                      ['gpt-4o', 'GPT-4o'],
-                      ['gpt-4o-mini', 'GPT-4o Mini'],
-                      ['claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet'],
-                      ['claude-3-5-haiku-20241022', 'Claude 3.5 Haiku'],
-                      ['gemini-2.0-flash-exp', 'Gemini 2.0 Flash'],
-                      ['gemini-exp-1206', 'Gemini Exp']
-                    ].map(([v, l]) => (
-                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
-                    ))}
+                    {availableModels.length > 0 ? (
+                      availableModels.map((model) => (
+                        <SelectItem key={model.value} value={model.value} className="rounded-md">
+                          {model.label}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>No models available</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
+                {!hasAnyApiKey && !loadingModels && (
+                  <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <Sparkles className="w-3 h-3" />
+                    Add your API keys in Settings to enable AI generation
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -300,7 +339,7 @@ export default function LinkedInPage() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={loading || !positionTitle || !companyName}
+                disabled={loading || !positionTitle || !companyName || !hasAnyApiKey || !llmModel}
                 className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {loading ? (

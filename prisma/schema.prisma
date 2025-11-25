@@ -12,6 +12,7 @@ datasource db {
 model User {
   id                String    @id @default(uuid())
   email             String    @unique
+  userType          UserType  @default(FREE)
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
@@ -187,6 +188,12 @@ model EmailMessage {
 }
 
 // Enums
+enum UserType {
+  FREE
+  PLUS
+  ADMIN
+}
+
 enum TabType {
   COVER_LETTER
   LINKEDIN

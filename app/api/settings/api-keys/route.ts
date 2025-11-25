@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
-import { encrypt } from '@/lib/encryption';
+import { encrypt, getAvailableModels } from '@/lib/encryption';
 
 export async function GET(req: NextRequest) {
   try {
@@ -59,14 +59,70 @@ export async function POST(req: NextRequest) {
     // Prepare update data (only encrypt if key is provided)
     const updateData: any = {};
 
-    if (openaiApiKey) {
-      updateData.openaiApiKey = encrypt(openaiApiKey);
+    // OpenAI - encrypt key and fetch models
+    if (openaiApiKey !== undefined) {
+      if (openaiApiKey && openaiApiKey.trim() !== '') {
+        updateData.openaiApiKey = encrypt(openaiApiKey);
+        // Fetch available models
+        try {
+          const models = await getAvailableModels(openaiApiKey, 'openai');
+          updateData.openaiModels = models;
+        } catch (error) {
+          console.error('Failed to fetch OpenAI models:', error);
+          return NextResponse.json(
+            { error: 'Invalid OpenAI API key or failed to fetch models' },
+            { status: 400 }
+          );
+        }
+      } else {
+        // Remove key and models if empty string provided
+        updateData.openaiApiKey = null;
+        updateData.openaiModels = [];
+      }
     }
-    if (anthropicApiKey) {
-      updateData.anthropicApiKey = encrypt(anthropicApiKey);
+
+    // Anthropic - encrypt key and fetch models
+    if (anthropicApiKey !== undefined) {
+      if (anthropicApiKey && anthropicApiKey.trim() !== '') {
+        updateData.anthropicApiKey = encrypt(anthropicApiKey);
+        // Fetch available models
+        try {
+          const models = await getAvailableModels(anthropicApiKey, 'anthropic');
+          updateData.anthropicModels = models;
+        } catch (error) {
+          console.error('Failed to fetch Anthropic models:', error);
+          return NextResponse.json(
+            { error: 'Invalid Anthropic API key or failed to fetch models' },
+            { status: 400 }
+          );
+        }
+      } else {
+        // Remove key and models if empty string provided
+        updateData.anthropicApiKey = null;
+        updateData.anthropicModels = [];
+      }
     }
-    if (geminiApiKey) {
-      updateData.geminiApiKey = encrypt(geminiApiKey);
+
+    // Gemini - encrypt key and fetch models
+    if (geminiApiKey !== undefined) {
+      if (geminiApiKey && geminiApiKey.trim() !== '') {
+        updateData.geminiApiKey = encrypt(geminiApiKey);
+        // Fetch available models
+        try {
+          const models = await getAvailableModels(geminiApiKey, 'gemini');
+          updateData.geminiModels = models;
+        } catch (error) {
+          console.error('Failed to fetch Gemini models:', error);
+          return NextResponse.json(
+            { error: 'Invalid Gemini API key or failed to fetch models' },
+            { status: 400 }
+          );
+        }
+      } else {
+        // Remove key and models if empty string provided
+        updateData.geminiApiKey = null;
+        updateData.geminiModels = [];
+      }
     }
 
     // Create or update user
