@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, Mail } from 'lucide-react';
+import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw } from 'lucide-react';
 
 interface Resume {
   id: string;
@@ -100,256 +100,299 @@ export default function EmailPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-[1400px] mx-auto">
+      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-display font-bold text-slate-900 mb-3">Professional Email Generator</h1>
-        <p className="text-lg text-slate-600">
-          Create compelling job application emails that get responses from recruiters and hiring managers.
-        </p>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-slate-400 to-gray-500 flex items-center justify-center shadow-lg">
+            <Mail className="w-6 h-6 text-white" strokeWidth={2.5} />
+          </div>
+          <div>
+            <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Professional Emails</h1>
+            <p className="text-lg text-slate-500">
+              Craft compelling job application emails that get responses from recruiters
+            </p>
+          </div>
+        </div>
       </motion.div>
 
-      <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)} className="mb-6">
-        <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200 p-1 rounded-[20px]">
-          <TabsTrigger
-            value="NEW"
-            className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white"
-          >
-            New Email
-          </TabsTrigger>
-          <TabsTrigger
-            value="FOLLOW_UP"
-            className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white"
-          >
-            Follow-up Email
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      {/* Message Type Tabs */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6"
+      >
+        <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)}>
+          <TabsList className="bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
+            <TabsTrigger
+              value="NEW"
+              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+            >
+              New Email
+            </TabsTrigger>
+            <TabsTrigger
+              value="FOLLOW_UP"
+              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Follow-up Email
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      </motion.div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
+      <div className="grid lg:grid-cols-2 gap-8">
+        {/* Input Form */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.15 }}
+          className="space-y-6"
         >
-          <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
+          {/* Configuration Card */}
+          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-slate-600" />
+                Configuration
+              </h2>
+              <p className="text-sm text-slate-600 mt-0.5">Set your preferences</p>
+            </div>
             <div className="p-6 space-y-5">
-              <div>
-                <h2 className="text-xl font-display font-semibold text-slate-900 mb-1">Email Details</h2>
-                <p className="text-sm text-slate-600">
-                  {messageType === 'NEW' ? 'Enter recipient and position information' : 'Following up on your previous email'}
-                </p>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">Resume</Label>
+                <Select value={selectedResumeId} onValueChange={setSelectedResumeId} disabled={loadingResumes}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                    <SelectValue placeholder={loadingResumes ? "Loading..." : "Choose a resume"} />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg">
+                    {resumes.map((resume) => (
+                      <SelectItem key={resume.id} value={resume.id} className="rounded-md">
+                        {resume.title}
+                      </SelectItem>
+                    ))}
+                    {resumes.length === 0 && (
+                      <SelectItem value="none" disabled>No resumes - Upload in Settings</SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Select Resume</Label>
-                  <Select value={selectedResumeId} onValueChange={setSelectedResumeId} disabled={loadingResumes}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 rounded-[16px]">
-                      <SelectValue placeholder={loadingResumes ? "Loading..." : "Choose a resume"} />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-[16px]">
-                      {resumes.map((resume) => (
-                        <SelectItem key={resume.id} value={resume.id} className="rounded-[12px]">
-                          {resume.title}
-                        </SelectItem>
-                      ))}
-                      {resumes.length === 0 && (
-                        <SelectItem value="none" disabled>No resumes - Upload in Settings</SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">AI Model</Label>
+                <Select value={llmModel} onValueChange={setLlmModel}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg">
+                    {[
+                      ['gpt-4o', 'GPT-4o'],
+                      ['gpt-4o-mini', 'GPT-4o Mini'],
+                      ['claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet'],
+                      ['claude-3-5-haiku-20241022', 'Claude 3.5 Haiku'],
+                      ['gemini-2.0-flash-exp', 'Gemini 2.0 Flash'],
+                      ['gemini-exp-1206', 'Gemini Exp']
+                    ].map(([v, l]) => (
+                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">AI Model</Label>
-                  <Select value={llmModel} onValueChange={setLlmModel}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 rounded-[16px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-[16px]">
-                      {[
-                        ['gpt-4o', 'GPT-4o'],
-                        ['gpt-4o-mini', 'GPT-4o Mini'],
-                        ['claude-3-5-sonnet-20241022', 'Claude 3.5 Sonnet'],
-                        ['claude-3-5-haiku-20241022', 'Claude 3.5 Haiku'],
-                        ['gemini-2.0-flash-exp', 'Gemini 2.0 Flash'],
-                        ['gemini-exp-1206', 'Gemini Exp']
-                      ].map(([v, l]) => (
-                        <SelectItem key={v} value={v} className="rounded-[12px]">{l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">Email Length</Label>
+                <Select value={length} onValueChange={(value: any) => setLength(value)}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg">
+                    {[
+                      ['CONCISE', 'Concise'],
+                      ['MEDIUM', 'Medium'],
+                      ['LONG', 'Detailed']
+                    ].map(([v, l]) => (
+                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </Card>
 
+          {/* Email Details Card */}
+          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 border-b border-slate-200 px-6 py-4">
+              <h2 className="text-lg font-semibold text-slate-900">Email Details</h2>
+              <p className="text-sm text-slate-600 mt-0.5">
+                {messageType === 'NEW' ? 'Enter recipient and position information' : 'Following up on your previous email'}
+              </p>
+            </div>
+            <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">
+                  Recipient Email <span className="text-slate-600">*</span>
+                </Label>
+                <Input
+                  type="email"
+                  placeholder="hiring@company.com"
+                  value={recipientEmail}
+                  onChange={(e) => setRecipientEmail(e.target.value)}
+                  className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">Recipient Name (Optional)</Label>
+                <Input
+                  placeholder="Jane Smith"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">
-                    Recipient Email <span className="text-red-500">*</span>
+                  <Label className="text-sm font-medium text-slate-900">
+                    Position <span className="text-slate-600">*</span>
                   </Label>
                   <Input
-                    type="email"
-                    placeholder="hiring@company.com"
-                    value={recipientEmail}
-                    onChange={(e) => setRecipientEmail(e.target.value)}
-                    className="h-11 bg-white border-slate-200 rounded-[16px]"
+                    placeholder="Software Engineer"
+                    value={positionTitle}
+                    onChange={(e) => setPositionTitle(e.target.value)}
+                    className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
                   />
                 </div>
-
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Recipient Name (Optional)</Label>
+                  <Label className="text-sm font-medium text-slate-900">
+                    Company <span className="text-slate-600">*</span>
+                  </Label>
                   <Input
-                    placeholder="Jane Smith"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
-                    className="h-11 bg-white border-slate-200 rounded-[16px]"
+                    placeholder="Tech Corp"
+                    value={companyName}
+                    onChange={(e) => setCompanyName(e.target.value)}
+                    className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
                   />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-2 gap-3">
+              {messageType === 'NEW' && (
+                <>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-700">
-                      Position <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      placeholder="Software Engineer"
-                      value={positionTitle}
-                      onChange={(e) => setPositionTitle(e.target.value)}
-                      className="h-11 bg-white border-slate-200 rounded-[16px]"
+                    <Label className="text-sm font-medium text-slate-900">Job Description (Optional)</Label>
+                    <Textarea
+                      placeholder="Paste the job description here..."
+                      className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                      value={jobDescription}
+                      onChange={(e) => setJobDescription(e.target.value)}
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-700">
-                      Company <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      placeholder="Tech Corp"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      className="h-11 bg-white border-slate-200 rounded-[16px]"
+                    <Label className="text-sm font-medium text-slate-900">Company Info (Optional)</Label>
+                    <Textarea
+                      placeholder="What interests you about this company?"
+                      className="min-h-[80px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                      value={companyDescription}
+                      onChange={(e) => setCompanyDescription(e.target.value)}
                     />
                   </div>
-                </div>
+                </>
+              )}
 
-                {messageType === 'NEW' && (
+              <Button
+                onClick={handleGenerate}
+                disabled={loading || !recipientEmail || !positionTitle || !companyName}
+                className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+              >
+                {loading ? (
                   <>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-slate-700">Job Description (Optional)</Label>
-                      <Textarea
-                        placeholder="Paste the job description here..."
-                        className="min-h-[90px] bg-white border-slate-200 rounded-[16px] resize-none"
-                        value={jobDescription}
-                        onChange={(e) => setJobDescription(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-slate-700">Company Info (Optional)</Label>
-                      <Textarea
-                        placeholder="What interests you about this company?"
-                        className="min-h-[70px] bg-white border-slate-200 rounded-[16px] resize-none"
-                        value={companyDescription}
-                        onChange={(e) => setCompanyDescription(e.target.value)}
-                      />
-                    </div>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Generating email...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-5 w-5" />
+                    Generate Email
                   </>
                 )}
-
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-700">Email Length</Label>
-                  <Select value={length} onValueChange={(value: any) => setLength(value)}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 rounded-[16px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="rounded-[16px]">
-                      {[
-                        ['CONCISE', 'Concise'],
-                        ['MEDIUM', 'Medium'],
-                        ['LONG', 'Detailed']
-                      ].map(([v, l]) => (
-                        <SelectItem key={v} value={v} className="rounded-[12px]">{l}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <Button
-                  onClick={handleGenerate}
-                  disabled={loading || !recipientEmail || !positionTitle || !companyName}
-                  className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-[20px] transition-colors"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    'Generate Email'
-                  )}
-                </Button>
-              </div>
+              </Button>
             </div>
           </Card>
         </motion.div>
 
+        {/* Output Panel */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.25 }}
         >
-          <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm h-full">
-            <div className="p-6">
-              {generatedSubject && generatedBody ? (
-                <div className="space-y-5">
-                  <div>
-                    <h2 className="text-xl font-display font-semibold text-slate-900 mb-1">Generated Email</h2>
-                    <p className="text-sm text-slate-600">Review and edit your email before sending</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-slate-700">Subject Line</Label>
-                      <Input
-                        value={generatedSubject}
-                        onChange={(e) => setGeneratedSubject(e.target.value)}
-                        className="h-11 bg-white border-slate-200 rounded-[16px] font-medium"
-                      />
+          <Card className="bg-white border-slate-200/60 shadow-sm h-full overflow-hidden">
+            {generatedSubject && generatedBody ? (
+              <>
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 border-b border-emerald-100/50 px-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                        Your Email
+                      </h2>
+                      <p className="text-sm text-slate-600 mt-0.5">Review and edit before sending</p>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium text-slate-700">Email Body</Label>
-                      <Textarea
-                        value={generatedBody}
-                        onChange={(e) => setGeneratedBody(e.target.value)}
-                        className="min-h-[440px] bg-white border-slate-200 rounded-[16px] resize-none leading-relaxed"
-                      />
-                    </div>
-
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={copyToClipboard}
-                        variant="outline"
-                        className="flex-1 h-11 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white font-medium rounded-[16px] transition-colors"
-                      >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy to Clipboard
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={copyToClipboard}
+                      size="sm"
+                      variant="outline"
+                      className="border-emerald-200 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                    >
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy
+                    </Button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full min-h-[600px]">
-                  <div className="w-20 h-20 rounded-[20px] bg-slate-100 flex items-center justify-center mb-4">
-                    <Mail className="w-10 h-10 text-slate-400" />
+
+                <div className="p-6 space-y-5">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-900">Subject Line</Label>
+                    <Input
+                      value={generatedSubject}
+                      onChange={(e) => setGeneratedSubject(e.target.value)}
+                      className="h-11 bg-white border-slate-200 rounded-lg font-medium"
+                    />
                   </div>
-                  <h3 className="text-lg font-display font-semibold text-slate-900 mb-2">No Email Yet</h3>
-                  <p className="text-sm text-slate-600 text-center max-w-sm">
-                    Fill in the required fields and click Generate Email to create your professional job application email.
+
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-900">Email Body</Label>
+                    <Textarea
+                      value={generatedBody}
+                      onChange={(e) => setGeneratedBody(e.target.value)}
+                      className="min-h-[580px] bg-white border-slate-200 rounded-lg resize-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full min-h-[780px] p-12">
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.35 }}
+                  className="text-center"
+                >
+                  <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                    <Mail className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
+                  <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
+                    Fill in the required fields and click Generate Email to create your professional job application email
                   </p>
-                </div>
-              )}
-            </div>
+                </motion.div>
+              </div>
+            )}
           </Card>
         </motion.div>
       </div>

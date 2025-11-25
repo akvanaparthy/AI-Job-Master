@@ -1,6 +1,6 @@
-import { Length, MessageStatus, MessageType, TabType } from '@prisma/client';
+import { Length, ApplicationStatus, LinkedInMessageType, EmailMessageType, TabType } from '@prisma/client';
 
-export type { Length, MessageStatus, MessageType, TabType };
+export type { Length, ApplicationStatus, LinkedInMessageType, EmailMessageType, TabType };
 
 export interface User {
   id: string;
@@ -60,13 +60,13 @@ export interface LinkedInMessage {
   positionTitle: string;
   companyName: string;
   messageContent: string;
-  messageType: MessageType;
+  messageType: LinkedInMessageType;
   parentMessageId?: string | null;
   jobDescription?: string | null;
   companyDescription?: string | null;
   length: Length;
   llmModel?: string | null;
-  status: MessageStatus;
+  status: ApplicationStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,13 +81,13 @@ export interface EmailMessage {
   companyName: string;
   subjectLine: string;
   messageContent: string;
-  messageType: MessageType;
+  messageType: EmailMessageType;
   parentMessageId?: string | null;
   jobDescription?: string | null;
   companyDescription?: string | null;
   length: Length;
   llmModel?: string | null;
-  status: MessageStatus;
+  status: ApplicationStatus;
   createdAt: Date;
   updatedAt: Date;
 }

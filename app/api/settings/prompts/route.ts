@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
 
     // Convert array to object keyed by tab
     const promptsMap = prompts.reduce((acc, prompt) => {
-      acc[prompt.tab] = prompt.systemPrompt;
+      acc[prompt.tabType] = prompt.content;
       return acc;
     }, {} as Record<string, string>);
 
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
           prisma.customPrompt.deleteMany({
             where: {
               userId: user.id,
-              tab: 'COVER_LETTER',
+              tabType: 'COVER_LETTER',
             },
           })
         );
@@ -73,18 +73,20 @@ export async function POST(req: NextRequest) {
         operations.push(
           prisma.customPrompt.upsert({
             where: {
-              userId_tab: {
+              userId_name_tabType: {
                 userId: user.id,
-                tab: 'COVER_LETTER',
+                name: 'Cover Letter Prompt',
+                tabType: 'COVER_LETTER',
               },
             },
             update: {
-              systemPrompt: coverLetter.trim(),
+              content: coverLetter.trim(),
             },
             create: {
               userId: user.id,
-              tab: 'COVER_LETTER',
-              systemPrompt: coverLetter.trim(),
+              name: 'Cover Letter Prompt',
+              tabType: 'COVER_LETTER',
+              content: coverLetter.trim(),
             },
           })
         );
@@ -97,7 +99,7 @@ export async function POST(req: NextRequest) {
           prisma.customPrompt.deleteMany({
             where: {
               userId: user.id,
-              tab: 'LINKEDIN',
+              tabType: 'LINKEDIN',
             },
           })
         );
@@ -105,18 +107,20 @@ export async function POST(req: NextRequest) {
         operations.push(
           prisma.customPrompt.upsert({
             where: {
-              userId_tab: {
+              userId_name_tabType: {
                 userId: user.id,
-                tab: 'LINKEDIN',
+                name: 'LinkedIn Prompt',
+                tabType: 'LINKEDIN',
               },
             },
             update: {
-              systemPrompt: linkedIn.trim(),
+              content: linkedIn.trim(),
             },
             create: {
               userId: user.id,
-              tab: 'LINKEDIN',
-              systemPrompt: linkedIn.trim(),
+              name: 'LinkedIn Prompt',
+              tabType: 'LINKEDIN',
+              content: linkedIn.trim(),
             },
           })
         );
@@ -129,7 +133,7 @@ export async function POST(req: NextRequest) {
           prisma.customPrompt.deleteMany({
             where: {
               userId: user.id,
-              tab: 'EMAIL',
+              tabType: 'EMAIL',
             },
           })
         );
@@ -137,18 +141,20 @@ export async function POST(req: NextRequest) {
         operations.push(
           prisma.customPrompt.upsert({
             where: {
-              userId_tab: {
+              userId_name_tabType: {
                 userId: user.id,
-                tab: 'EMAIL',
+                name: 'Email Prompt',
+                tabType: 'EMAIL',
               },
             },
             update: {
-              systemPrompt: email.trim(),
+              content: email.trim(),
             },
             create: {
               userId: user.id,
-              tab: 'EMAIL',
-              systemPrompt: email.trim(),
+              name: 'Email Prompt',
+              tabType: 'EMAIL',
+              content: email.trim(),
             },
           })
         );

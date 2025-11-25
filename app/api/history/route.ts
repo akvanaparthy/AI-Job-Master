@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { ApplicationStatus } from '@prisma/client';
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
       prisma.coverLetter.findMany({
         where: {
           userId: user.id,
-          ...(status && status !== 'ALL' ? { status } : {}),
+          ...(status && status !== 'ALL' ? { status: status as ApplicationStatus } : {}),
           ...(search
             ? {
                 OR: [
@@ -47,7 +48,7 @@ export async function GET(req: NextRequest) {
       prisma.linkedInMessage.findMany({
         where: {
           userId: user.id,
-          ...(status && status !== 'ALL' ? { status } : {}),
+          ...(status && status !== 'ALL' ? { status: status as ApplicationStatus } : {}),
           ...(search
             ? {
                 OR: [
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
       prisma.emailMessage.findMany({
         where: {
           userId: user.id,
-          ...(status && status !== 'ALL' ? { status } : {}),
+          ...(status && status !== 'ALL' ? { status: status as ApplicationStatus } : {}),
           ...(search
             ? {
                 OR: [

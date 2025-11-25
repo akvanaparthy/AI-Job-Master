@@ -89,6 +89,8 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         title: title.trim(),
+        fileName: file.name,
+        fileUrl: '', // TODO: Upload to Supabase storage and get URL
         content,
         isDefault: isFirstResume,
       },

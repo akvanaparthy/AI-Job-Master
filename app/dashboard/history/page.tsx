@@ -87,8 +87,8 @@ export default function HistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-display font-bold text-slate-900 mb-3">Application History</h1>
-        <p className="text-lg text-slate-600">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Application History</h1>
+        <p className="text-lg text-slate-500">
           Track all your job applications and outreach in one centralized location.
         </p>
       </motion.div>
@@ -99,7 +99,7 @@ export default function HistoryPage() {
         transition={{ delay: 0.1 }}
         className="mb-6"
       >
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
+        <Card className=" border-slate-200 shadow-sm">
           <div className="p-6">
             <div className="grid md:grid-cols-4 gap-4">
               <div className="relative">
@@ -108,31 +108,31 @@ export default function HistoryPage() {
                   placeholder="Search company or position..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 h-11 bg-white border-slate-200 rounded-[16px]"
+                  className="pl-12 h-10 bg-white border-slate-200 rounded-lg"
                 />
               </div>
 
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="h-11 bg-white border-slate-200 rounded-[16px]">
+                <SelectTrigger className="h-10 bg-white border-slate-200 rounded-lg">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
-                <SelectContent className="rounded-[16px]">
+                <SelectContent className="rounded-lg">
                   {[
                     ['ALL', 'All Types'],
                     ['Cover Letter', 'Cover Letters'],
                     ['LinkedIn', 'LinkedIn'],
                     ['Email', 'Emails']
                   ].map(([v, l]) => (
-                    <SelectItem key={v} value={v} className="rounded-[12px]">{l}</SelectItem>
+                    <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="h-11 bg-white border-slate-200 rounded-[16px]">
+                <SelectTrigger className="h-10 bg-white border-slate-200 rounded-lg">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
-                <SelectContent className="rounded-[16px]">
+                <SelectContent className="rounded-lg">
                   {[
                     ['ALL', 'All Statuses'],
                     ['DRAFT', 'Draft'],
@@ -140,14 +140,14 @@ export default function HistoryPage() {
                     ['DONE', 'Done'],
                     ['GHOST', 'Ghost']
                   ].map(([v, l]) => (
-                    <SelectItem key={v} value={v} className="rounded-[12px]">{l}</SelectItem>
+                    <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
 
               <Button
                 onClick={handleExportCSV}
-                className="h-11 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-[16px] transition-colors"
+                className="h-10 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-colors"
               >
                 <Download className="mr-2 h-4 w-4" />
                 Export CSV
@@ -162,7 +162,7 @@ export default function HistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-sm">
+        <Card className=" border-slate-200 shadow-sm">
           <div className="p-6">
             {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
@@ -173,7 +173,7 @@ export default function HistoryPage() {
               <>
                 {history.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20">
-                    <div className="w-20 h-20 rounded-[20px] bg-slate-100 flex items-center justify-center mb-4">
+                    <div className="w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center mb-4">
                       <History className="w-10 h-10 text-slate-400" />
                     </div>
                     <h3 className="text-lg font-display font-semibold text-slate-900 mb-2">No Applications Yet</h3>
@@ -182,7 +182,7 @@ export default function HistoryPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="rounded-[16px] border border-slate-200 overflow-hidden">
+                  <div className="rounded-lg border border-slate-200 overflow-hidden">
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-slate-50 border-b border-slate-200">
@@ -212,14 +212,14 @@ export default function HistoryPage() {
                                   {item.status}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="text-slate-600">
+                              <TableCell className="text-slate-500">
                                 {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                               </TableCell>
                               <TableCell className="text-right">
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="rounded-[12px] border-slate-200 hover:bg-slate-50 text-slate-700"
+                                  className="rounded-md border-slate-200 hover:bg-slate-50 text-slate-700"
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
                                   View
@@ -234,7 +234,7 @@ export default function HistoryPage() {
                 )}
 
                 {history.length > 0 && (
-                  <div className="mt-6 flex justify-between items-center text-sm text-slate-600">
+                  <div className="mt-6 flex justify-between items-center text-sm text-slate-500">
                     <span>
                       Showing {history.length} {history.length === 1 ? 'application' : 'applications'}
                     </span>

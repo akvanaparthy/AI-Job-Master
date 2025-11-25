@@ -16,8 +16,8 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-display font-bold text-slate-900 mb-3">Settings</h1>
-        <p className="text-lg text-slate-600">
+        <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
+        <p className="text-lg text-slate-500">
           Manage your API keys, resumes, custom prompts, and preferences.
         </p>
       </motion.div>
@@ -28,31 +28,31 @@ export default function SettingsPage() {
         transition={{ delay: 0.1 }}
       >
         <Tabs defaultValue="api-keys" className="space-y-6">
-          <TabsList className="bg-white/80 backdrop-blur-sm border border-slate-200 p-1 rounded-[20px] grid grid-cols-4 gap-1">
+          <TabsList className="bg-white border border-slate-200 p-1 rounded-lg grid grid-cols-4 gap-1">
             <TabsTrigger
               value="api-keys"
-              className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
             >
               <Key className="h-4 w-4" />
               <span className="hidden sm:inline">API Keys</span>
             </TabsTrigger>
             <TabsTrigger
               value="resumes"
-              className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
             >
               <FileText className="h-4 w-4" />
               <span className="hidden sm:inline">Resumes</span>
             </TabsTrigger>
             <TabsTrigger
               value="prompts"
-              className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
             >
               <MessageSquare className="h-4 w-4" />
               <span className="hidden sm:inline">Prompts</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
-              className="rounded-[16px] data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
             >
               <SettingsIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Preferences</span>

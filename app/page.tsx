@@ -232,7 +232,7 @@ export default function Home() {
               We Understand Your <span className="text-red-400">Challenges</span>
             </h2>
             <p className="text-xl text-purple-200 max-w-3xl mx-auto">
-              The job search journey can be overwhelming. You're qualified and talented, yet...
+              The job search journey can be overwhelming. You&apos;re qualified and talented, yet...
             </p>
           </motion.div>
 
@@ -288,7 +288,7 @@ export default function Home() {
               Your Personal AI <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Career Assistant</span>
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Imagine having an assistant who crafts perfect messages, knows what to say, and keeps everything organized. That's us.
+              Imagine having an assistant who crafts perfect messages, knows what to say, and keeps everything organized. That&apos;s us.
             </p>
           </motion.div>
 

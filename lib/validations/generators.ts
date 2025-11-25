@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Length, MessageStatus } from '@prisma/client';
+import { Length, ApplicationStatus } from '@prisma/client';
 
 export const coverLetterSchema = z.object({
   resumeId: z.string().min(1, 'Resume is required'),
@@ -31,7 +31,7 @@ export const linkedInMessageSchema = z.object({
   companyDescription: z.string().optional(),
   length: z.nativeEnum(Length),
   llmModel: z.string().min(1, 'LLM model is required'),
-  status: z.nativeEnum(MessageStatus),
+  status: z.nativeEnum(ApplicationStatus),
   customPromptId: z.string().optional(),
 }).refine((data) => {
   if (data.messageType === 'NEW') {
@@ -64,7 +64,7 @@ export const emailMessageSchema = z.object({
   companyDescription: z.string().optional(),
   length: z.nativeEnum(Length),
   llmModel: z.string().min(1, 'LLM model is required'),
-  status: z.nativeEnum(MessageStatus),
+  status: z.nativeEnum(ApplicationStatus),
   customPromptId: z.string().optional(),
 });
 

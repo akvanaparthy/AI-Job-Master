@@ -148,16 +148,16 @@ export async function POST(req: NextRequest) {
     // Expected format: "Subject: ...\n\nBody: ..." or just "Subject: ...\n\n<email content>"
     const lines = generatedContent.split('\n');
     let subject = '';
-    let body = '';
+    let emailBody = '';
 
     const subjectLineIndex = lines.findIndex(line => line.toLowerCase().startsWith('subject:'));
     
     if (subjectLineIndex !== -1) {
       // Extract subject
       subject = lines[subjectLineIndex].replace(/^subject:\s*/i, '').trim();
-      
+
       // Extract body - everything after subject line, skipping "Body:" label if present
-      body = lines.slice(subjectLineIndex + 1)
+      emailBody = lines.slice(subjectLineIndex + 1)
         .filter((line, index) => {
           // Skip the first line if it says "Body:" or is empty
           if (index === 0 && (line.toLowerCase().startsWith('body:') || line.trim() === '')) {
@@ -168,10 +168,10 @@ export async function POST(req: NextRequest) {
         .join('\n')
         .trim();
     }
-    
+
     // Fallback: if no subject found or body is empty, use entire content as body
-    if (!subject || !body) {
-      body = generatedContent.replace(/^subject:\s*.+\n*/i, '').trim() || generatedContent;
+    if (!subject || !emailBody) {
+      emailBody = generatedContent.replace(/^subject:\s*.+\n*/i, '').trim() || generatedContent;
       if (!subject) {
         subject = `Application for ${positionTitle} at ${companyName}`;
       }
@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
         jobDescription,
         companyDescription,
         subject,
-        body,
+        body: emailBody,
         length: length as Length,
         llmModel,
         parentMessageId: parentMessageId || null,
@@ -200,7 +200,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       subject,
-      body,
+      body: emailBody,
       id: emailMessage.id,
     });
   } catch (error: any) {

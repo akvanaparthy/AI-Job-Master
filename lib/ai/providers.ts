@@ -14,6 +14,11 @@ export interface GenerateContentParams {
   temperature?: number;
 }
 
+type ProviderGenerateParams = Omit<GenerateContentParams, 'provider'> & {
+  maxTokens: number;
+  temperature: number;
+};
+
 /**
  * Generates content using the specified AI provider
  */
@@ -74,7 +79,7 @@ async function generateWithOpenAI({
   userPrompt,
   maxTokens,
   temperature,
-}: Omit<GenerateContentParams, 'provider'>): Promise<string> {
+}: ProviderGenerateParams): Promise<string> {
   const openai = new OpenAI({ apiKey });
 
   const response = await openai.chat.completions.create({
@@ -97,7 +102,7 @@ async function generateWithAnthropic({
   userPrompt,
   maxTokens,
   temperature,
-}: Omit<GenerateContentParams, 'provider'>): Promise<string> {
+}: ProviderGenerateParams): Promise<string> {
   const anthropic = new Anthropic({ apiKey });
 
   const response = await anthropic.messages.create({
@@ -121,7 +126,7 @@ async function generateWithGemini({
   userPrompt,
   maxTokens,
   temperature,
-}: Omit<GenerateContentParams, 'provider'>): Promise<string> {
+}: ProviderGenerateParams): Promise<string> {
   const genAI = new GoogleGenerativeAI(apiKey);
   const geminiModel = genAI.getGenerativeModel({
     model,

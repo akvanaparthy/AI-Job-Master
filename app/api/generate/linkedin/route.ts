@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     // Parse request body
     const body = await req.json();
-    const {
+    let {
       resumeId,
       messageType,
       linkedinUrl,
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
 
       // For follow-ups without explicit parentMessageId, use the most recent message
       if (!parentMessageId) {
-        body.parentMessageId = existingMessages[existingMessages.length - 1].id;
+        parentMessageId = existingMessages[existingMessages.length - 1].id;
       }
     }
 
