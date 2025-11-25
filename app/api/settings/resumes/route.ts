@@ -83,6 +83,33 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Upload file to Supabase Storage
+    const fileBuffer = await file.arrayBuffer();
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('resumes')
+      .upload(fileName, fileBuffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error('Supabase storage upload error:', uploadError);
+      return NextResponse.json(
+        { error: 'Failed to upload resume file to storage' },
+        { status: 500 }
+      );
+    }
+
+    // Get public URL for the uploaded file
+    const { data: { publicUrl } } = supabase
+      .storage
+      .from('resumes')
+      .getPublicUrl(fileName);
+
     // Create resume (set as default if it's the first one)
     const isFirstResume = resumeCount === 0;
     const resume = await prisma.resume.create({
@@ -90,7 +117,7 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         title: title.trim(),
         fileName: file.name,
-        fileUrl: '', // TODO: Upload to Supabase storage and get URL
+        fileUrl: publicUrl,
         content,
         isDefault: isFirstResume,
       },
@@ -151,7 +178,23 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // Delete the resume
+    // Delete file from Supabase Storage if fileUrl exists
+    if (resume.fileUrl) {
+      try {
+        // Extract file path from URL
+        const url = new URL(resume.fileUrl);
+        const pathParts = url.pathname.split('/resumes/');
+        if (pathParts.length > 1) {
+          const filePath = pathParts[1];
+          await supabase.storage.from('resumes').remove([filePath]);
+        }
+      } catch (storageError) {
+        console.error('Failed to delete file from storage:', storageError);
+        // Continue with database deletion even if storage deletion fails
+      }
+    }
+
+    // Delete the resume from database
     await prisma.resume.delete({
       where: { id: resumeId },
     });

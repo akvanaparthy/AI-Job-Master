@@ -20,6 +20,11 @@ model User {
   anthropicApiKey   String?
   geminiApiKey      String?
 
+  // Available models (fetched from API providers)
+  openaiModels      String[]  @default([])
+  anthropicModels   String[]  @default([])
+  geminiModels      String[]  @default([])
+
   // User preferences
   defaultResumeId   String?
   defaultLlmModel   String?
