@@ -10,16 +10,23 @@ import UserPreferencesManager from '@/components/settings/UserPreferencesManager
 
 export default function SettingsPage() {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-[1400px] mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Settings</h1>
-        <p className="text-lg text-slate-500">
-          Manage your API keys, resumes, custom prompts, and preferences.
-        </p>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
+            <SettingsIcon className="w-6 h-6 text-white" strokeWidth={2.5} />
+          </div>
+          <div>
+            <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Settings</h1>
+            <p className="text-lg text-slate-500">
+              Manage your API keys, resumes, custom prompts, and preferences
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       <motion.div
