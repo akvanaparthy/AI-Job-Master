@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
       companyDescription,
       length,
       llmModel,
+      saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
     // Validate required fields
@@ -107,6 +108,8 @@ export async function POST(req: NextRequest) {
       resumeContent,
       jobDescription,
       companyDescription,
+      companyName,
+      positionTitle,
       length: length as Length,
     });
 
@@ -121,25 +124,30 @@ export async function POST(req: NextRequest) {
       temperature: 0.7,
     });
 
-    // Save to database (if auto-save is enabled or explicitly requested)
-    const coverLetter = await prisma.coverLetter.create({
-      data: {
-        userId: user.id,
-        resumeId: resumeId || null,
-        companyName,
-        positionTitle,
-        jobDescription,
-        companyDescription,
-        content: generatedContent,
-        length: length as Length,
-        llmModel,
-      },
-    });
+    // Save to database only if requested
+    let coverLetterId = null;
+    if (saveToHistory) {
+      const coverLetter = await prisma.coverLetter.create({
+        data: {
+          userId: user.id,
+          resumeId: resumeId || null,
+          companyName,
+          positionTitle,
+          jobDescription,
+          companyDescription,
+          content: generatedContent,
+          length: length as Length,
+          llmModel,
+        },
+      });
+      coverLetterId = coverLetter.id;
+    }
 
     return NextResponse.json({
       success: true,
       content: generatedContent,
-      id: coverLetter.id,
+      id: coverLetterId,
+      saved: saveToHistory,
     });
   } catch (error: any) {
     console.error('Cover letter generation error:', error);

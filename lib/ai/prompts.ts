@@ -25,7 +25,7 @@ const lengthInstructions: Record<Length, string> = {
  * Default cover letter prompt
  */
 export function getCoverLetterPrompt(params: PromptParams): { system: string; user: string } {
-  const { resumeContent, jobDescription, companyDescription, length } = params;
+  const { resumeContent, jobDescription, companyDescription, length, companyName, positionTitle } = params;
 
   const system = `You are an expert cover letter writer with years of experience helping job seekers land their dream roles. Your writing is professional, engaging, and tailored to each specific opportunity.
 
@@ -34,11 +34,14 @@ Key principles:
 - Show genuine enthusiasm for the role and company
 - Use a professional yet personable tone
 - Be specific and avoid generic statements
-- Use proper business letter format
+- Extract the candidate's name, location, and contact details from their resume
+- Format the letter with proper header including: candidate's name, location, today's date, and recipient info
+- Use actual information from the resume, NOT placeholders like [Your Address] or [Date]
 - ${lengthInstructions[length]}`;
 
   const user = `Please write a compelling cover letter for the following job opportunity:
 
+${positionTitle && companyName ? `POSITION: ${positionTitle} at ${companyName}\n` : ''}
 JOB DESCRIPTION:
 ${jobDescription || 'Not provided'}
 
@@ -46,7 +49,17 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY RESUME:
 ${resumeContent || 'Not provided'}
 
-Create a cover letter that effectively showcases why I'm an excellent fit for this role.`;
+IMPORTANT INSTRUCTIONS:
+1. Extract my name, location (city, state), and contact info from the resume above
+2. Use today's date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+3. Format the header as:
+   [My Name from resume]
+   [My City, State from resume]
+   ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+4. Then write the letter body showcasing why I'm an excellent fit for this role.
+
+Do NOT use placeholders like [Your Address] or [Date]. Extract actual information from my resume.`;
 
   return { system, user };
 }
