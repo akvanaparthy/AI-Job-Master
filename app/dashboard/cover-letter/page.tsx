@@ -45,6 +45,7 @@ export default function CoverLetterPage() {
   useEffect(() => {
     loadResumes();
     loadAvailableModels();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadResumes = async () => {

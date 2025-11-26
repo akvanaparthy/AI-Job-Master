@@ -107,6 +107,7 @@ export default function EmailPage() {
         description: 'Form pre-filled with previous email details',
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadResumes = async () => {

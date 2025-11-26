@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -88,13 +88,7 @@ export default function UserActivityPage() {
   const [data, setData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (params.id) {
-      loadUserActivity(params.id as string);
-    }
-  }, [params.id]);
-
-  const loadUserActivity = async (userId: string) => {
+  const loadUserActivity = useCallback(async (userId: string) => {
     setLoading(true);
     try {
       const response = await fetch(`/api/admin/users/${userId}/activity`);
@@ -115,7 +109,13 @@ export default function UserActivityPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router, toast]);
+
+  useEffect(() => {
+    if (params.id) {
+      loadUserActivity(params.id as string);
+    }
+  }, [params.id, loadUserActivity]);
 
   if (loading) {
     return (

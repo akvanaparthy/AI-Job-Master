@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -27,11 +27,7 @@ export default function AdminSettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    loadLimits();
-  }, []);
-
-  const loadLimits = async () => {
+  const loadLimits = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch('/api/admin/usage-limits');
@@ -52,7 +48,11 @@ export default function AdminSettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router, toast]);
+
+  useEffect(() => {
+    loadLimits();
+  }, [loadLimits]);
 
   const updateLimit = async (userType: string, maxActivities: number, includeFollowups: boolean) => {
     setSaving(true);

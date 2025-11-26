@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,7 +10,7 @@ import ResumeManager from '@/components/settings/ResumeManager';
 import CustomPromptsManager from '@/components/settings/CustomPromptsManager';
 import UserPreferencesManager from '@/components/settings/UserPreferencesManager';
 
-export default function SettingsPage() {
+function SettingsContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('api-keys');
 
@@ -120,5 +120,13 @@ export default function SettingsPage() {
         </Tabs>
       </motion.div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]">Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   );
 }

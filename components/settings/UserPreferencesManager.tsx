@@ -216,7 +216,7 @@ export default function UserPreferencesManager() {
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              You'll be reminded to follow up on LinkedIn/Email messages after this many days
+              You&apos;ll be reminded to follow up on LinkedIn/Email messages after this many days
             </p>
           </div>
         </CardContent>

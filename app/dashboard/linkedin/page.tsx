@@ -104,6 +104,7 @@ export default function LinkedInPage() {
         description: 'Form pre-filled with previous message details',
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadResumes = async () => {

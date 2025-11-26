@@ -68,6 +68,7 @@ export default function DashboardPage() {
   // Force refresh on mount to get latest data
   useEffect(() => {
     refreshStats();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalGenerated = (stats?.totalCoverLetters || 0) + (stats?.totalLinkedInMessages || 0) + (stats?.totalEmails || 0);

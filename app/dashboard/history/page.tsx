@@ -74,10 +74,12 @@ export default function HistoryPage() {
 
   useEffect(() => {
     loadHistory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     filterHistory();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchQuery, typeFilter, statusFilter, history]);
 
   const loadHistory = async () => {
