@@ -25,7 +25,7 @@ async function setFullAdmin() {
   console.log(`   User Type: ${user.userType}`);
   console.log(`   Is Admin: ${user.isAdmin}`);
   console.log('\n🎉 You now have full admin access with unlimited activities!');
-  console.log('\n📍 Access admin dashboard at: /dashboard/admin');
+  console.log('\n📍 Access admin dashboard at: /admin');
 }
 
 setFullAdmin()

@@ -178,7 +178,7 @@ export default function AdminDashboard() {
             </button>
 
             <button
-              onClick={() => router.push('/dashboard/admin/settings')}
+              onClick={() => router.push('/admin/settings')}
               className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border border-purple-100 hover:border-purple-200 transition-colors text-left"
             >
               <MessageSquare className="w-5 h-5 text-purple-600 mb-2" />
@@ -187,7 +187,7 @@ export default function AdminDashboard() {
             </button>
 
             <button
-              onClick={() => router.push('/dashboard/admin/analytics')}
+              onClick={() => router.push('/admin/analytics')}
               className="p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg border border-emerald-100 hover:border-emerald-200 transition-colors text-left"
             >
               <TrendingUp className="w-5 h-5 text-emerald-600 mb-2" />

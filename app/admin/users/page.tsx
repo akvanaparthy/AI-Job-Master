@@ -260,7 +260,7 @@ export default function AdminUsersPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => router.push(`/dashboard/admin/users/${user.id}`)}
+                            onClick={() => router.push(`/admin/users/${user.id}`)}
                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                           >
                             <Eye className="w-4 h-4" />

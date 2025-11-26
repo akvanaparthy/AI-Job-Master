@@ -146,7 +146,7 @@ export default function AdminAnalyticsPage() {
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => router.push('/dashboard/admin')}>
+            <Button variant="outline" size="sm" onClick={() => router.push('/admin')}>
               <ChevronLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
