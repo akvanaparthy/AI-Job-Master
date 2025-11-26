@@ -14,6 +14,7 @@ interface Preferences {
   defaultLength: string;
   autoSave: boolean;
   defaultStatus: string;
+  followupReminderDays: number;
 }
 
 export default function UserPreferencesManager() {
@@ -25,6 +26,7 @@ export default function UserPreferencesManager() {
     defaultLength: 'MEDIUM',
     autoSave: true,
     defaultStatus: 'SENT',
+    followupReminderDays: 7,
   });
 
   useEffect(() => {
@@ -178,7 +180,7 @@ export default function UserPreferencesManager() {
             Configure how the application behaves
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Auto-save Generated Content</Label>
@@ -192,6 +194,30 @@ export default function UserPreferencesManager() {
                 setPreferences((prev) => ({ ...prev, autoSave: checked }))
               }
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Follow-up Reminder Days</Label>
+            <Select
+              value={preferences.followupReminderDays.toString()}
+              onValueChange={(value) =>
+                setPreferences((prev) => ({ ...prev, followupReminderDays: parseInt(value) }))
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="3">3 days</SelectItem>
+                <SelectItem value="5">5 days</SelectItem>
+                <SelectItem value="7">7 days (recommended)</SelectItem>
+                <SelectItem value="10">10 days</SelectItem>
+                <SelectItem value="14">14 days</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              You'll be reminded to follow up on LinkedIn/Email messages after this many days
+            </p>
           </div>
         </CardContent>
       </Card>

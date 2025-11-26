@@ -17,10 +17,10 @@ export async function GET(req: NextRequest) {
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { userType: true },
+      select: { isAdmin: true },
     });
 
-    if (!dbUser || dbUser.userType !== 'ADMIN') {
+    if (!dbUser || !dbUser.isAdmin) {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
@@ -49,6 +49,7 @@ export async function GET(req: NextRequest) {
           id: true,
           email: true,
           userType: true,
+          isAdmin: true,
           createdAt: true,
           updatedAt: true,
           openaiApiKey: true,
@@ -75,6 +76,7 @@ export async function GET(req: NextRequest) {
       id: u.id,
       email: u.email,
       userType: u.userType,
+      isAdmin: u.isAdmin,
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       hasOpenaiKey: !!u.openaiApiKey,
@@ -102,6 +104,60 @@ export async function GET(req: NextRequest) {
     console.error('Admin get users error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch users' },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT - Update user (change type or admin status)
+export async function PUT(req: NextRequest) {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check if user is admin
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { isAdmin: true },
+    });
+
+    if (!dbUser || !dbUser.isAdmin) {
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
+    }
+
+    const body = await req.json();
+    const { userId, userType, isAdmin } = body;
+
+    if (!userId) {
+      return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
+    }
+
+    // Update user
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        ...(userType && { userType }),
+        ...(isAdmin !== undefined && { isAdmin }),
+      },
+      select: {
+        id: true,
+        email: true,
+        userType: true,
+        isAdmin: true,
+      },
+    });
+
+    return NextResponse.json({ user: updated });
+  } catch (error: any) {
+    console.error('Admin update user error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to update user' },
       { status: 500 }
     );
   }

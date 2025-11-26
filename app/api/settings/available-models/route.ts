@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { getModelDisplayNameWithProvider } from '@/lib/utils/modelNames';
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,11 +39,23 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Combine all available models with provider information
+    // Combine all available models with provider information and user-friendly names
     const allModels = [
-      ...dbUser.openaiModels.map(model => ({ value: model, label: model, provider: 'openai' })),
-      ...dbUser.anthropicModels.map(model => ({ value: model, label: model, provider: 'anthropic' })),
-      ...dbUser.geminiModels.map(model => ({ value: model, label: model, provider: 'gemini' })),
+      ...dbUser.openaiModels.map(model => ({
+        value: model,
+        label: getModelDisplayNameWithProvider(model),
+        provider: 'openai'
+      })),
+      ...dbUser.anthropicModels.map(model => ({
+        value: model,
+        label: getModelDisplayNameWithProvider(model),
+        provider: 'anthropic'
+      })),
+      ...dbUser.geminiModels.map(model => ({
+        value: model,
+        label: getModelDisplayNameWithProvider(model),
+        provider: 'gemini'
+      })),
     ];
 
     const hasAnyKey = !!(dbUser.openaiApiKey || dbUser.anthropicApiKey || dbUser.geminiApiKey);

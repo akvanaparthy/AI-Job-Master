@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,14 @@ import {
 } from 'lucide-react';
 
 export default function Home() {
+  const [userCount, setUserCount] = useState('10,000+');
+
+  useEffect(() => {
+    fetch('/api/public/stats')
+      .then(res => res.json())
+      .then(data => setUserCount(data.displayCount))
+      .catch(() => setUserCount('10,000+'));
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] relative overflow-hidden">
       {/* Subtle gradient orbs - very soft */}
@@ -51,18 +60,18 @@ export default function Home() {
 
               {/* Nav Links - Center */}
               <div className="hidden md:flex items-center gap-12">
-                <Link href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                <a href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
                   Features
-                </Link>
-                <Link href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                </a>
+                <a href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
                   How It Works
-                </Link>
-                <Link href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                </a>
+                <a href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
                   About
-                </Link>
-                <Link href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
+                </a>
+                <a href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
                   Pricing
-                </Link>
+                </a>
               </div>
 
               {/* CTA Button - Right side */}
@@ -95,15 +104,23 @@ export default function Home() {
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 to-purple-400 border-[3px] border-white shadow-md" />
             </div>
             <p className="text-[15px] text-slate-700 font-medium">
-              <span className="text-teal-600 font-bold">10,000+</span> job seekers trust us
+              <span className="text-teal-600 font-bold">{userCount}</span> job seekers trust us
             </p>
           </motion.div>
 
           {/* Main Headline with Icon */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            animate={{ opacity: 1, y: [0, -8, 0] }}
+            transition={{ 
+              opacity: { delay: 0.3 },
+              y: { 
+                delay: 0.3,
+                duration: 3, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }
+            }}
             className="mb-8"
           >
             <h1 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1] mb-0">
@@ -220,7 +237,7 @@ export default function Home() {
       </section>
 
       {/* Problem Section */}
-      <section className="relative z-10 py-24 px-6 bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+      <section id="features" className="relative z-10 py-24 px-6 bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -276,7 +293,7 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section className="relative z-10 py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <section id="how-it-works" className="relative z-10 py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -446,7 +463,7 @@ export default function Home() {
       </section>
 
       {/* Benefits */}
-      <section className="relative z-10 py-24 px-6 bg-white">
+      <section id="about" className="relative z-10 py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
@@ -490,7 +507,7 @@ export default function Home() {
               },
               {
                 icon: Users,
-                title: "10,000+ Community",
+                title: `${userCount} Community`,
                 description: "Join thousands of successful job seekers achieving their goals.",
                 color: "from-red-500 to-rose-500"
               },
@@ -525,7 +542,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative z-10 py-28 px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
+      <section id="pricing" className="relative z-10 py-28 px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-0 w-full h-full bg-white rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-white rounded-full blur-[150px] translate-x-1/2 translate-y-1/2" />
@@ -563,7 +580,7 @@ export default function Home() {
             </div>
             <div className="flex items-center gap-2.5 text-white">
               <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">10,000+ Users</span>
+              <span className="text-sm font-medium">{userCount} Users</span>
             </div>
             <div className="flex items-center gap-2.5 text-white">
               <Zap className="w-5 h-5" />

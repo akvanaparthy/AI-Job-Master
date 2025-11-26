@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
         defaultLength: true,
         autoSave: true,
         defaultStatus: true,
+        followupReminderDays: true,
       },
     });
 
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
           defaultLength: 'MEDIUM',
           autoSave: true,
           defaultStatus: 'SENT',
+          followupReminderDays: 7,
         },
       });
     }
@@ -42,6 +44,7 @@ export async function GET(req: NextRequest) {
         defaultLength: dbUser.defaultLength || 'MEDIUM',
         autoSave: dbUser.autoSave !== null ? dbUser.autoSave : true,
         defaultStatus: dbUser.defaultStatus || 'SENT',
+        followupReminderDays: dbUser.followupReminderDays || 7,
       },
     });
   } catch (error: any) {
@@ -66,7 +69,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { defaultLlmModel, defaultLength, autoSave, defaultStatus } = body;
+    const { defaultLlmModel, defaultLength, autoSave, defaultStatus, followupReminderDays } = body;
 
     await prisma.user.upsert({
       where: { id: user.id },
@@ -75,6 +78,7 @@ export async function POST(req: NextRequest) {
         defaultLength,
         autoSave,
         defaultStatus,
+        followupReminderDays,
       },
       create: {
         id: user.id,
@@ -83,6 +87,7 @@ export async function POST(req: NextRequest) {
         defaultLength,
         autoSave,
         defaultStatus,
+        followupReminderDays,
       },
     });
 

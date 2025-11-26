@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useState, useEffect } from 'react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { NotificationsBell } from '@/components/NotificationsBell';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -31,6 +33,18 @@ export default function DashboardLayout({
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
+  const [userEmail, setUserEmail] = useState<string>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.email) {
+        setUserEmail(user.email);
+      }
+    };
+    loadUser();
+  }, [supabase]);
 
   const handleLogout = async () => {
     try {
@@ -123,16 +137,16 @@ export default function DashboardLayout({
 
         {/* User Profile */}
         <div className="p-4 border-t border-gray-300/50 mt-auto">
-          <DropdownMenu>
+          <DropdownMenu onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-3 px-3 py-2.5 mb-3 w-full rounded-xl hover:bg-white/40 transition-all">
                 <div className="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
                   <User className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-[15px] font-semibold text-gray-900 truncate">Personal</p>
+                  <p className="text-[15px] font-semibold text-gray-900 truncate">{userEmail || 'Loading...'}</p>
                 </div>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
+                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
@@ -158,6 +172,13 @@ export default function DashboardLayout({
 
       {/* Main content */}
       <div className="pl-[280px]">
+        {/* Top header bar */}
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-4">
+          <div className="flex items-center justify-end">
+            <NotificationsBell />
+          </div>
+        </div>
+
         <main className="min-h-screen p-8 bg-white">
           {children}
         </main>

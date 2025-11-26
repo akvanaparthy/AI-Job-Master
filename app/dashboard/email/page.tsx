@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -46,10 +46,47 @@ export default function EmailPage() {
   const [generatedBody, setGeneratedBody] = useState('');
   const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [parentMessageId, setParentMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     loadResumes();
     loadAvailableModels();
+
+    // Check for followup parameters in URL
+    const params = new URLSearchParams(window.location.search);
+    const isFollowup = params.get('followup') === 'true';
+    const messageId = params.get('id');
+
+    if (isFollowup && messageId) {
+      setMessageType('FOLLOW_UP');
+      setParentMessageId(messageId);
+
+      // Pre-fill form fields from URL params
+      const positionTitleParam = params.get('positionTitle');
+      const companyNameParam = params.get('companyName');
+      const recipientEmailParam = params.get('recipientEmail');
+      const recipientNameParam = params.get('recipientName');
+      const jobDescriptionParam = params.get('jobDescription');
+      const companyDescriptionParam = params.get('companyDescription');
+      const resumeIdParam = params.get('resumeId');
+      const lengthParam = params.get('length');
+      const llmModelParam = params.get('llmModel');
+
+      if (positionTitleParam) setPositionTitle(positionTitleParam);
+      if (companyNameParam) setCompanyName(companyNameParam);
+      if (recipientEmailParam) setRecipientEmail(recipientEmailParam);
+      if (recipientNameParam) setRecipientName(recipientNameParam);
+      if (jobDescriptionParam) setJobDescription(jobDescriptionParam);
+      if (companyDescriptionParam) setCompanyDescription(companyDescriptionParam);
+      if (resumeIdParam) setSelectedResumeId(resumeIdParam);
+      if (lengthParam) setLength(lengthParam as 'CONCISE' | 'MEDIUM' | 'LONG');
+      if (llmModelParam) setLlmModel(llmModelParam);
+
+      toast({
+        title: 'Follow-up mode',
+        description: 'Form pre-filled with previous email details',
+      });
+    }
   }, []);
 
   const loadResumes = async () => {
@@ -213,13 +250,13 @@ export default function EmailPage() {
           <TabsList className="bg-white border border-slate-200 p-1.5 rounded-xl shadow-sm">
             <TabsTrigger
               value="NEW"
-              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out"
             >
               New Email
             </TabsTrigger>
             <TabsTrigger
               value="FOLLOW_UP"
-              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all"
+              className="rounded-lg px-6 data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Follow-up Email
@@ -402,28 +439,38 @@ export default function EmailPage() {
                 </div>
               </div>
 
-              {messageType === 'NEW' && (
-                <>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-900">Job Description (Optional)</Label>
-                    <Textarea
-                      placeholder="Paste the job description here..."
-                      className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
-                      value={jobDescription}
-                      onChange={(e) => setJobDescription(e.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-900">Company Info (Optional)</Label>
-                    <Textarea
-                      placeholder="What interests you about this company?"
-                      className="min-h-[80px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
-                      value={companyDescription}
-                      onChange={(e) => setCompanyDescription(e.target.value)}
-                    />
-                  </div>
-                </>
-              )}
+              <AnimatePresence mode="wait">
+                {messageType === 'NEW' && (
+                  <motion.div
+                    key="new-email-fields"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  >
+                    <div className="space-y-5">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-900">Job Description (Optional)</Label>
+                        <Textarea
+                          placeholder="Paste the job description here..."
+                          className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                          value={jobDescription}
+                          onChange={(e) => setJobDescription(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-900">Company Info (Optional)</Label>
+                        <Textarea
+                          placeholder="What interests you about this company?"
+                          className="min-h-[80px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                          value={companyDescription}
+                          onChange={(e) => setCompanyDescription(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <Button
                 onClick={handleGenerate}

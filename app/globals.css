@@ -96,6 +96,15 @@
   }
 }
 
+@keyframes gaugePulse {
+  0%, 100% {
+    stroke-dasharray: 40 267;
+  }
+  50% {
+    stroke-dasharray: 267 267;
+  }
+}
+
 .animate-gradient {
   background-size: 200% 200%;
   animation: gradient-shift 8s ease infinite;

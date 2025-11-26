@@ -1,29 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useSpring, useTransform } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, MessageSquare, Mail, ArrowRight, TrendingUp, Clock, ArrowUpRight } from 'lucide-react';
+import { FileText, MessageSquare, Mail, ArrowRight, TrendingUp, Clock, ArrowUpRight, Reply, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useToast } from '@/hooks/use-toast';
 
-interface DashboardStats {
-  totalCoverLetters: number;
-  totalLinkedInMessages: number;
-  totalEmails: number;
-  hoursSaved: number;
-  usagePercentage: number;
-  recentActivity: Array<{
-    id: string;
-    type: 'Cover Letter' | 'LinkedIn' | 'Email';
-    company: string;
-    position: string;
-    createdAt: string;
-    reduction?: number;
-    wordsBefore?: number;
-    wordsAfter?: number;
-  }>;
+// Animated number component
+function AnimatedNumber({ value }: { value: number }) {
+  const spring = useSpring(0, { stiffness: 100, damping: 30 });
+  const display = useTransform(spring, (current) => Math.round(current));
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    spring.set(value);
+    const unsubscribe = display.on('change', (latest) => {
+      setDisplayValue(latest);
+    });
+    return unsubscribe;
+  }, [value, spring, display]);
+
+  return <>{displayValue}</>;
 }
 
 const QUICK_ACTIONS = [
@@ -57,37 +59,76 @@ const QUICK_ACTIONS = [
 ];
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalCoverLetters: 55,
-    totalLinkedInMessages: 12,
-    totalEmails: 24,
-    hoursSaved: 16,
-    usagePercentage: 68,
-    recentActivity: [
-      {
-        id: '1',
-        type: 'Cover Letter',
-        company: 'TechCorp Inc.',
-        position: 'Senior Software Engineer',
-        createdAt: new Date().toISOString(),
-        reduction: 56,
-        wordsBefore: 637,
-        wordsAfter: 280,
-      },
-      {
-        id: '2',
-        type: 'LinkedIn',
-        company: 'StartupXYZ',
-        position: 'Product Manager',
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-        reduction: 50,
-        wordsBefore: 102,
-        wordsAfter: 51,
-      },
-    ],
-  });
+  const router = useRouter();
+  const { toast } = useToast();
 
-  const totalGenerated = stats.totalCoverLetters + stats.totalLinkedInMessages + stats.totalEmails;
+  // Use custom hook for dashboard stats with caching
+  const { data: stats, isLoading: loading, error, refreshStats } = useDashboardStats();
+
+  // Force refresh on mount to get latest data
+  useEffect(() => {
+    refreshStats();
+  }, []);
+
+  const totalGenerated = (stats?.totalCoverLetters || 0) + (stats?.totalLinkedInMessages || 0) + (stats?.totalEmails || 0);
+
+  // Handle follow-up button click
+  const handleFollowup = (activity: any) => {
+    const params = new URLSearchParams({
+      followup: 'true',
+      id: activity.id,
+      positionTitle: activity.position,
+      companyName: activity.company,
+    });
+
+    // Add specific data based on type
+    if (activity.data) {
+      Object.keys(activity.data).forEach(key => {
+        if (activity.data[key]) {
+          params.set(key, activity.data[key]);
+        }
+      });
+    }
+
+    const route = activity.type === 'LinkedIn'
+      ? '/dashboard/linkedin'
+      : '/dashboard/email';
+
+    router.push(`${route}?${params.toString()}`);
+  };
+
+  // Handle delete button click
+  const handleDelete = async (activity: any) => {
+    if (!confirm(`Are you sure you want to delete this ${activity.type}?`)) {
+      return;
+    }
+
+    try {
+      const endpoint = activity.type === 'Cover Letter'
+        ? `/api/cover-letters/${activity.id}`
+        : activity.type === 'LinkedIn'
+        ? `/api/linkedin-messages/${activity.id}`
+        : `/api/email-messages/${activity.id}`;
+
+      const response = await fetch(endpoint, { method: 'DELETE' });
+
+      if (response.ok) {
+        toast({
+          title: 'Success',
+          description: `${activity.type} deleted successfully`,
+        });
+        refreshStats(); // Refresh dashboard stats
+      } else {
+        throw new Error('Delete failed');
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete item',
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <div className="max-w-[1400px] mx-auto">
@@ -111,9 +152,9 @@ export default function DashboardPage() {
         {QUICK_ACTIONS.map((action, index) => {
           const Icon = action.icon;
           let count = 0;
-          if (action.title === 'Cover Letters') count = stats.totalCoverLetters;
-          else if (action.title === 'LinkedIn') count = stats.totalLinkedInMessages;
-          else if (action.title === 'Emails') count = stats.totalEmails;
+          if (action.title === 'Cover Letters') count = stats?.totalCoverLetters || 0;
+          else if (action.title === 'LinkedIn') count = stats?.totalLinkedInMessages || 0;
+          else if (action.title === 'Emails') count = stats?.totalEmails || 0;
 
           return (
             <motion.div
@@ -138,7 +179,13 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex items-end justify-between">
                       <span className={`text-[56px] font-bold leading-none ${action.textColor}`}>
-                        {count}
+                        {loading ? (
+                          <>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                          </>
+                        ) : <AnimatedNumber value={count} />}
                       </span>
                       <div className="w-10 h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
                         <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
@@ -165,7 +212,19 @@ export default function DashboardPage() {
                     <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
                   </div>
                   <div>
-                    <p className="text-[32px] font-bold leading-none">{totalGenerated}+</p>
+                    <p className="text-[32px] font-bold leading-none">
+                      {loading ? (
+                        <>
+                          <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                          <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                          <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                        </>
+                      ) : (
+                        <>
+                          <AnimatedNumber value={totalGenerated} />+
+                        </>
+                      )}
+                    </p>
                     <p className="text-sm text-slate-300">generated</p>
                   </div>
                 </div>
@@ -175,7 +234,15 @@ export default function DashboardPage() {
                   <Clock className="w-5 h-5 text-white" strokeWidth={2.5} />
                 </div>
                 <div>
-                  <p className="text-[32px] font-bold leading-none">{stats.hoursSaved}</p>
+                  <p className="text-[32px] font-bold leading-none">
+                    {loading ? (
+                      <>
+                        <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                        <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                        <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                      </>
+                    ) : <AnimatedNumber value={stats?.hoursSaved || 0} />}
+                  </p>
                   <p className="text-sm text-slate-300">hours saved</p>
                 </div>
               </div>
@@ -208,7 +275,22 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            {stats.recentActivity.length === 0 ? (
+            {loading ? (
+              <Card className="bg-white border-slate-200">
+                <div className="p-8">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center gap-4 py-4 border-b border-slate-100 last:border-0">
+                      <div className="w-14 h-14 rounded-[14px] bg-slate-200 animate-pulse" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 bg-slate-200 rounded animate-pulse w-3/4" />
+                        <div className="h-3 bg-slate-200 rounded animate-pulse w-1/2" />
+                      </div>
+                      <div className="w-16 h-8 bg-slate-200 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            ) : !stats || stats.recentActivity.length === 0 ? (
               <Card className="bg-white border-slate-200">
                 <div className="p-16 text-center">
                   <div className="w-20 h-20 rounded-[20px] bg-slate-100 flex items-center justify-center mx-auto mb-4">
@@ -233,22 +315,21 @@ export default function DashboardPage() {
                       <thead>
                         <tr className="border-b border-slate-200">
                           <th className="text-left text-sm font-semibold text-slate-700 py-4 px-6">
-                            Resource
+                            Application
+                          </th>
+                          <th className="text-left text-sm font-semibold text-slate-700 py-4 px-4">
+                            Date
                           </th>
                           <th className="text-center text-sm font-semibold text-slate-700 py-4 px-4">
-                            Optimized
+                            Status
                           </th>
                           <th className="text-center text-sm font-semibold text-slate-700 py-4 px-4">
-                            Before
-                          </th>
-                          <th className="text-center text-sm font-semibold text-slate-700 py-4 px-4"></th>
-                          <th className="text-center text-sm font-semibold text-slate-700 py-4 px-4">
-                            After
+                            Actions
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {stats.recentActivity.map((activity, index) => {
+                        {stats?.recentActivity.map((activity, index) => {
                           const Icon =
                             activity.type === 'Cover Letter'
                               ? FileText
@@ -280,66 +361,63 @@ export default function DashboardPage() {
                                       {activity.position}
                                     </p>
                                     <p className="text-sm text-slate-600">
-                                      {activity.company} •{' '}
-                                      {new Date(activity.createdAt).toLocaleDateString('en-US', {
-                                        month: 'short',
-                                        day: 'numeric',
-                                      })}
+                                      {activity.company}
                                     </p>
                                   </div>
                                 </div>
                               </td>
+                              <td className="py-5 px-4">
+                                <p className="text-sm text-slate-600">
+                                  {new Date(activity.createdAt).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </p>
+                              </td>
                               <td className="text-center py-5 px-4">
-                                {activity.reduction && (
-                                  <div className="flex items-center justify-center gap-2">
-                                    <div className="relative w-14 h-14">
-                                      <svg className="w-full h-full transform -rotate-90">
-                                        <circle
-                                          cx="28"
-                                          cy="28"
-                                          r="24"
-                                          fill="none"
-                                          stroke="#e2e8f0"
-                                          strokeWidth="4"
-                                        />
-                                        <circle
-                                          cx="28"
-                                          cy="28"
-                                          r="24"
-                                          fill="none"
-                                          stroke="#3b82f6"
-                                          strokeWidth="4"
-                                          strokeDasharray={`${2 * Math.PI * 24}`}
-                                          strokeDashoffset={`${2 * Math.PI * 24 * (1 - activity.reduction / 100)}`}
-                                          strokeLinecap="round"
-                                        />
-                                      </svg>
-                                      <div className="absolute inset-0 flex items-center justify-center">
-                                        <span className="text-sm font-bold text-blue-600">
-                                          {activity.reduction}%
-                                        </span>
-                                      </div>
-                                    </div>
-                                  </div>
+                                {activity.type === 'Cover Letter' ? (
+                                  <span className="text-sm text-slate-400">—</span>
+                                ) : (
+                                  <Badge
+                                    variant={
+                                      activity.status === 'SENT' ? 'default' :
+                                      activity.status === 'DONE' ? 'secondary' :
+                                      activity.status === 'GHOST' ? 'destructive' : 'outline'
+                                    }
+                                    className="font-medium"
+                                  >
+                                    {activity.status}
+                                  </Badge>
                                 )}
                               </td>
                               <td className="text-center py-5 px-4">
-                                <div>
-                                  <p className="text-[26px] font-bold text-slate-900 leading-none mb-0.5">
-                                    {activity.wordsBefore}
-                                  </p>
-                                  <p className="text-xs text-slate-500">Words</p>
-                                </div>
-                              </td>
-                              <td className="text-center py-5 px-4">
-                                <ArrowRight className="w-5 h-5 text-slate-400 mx-auto" />
-                              </td>
-                              <td className="text-center py-5 px-4">
-                                <div>
-                                  <p className="text-[26px] font-bold text-slate-900 leading-none mb-0.5">
-                                    {activity.wordsAfter}
-                                  </p>
-                                  <p className="text-xs text-slate-500">Words</p>
+                                <div className="flex items-center justify-center gap-2">
+                                  {/* Follow-up button for LinkedIn/Email NEW messages */}
+                                  {(activity.type === 'LinkedIn' || activity.type === 'Email') &&
+                                   activity.messageType === 'NEW' && (
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleFollowup(activity)}
+                                      className="h-8 text-xs"
+                                    >
+                                      <Reply className="w-3 h-3 mr-1" />
+                                      Follow-up
+                                    </Button>
+                                  )}
+
+                                  {/* Delete button for cover letters or follow-up messages */}
+                                  {(activity.type === 'Cover Letter' || activity.messageType === 'FOLLOW_UP') && (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => handleDelete(activity)}
+                                      className="h-8 w-8 p-0"
+                                    >
+                                      <Trash2 className="w-4 h-4 text-red-600" />
+                                    </Button>
+                                  )}
                                 </div>
                               </td>
                             </motion.tr>
@@ -365,15 +443,21 @@ export default function DashboardPage() {
             <Card className="bg-white border-slate-200/60">
               <div className="p-7">
                 <h3 className="text-lg font-semibold text-slate-900 mb-1">Your usage</h3>
-                <p className="text-sm text-slate-500 mb-7">Current plan: Personal</p>
+                <p className="text-sm text-slate-500 mb-7">
+                  Current plan: {loading ? (
+                    <span className="inline-block w-12 h-4 bg-slate-200 rounded animate-pulse"></span>
+                  ) : (
+                    stats?.userType === 'FREE' ? 'Free' : stats?.userType === 'PLUS' ? 'Plus' : 'Admin'
+                  )}
+                </p>
 
                 {/* Gauge Chart */}
                 <div className="flex items-center justify-center mb-7">
-                  <div className="relative w-56 h-28">
+                  <div className="relative w-56 h-32">
                     {/* Background arc */}
-                    <svg className="w-full h-full" viewBox="0 0 200 100">
+                    <svg className="w-full h-full" viewBox="0 0 200 110">
                       <path
-                        d="M 15 90 A 85 85 0 0 1 185 90"
+                        d="M 15 95 A 85 85 0 0 1 185 95"
                         fill="none"
                         stroke="#e2e8f0"
                         strokeWidth="18"
@@ -381,13 +465,16 @@ export default function DashboardPage() {
                       />
                       {/* Filled arc */}
                       <path
-                        d="M 15 90 A 85 85 0 0 1 185 90"
+                        d="M 15 95 A 85 85 0 0 1 185 95"
                         fill="none"
                         stroke="url(#gaugeGradient)"
                         strokeWidth="18"
                         strokeLinecap="round"
-                        strokeDasharray={`${(stats.usagePercentage / 100) * 267} 267`}
+                        strokeDasharray={loading ? `267 267` : `${((stats?.usagePercentage || 0) / 100) * 267} 267`}
                         className="transition-all duration-1000 ease-out"
+                        style={loading ? {
+                          animation: 'gaugePulse 2s ease-in-out infinite'
+                        } : undefined}
                       />
                       <defs>
                         <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -397,17 +484,37 @@ export default function DashboardPage() {
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div className="absolute inset-0 flex items-end justify-center pb-1">
+                    <div className="absolute inset-0 flex items-end justify-center pb-2">
                       <span className="text-[56px] font-bold text-slate-900 leading-none">
-                        {stats.usagePercentage}
-                        <span className="text-3xl text-slate-600">%</span>
+                        {loading ? (
+                          <>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+                            <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+                          </>
+                        ) : (
+                          <>
+                            <AnimatedNumber value={stats?.usagePercentage || 0} />
+                            <span className="text-3xl text-slate-600">%</span>
+                          </>
+                        )}
                       </span>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-center text-sm text-slate-600 mb-6">
-                  {totalGenerated} items used of 30
+                  {loading ? (
+                    <>
+                      <span className="inline-block w-3 h-3 bg-slate-300 rounded animate-pulse"></span>
+                      {' items used of '}
+                      <span className="inline-block w-8 h-3 bg-slate-300 rounded animate-pulse"></span>
+                    </>
+                  ) : (
+                    <>
+                      <AnimatedNumber value={totalGenerated} /> items used of {stats?.maxActivities || 0}
+                    </>
+                  )}
                 </p>
 
                 <div className="flex gap-2.5">
