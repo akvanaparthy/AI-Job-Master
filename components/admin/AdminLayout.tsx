@@ -115,7 +115,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <div className="text-sm font-semibold text-slate-900 truncate">{userEmail || 'admin@...'}</div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Shield className="w-3 h-3 text-red-600" strokeWidth={2.5} />
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-red-600">ADMIN</span>
+                    <span className="text-[10px] font-bold tracking-wide text-red-600">Admin</span>
                   </div>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />

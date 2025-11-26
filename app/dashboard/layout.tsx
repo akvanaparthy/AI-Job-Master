@@ -38,6 +38,16 @@ export default function DashboardLayout({
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Helper function to format user type for display
+  const formatUserType = (type: string) => {
+    const typeMap: Record<string, string> = {
+      'FREE': 'Free',
+      'PLUS': 'Plus',
+      'ADMIN': 'Admin'
+    };
+    return typeMap[type] || type;
+  };
+
   useEffect(() => {
     const loadUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -185,11 +195,11 @@ export default function DashboardLayout({
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600" strokeWidth={2.5} />}
                     {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600" strokeWidth={2.5} />}
-                    <span className={`text-[10px] font-bold uppercase tracking-wide ${
+                    <span className={`text-[10px] font-bold tracking-wide ${
                       userType === 'ADMIN' ? 'text-red-600' :
                       userType === 'PLUS' ? 'text-purple-600' :
                       'text-gray-500'
-                    }`}>{userType}</span>
+                    }`}>{formatUserType(userType)}</span>
                   </div>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
