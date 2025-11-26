@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useParams } from 'next/navigation';
+import AdminLayout from '@/components/admin/AdminLayout';
 
 interface Activity {
   id: string;
@@ -119,9 +120,11 @@ export default function UserActivityPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -140,19 +143,40 @@ export default function UserActivityPage() {
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center gap-3 mb-6">
-          <Button variant="outline" size="sm" onClick={() => router.push('/admin/users')}>
-            <ChevronLeft className="w-4 h-4 mr-1" />
-            Back to Users
-          </Button>
+    <AdminLayout>
+      {/* Top Navigation Bar */}
+      <div className="h-16 bg-white border-b border-slate-200/60 flex items-center px-8 flex-shrink-0 shadow-sm">
+        <div className="flex items-center gap-4 flex-1">
+          <h2 className="text-lg font-bold text-slate-900">User Details</h2>
         </div>
+
+        <div className="flex items-center gap-5">
+          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
+          >
+            User Dashboard
+            <span className="text-base">→</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+        <div className="p-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <Button variant="outline" size="sm" onClick={() => router.push('/admin/users')}>
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Back to Users
+              </Button>
+            </div>
 
         {/* User Info Card */}
         <Card className="bg-white border-slate-200/60 shadow-sm p-6">
@@ -377,6 +401,8 @@ export default function UserActivityPage() {
           </Card>
         </motion.div>
       )}
-    </div>
+        </div>
+      </div>
+    </AdminLayout>
   );
 }
