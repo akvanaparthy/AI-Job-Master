@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { getModelDisplayName } from '@/lib/utils/modelNames';
 
 interface HistoryItem {
   id: string;
@@ -460,9 +461,9 @@ export default function HistoryPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
                 <div className="text-xs text-slate-500">
-                  Created: {selectedItem.createdAt && new Date(selectedItem.createdAt).toLocaleDateString('en-US', {
+                  <span className="font-semibold">Created:</span> {selectedItem.createdAt && new Date(selectedItem.createdAt).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
                     year: 'numeric',
@@ -470,6 +471,14 @@ export default function HistoryPage() {
                     minute: '2-digit',
                   })}
                 </div>
+                {selectedItem.llmModel && (
+                  <div className="text-xs text-slate-500">
+                    <span className="font-semibold">AI Model:</span> {getModelDisplayName(selectedItem.llmModel)}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end pt-2">
                 <Button
                   variant="outline"
                   size="sm"
