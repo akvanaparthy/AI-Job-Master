@@ -16,6 +16,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import AdminLayout from '@/components/admin/AdminLayout';
 import {
   LineChart,
   Line,
@@ -116,9 +117,11 @@ export default function AdminAnalyticsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center min-h-[400px]">
+          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -137,30 +140,45 @@ export default function AdminAnalyticsPage() {
   ];
 
   return (
-    <div className="max-w-[1400px] mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm" onClick={() => router.push('/admin')}>
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Back
-            </Button>
-            <div>
-              <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Analytics</h1>
-              <p className="text-lg text-slate-500">Platform insights and trends</p>
-            </div>
-          </div>
-          <Button onClick={loadAnalytics} variant="outline">
-            <Activity className="w-4 h-4 mr-2" />
-            Refresh
-          </Button>
+    <AdminLayout>
+      {/* Top Navigation Bar */}
+      <div className="h-16 bg-white border-b border-slate-200/60 flex items-center px-8 flex-shrink-0 shadow-sm">
+        <div className="flex items-center gap-4 flex-1">
+          <h2 className="text-lg font-bold text-slate-900">Analytics</h2>
         </div>
-      </motion.div>
+
+        <div className="flex items-center gap-5">
+          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
+          >
+            User Dashboard
+            <span className="text-base">→</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+        <div className="p-8">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Analytics</h1>
+                <p className="text-lg text-slate-500">Platform insights and trends</p>
+              </div>
+              <Button onClick={loadAnalytics} variant="outline">
+                <Activity className="w-4 h-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
+          </motion.div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -391,6 +409,8 @@ export default function AdminAnalyticsPage() {
           </div>
         </Card>
       </motion.div>
-    </div>
+        </div>
+      </div>
+    </AdminLayout>
   );
 }

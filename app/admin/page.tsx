@@ -1,9 +1,28 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut } from 'lucide-react';
+import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut, Clock, Activity, ArrowUpRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { motion, useSpring, useTransform } from 'framer-motion';
+import AdminLayout from '@/components/admin/AdminLayout';
+
+// Animated number component
+function AnimatedNumber({ value }: { value: number }) {
+  const spring = useSpring(0, { stiffness: 100, damping: 30 });
+  const display = useTransform(spring, (current) => Math.round(current));
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    spring.set(value);
+    const unsubscribe = display.on('change', (latest) => {
+      setDisplayValue(latest);
+    });
+    return unsubscribe;
+  }, [value, spring, display]);
+
+  return <>{displayValue}</>;
+}
 
 interface Stats {
   users: {
@@ -26,9 +45,20 @@ interface Stats {
   };
 }
 
+interface RecentUser {
+  id: string;
+  email: string;
+  userType: string;
+  createdAt: string;
+  stats: {
+    totalMessages: number;
+  };
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [stats, setStats] = useState<Stats | null>(null);
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userEmail, setUserEmail] = useState<string>('');
@@ -46,27 +76,24 @@ export default function AdminDashboard() {
       setStats(data);
     } catch (error: any) {
       setError(error.message);
-    } finally {
-      setLoading(false);
     }
   }, [router]);
 
-  const loadUser = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user?.email) {
-      setUserEmail(user.email);
+  const loadRecentUsers = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/users?limit=5');
+      if (response.ok) {
+        const data = await response.json();
+        setRecentUsers(data.users);
+      }
+    } catch (error) {
+      console.error('Failed to load recent users:', error);
     }
-  }, [supabase]);
+  }, []);
 
   useEffect(() => {
-    loadStats();
-    loadUser();
-  }, [loadStats, loadUser]);
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/auth/signin');
-  };
+    Promise.all([loadStats(), loadRecentUsers()]).finally(() => setLoading(false));
+  }, [loadStats, loadRecentUsers]);
 
   if (loading) {
     return (
@@ -87,360 +114,298 @@ export default function AdminDashboard() {
   if (!stats) return null;
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] flex">
-      <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700;800&display=swap');
-
-        * {
-          font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-        }
-
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(-20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-
-        .stat-card {
-          animation: fadeIn 0.5s ease-out forwards;
-        }
-
-        .stat-card:nth-child(1) { animation-delay: 0.1s; opacity: 0; }
-        .stat-card:nth-child(2) { animation-delay: 0.2s; opacity: 0; }
-        .stat-card:nth-child(3) { animation-delay: 0.3s; opacity: 0; }
-        .stat-card:nth-child(4) { animation-delay: 0.4s; opacity: 0; }
-
-        .nav-item {
-          animation: slideIn 0.4s ease-out forwards;
-        }
-
-        .nav-item:nth-child(1) { animation-delay: 0.1s; opacity: 0; }
-        .nav-item:nth-child(2) { animation-delay: 0.15s; opacity: 0; }
-        .nav-item:nth-child(3) { animation-delay: 0.2s; opacity: 0; }
-        .nav-item:nth-child(4) { animation-delay: 0.25s; opacity: 0; }
-      `}</style>
-
-      {/* Left Sidebar */}
-      <div className="w-[220px] bg-white shadow-[2px_0_8px_rgba(0,0,0,0.04)] flex-shrink-0 flex flex-col">
-        <div className="flex-1 p-6">
-          {/* Logo */}
-          <div className="mb-12">
-            <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 bg-gradient-to-br from-slate-800 to-slate-900 rounded-lg flex items-center justify-center shadow-sm">
-                <div className="w-4 h-4 border-2 border-white rounded-sm"></div>
-              </div>
-              <span className="text-lg font-bold text-slate-900 tracking-tight">ROUNDS</span>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <div className="mb-10">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Navigation</div>
-            <div className="space-y-1">
-              <button
-                onClick={() => router.push('/admin')}
-                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-md shadow-slate-800/20"
-              >
-                <Shield className="w-[18px] h-[18px]" strokeWidth={2} />
-                <span className="font-semibold">Admin</span>
-              </button>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
-              >
-                <Home className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
-                <span className="font-medium">Dashboard</span>
-              </button>
-              <button
-                onClick={() => router.push('/admin/users')}
-                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
-              >
-                <Users className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
-                <span className="font-medium">Users</span>
-              </button>
-              <button
-                onClick={() => router.push('/admin/analytics')}
-                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
-              >
-                <BarChart3 className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
-                <span className="font-medium">Analytics</span>
-              </button>
-              <button
-                onClick={() => router.push('/admin/settings')}
-                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
-              >
-                <SettingsIcon className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
-                <span className="font-medium">Settings</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Stats */}
-          <div className="mb-10">
-            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Overview</div>
-            <div className="space-y-3 px-1">
-              <div className="p-3 rounded-lg bg-blue-50 border border-blue-100">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-blue-900">Total Users</span>
-                  <Users className="w-3.5 h-3.5 text-blue-600" strokeWidth={2.5} />
-                </div>
-                <div className="text-2xl font-extrabold text-blue-900">{stats.users.total}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-orange-50 border border-orange-100">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-orange-900">Content</span>
-                  <FileText className="w-3.5 h-3.5 text-orange-600" strokeWidth={2.5} />
-                </div>
-                <div className="text-2xl font-extrabold text-orange-900">{stats.content.totalGenerated}</div>
-              </div>
-              <div className="p-3 rounded-lg bg-purple-50 border border-purple-100">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs font-semibold text-purple-900">API Keys</span>
-                  <Shield className="w-3.5 h-3.5 text-purple-600" strokeWidth={2.5} />
-                </div>
-                <div className="text-2xl font-extrabold text-purple-900">
-                  {stats.apiKeys.openai + stats.apiKeys.anthropic + stats.apiKeys.gemini}
-                </div>
-              </div>
-            </div>
-          </div>
+    <AdminLayout>
+      {/* Top Navigation Bar */}
+      <div className="h-16 bg-white border-b border-slate-200/60 flex items-center px-8 flex-shrink-0 shadow-sm">
+        <div className="flex items-center gap-4 flex-1">
+          <h2 className="text-lg font-bold text-slate-900">Admin Dashboard</h2>
         </div>
 
-        {/* User Profile */}
-        <div className="p-6 border-t border-slate-100">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-all duration-200 mb-2">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex-shrink-0 shadow-md flex items-center justify-center">
-              <span className="text-white font-bold text-sm">{userEmail ? userEmail[0].toUpperCase() : 'A'}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-slate-900 truncate">Admin</div>
-              <div className="text-[11px] text-slate-500 truncate">{userEmail || 'admin@...'}</div>
-            </div>
-          </div>
+        <div className="flex items-center gap-5">
+          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
           <button
-            onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-all duration-200 text-xs font-semibold text-slate-700"
+            onClick={() => router.push('/dashboard')}
+            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
           >
-            <LogOut className="w-3.5 h-3.5" strokeWidth={2.5} />
-            Sign Out
+            User Dashboard
+            <span className="text-base">→</span>
           </button>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navigation Bar */}
-        <div className="h-16 bg-white border-b border-slate-200/60 flex items-center px-8 flex-shrink-0 shadow-sm">
-          <div className="flex items-center gap-4 flex-1">
-            <div className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-2.5 w-[280px] border border-slate-200/60">
-              <Search className="w-[17px] h-[17px] text-slate-400" strokeWidth={2} />
-              <input
-                type="text"
-                placeholder="Search"
-                className="bg-transparent border-none outline-none text-[13px] text-slate-900 placeholder-slate-400 w-full font-medium"
-              />
-            </div>
-
-            <button
-              onClick={() => router.push('/admin/users')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60"
-            >
-              <UserCircle className="w-[17px] h-[17px] text-slate-500" strokeWidth={2} />
-              <span className="text-[13px] font-semibold text-slate-700">Manage Users</span>
-            </button>
-
-            <button
-              onClick={() => router.push('/admin/analytics')}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60"
-            >
-              <BarChart3 className="w-[17px] h-[17px] text-slate-500" strokeWidth={2} />
-              <span className="text-[13px] font-semibold text-slate-700">Analytics</span>
-            </button>
-
-            <button
-              onClick={() => router.push('/admin/settings')}
-              className="p-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200"
-            >
-              <SettingsIcon className="w-5 h-5 text-slate-500" strokeWidth={2} />
-            </button>
-          </div>
-
-          <div className="flex items-center gap-5">
-            <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
-            >
-              Go to Dashboard
-              <span className="text-base">→</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Content Area */}
-        <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
-          <div className="p-8">
+      {/* Content Area */}
+      <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
+        <div className="p-8">
             {/* Page Header */}
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Admin Dashboard</h1>
-              <p className="text-[15px] text-slate-500">Monitor platform statistics and manage your application</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-8"
+            >
+              <h1 className="text-[42px] font-bold text-slate-900 mb-2 leading-tight">Platform Overview</h1>
+              <p className="text-lg text-slate-500">Monitor system health, user activity, and content generation</p>
+            </motion.div>
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
               {/* Total Users Card */}
-              <div className="stat-card bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0 * 0.08 }}
+              >
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 rounded-2xl p-6 border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-0.5">Total Users</h3>
+                      <p className="text-sm text-slate-600">All registered users</p>
+                    </div>
+                    <div className="w-11 h-11 rounded-[14px] bg-blue-500 flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity">
+                      <Users className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" strokeWidth={3} />
-                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide">Active</span>
+                  <div className="flex items-end justify-between">
+                    <span className="text-[56px] font-bold leading-none text-blue-900">
+                      <AnimatedNumber value={stats.users.total} />
+                    </span>
+                    <div className="w-10 h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                      <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-blue-100/60">
+                    <div>
+                      <div className="text-[10px] text-blue-600/70 mb-1 font-semibold uppercase">Free</div>
+                      <div className="text-base font-bold text-blue-900">{stats.users.free}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-blue-600/70 mb-1 font-semibold uppercase">Plus</div>
+                      <div className="text-base font-bold text-blue-900">{stats.users.plus}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-blue-600/70 mb-1 font-semibold uppercase">Admin</div>
+                      <div className="text-base font-bold text-blue-900">{stats.users.admin}</div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-4xl font-extrabold text-slate-900 leading-none mb-2">{stats.users.total}</div>
-                <div className="text-[13px] font-bold text-slate-500 mb-4 uppercase tracking-wide">Total Users</div>
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Free</div>
-                    <div className="text-base font-extrabold text-slate-900">{stats.users.free}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Plus</div>
-                    <div className="text-base font-extrabold text-blue-600">{stats.users.plus}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Admin</div>
-                    <div className="text-base font-extrabold text-rose-600">{stats.users.admin}</div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
 
               {/* Content Generated Card */}
-              <div className="stat-card bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <FileText className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1 * 0.08 }}
+              >
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 rounded-2xl p-6 border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-0.5">Content Generated</h3>
+                      <p className="text-sm text-slate-600">All content created</p>
+                    </div>
+                    <div className="w-11 h-11 rounded-[14px] bg-amber-500 flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity">
+                      <FileText className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/60">
-                    <TrendingUp className="w-3.5 h-3.5 text-emerald-600" strokeWidth={3} />
-                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wide">Growth</span>
+                  <div className="flex items-end justify-between">
+                    <span className="text-[56px] font-bold leading-none text-amber-900">
+                      <AnimatedNumber value={stats.content.totalGenerated} />
+                    </span>
+                    <div className="w-10 h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                      <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-amber-100/60">
+                    <div>
+                      <div className="text-[10px] text-amber-600/70 mb-1 font-semibold uppercase">Cover</div>
+                      <div className="text-base font-bold text-amber-900">{stats.content.coverLetters}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-amber-600/70 mb-1 font-semibold uppercase">LinkedIn</div>
+                      <div className="text-base font-bold text-amber-900">{stats.content.linkedInMessages}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-amber-600/70 mb-1 font-semibold uppercase">Email</div>
+                      <div className="text-base font-bold text-amber-900">{stats.content.emailMessages}</div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-4xl font-extrabold text-slate-900 leading-none mb-2">{stats.content.totalGenerated}</div>
-                <div className="text-[13px] font-bold text-slate-500 mb-4 uppercase tracking-wide">Content Generated</div>
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Cover</div>
-                    <div className="text-base font-extrabold text-slate-900">{stats.content.coverLetters}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">LinkedIn</div>
-                    <div className="text-base font-extrabold text-blue-600">{stats.content.linkedInMessages}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Email</div>
-                    <div className="text-base font-extrabold text-violet-600">{stats.content.emailMessages}</div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
 
               {/* Resumes Card */}
-              <div className="stat-card bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-teal-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <FileText className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 2 * 0.08 }}
+              >
+                <div className="bg-gradient-to-br from-teal-50 to-cyan-50/80 rounded-2xl p-6 border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 group cursor-pointer h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-base font-semibold text-slate-900 mb-0.5">Resumes</h3>
+                      <p className="text-sm text-slate-600">Documents uploaded</p>
+                    </div>
+                    <div className="w-11 h-11 rounded-[14px] bg-teal-500 flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity">
+                      <FileText className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <span className="text-[56px] font-bold leading-none text-teal-900">
+                      <AnimatedNumber value={stats.content.resumes} />
+                    </span>
+                    <div className="w-10 h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                      <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
                   </div>
                 </div>
-                <div className="text-4xl font-extrabold text-slate-900 leading-none mb-2">{stats.content.resumes}</div>
-                <div className="text-[13px] font-bold text-slate-500 uppercase tracking-wide">Resumes Uploaded</div>
-              </div>
+              </motion.div>
 
               {/* API Keys Card */}
-              <div className="stat-card bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-lg hover:border-slate-300/60 transition-all duration-300 group">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform duration-300">
-                    <Shield className="w-6 h-6 text-white" strokeWidth={2.5} />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 3 * 0.08 }}
+              >
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 border-0 text-white shadow-lg h-full">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <h3 className="text-base font-semibold text-white mb-0.5">API Keys</h3>
+                      <p className="text-sm text-slate-300">Configured keys</p>
+                    </div>
+                    <div className="w-11 h-11 rounded-[14px] bg-white/10 backdrop-blur-sm flex items-center justify-center">
+                      <Shield className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    </div>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <span className="text-[56px] font-bold leading-none text-white">
+                      <AnimatedNumber value={stats.apiKeys.openai + stats.apiKeys.anthropic + stats.apiKeys.gemini} />
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10">
+                    <div>
+                      <div className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">OpenAI</div>
+                      <div className="text-base font-bold text-white">{stats.apiKeys.openai}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Claude</div>
+                      <div className="text-base font-bold text-white">{stats.apiKeys.anthropic}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-slate-400 mb-1 font-semibold uppercase">Gemini</div>
+                      <div className="text-base font-bold text-white">{stats.apiKeys.gemini}</div>
+                    </div>
                   </div>
                 </div>
-                <div className="text-4xl font-extrabold text-slate-900 leading-none mb-2">
-                  {stats.apiKeys.openai + stats.apiKeys.anthropic + stats.apiKeys.gemini}
-                </div>
-                <div className="text-[13px] font-bold text-slate-500 mb-4 uppercase tracking-wide">API Keys Configured</div>
-                <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">OpenAI</div>
-                    <div className="text-base font-extrabold text-slate-900">{stats.apiKeys.openai}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Claude</div>
-                    <div className="text-base font-extrabold text-orange-600">{stats.apiKeys.anthropic}</div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-slate-400 mb-1 font-bold uppercase tracking-wider">Gemini</div>
-                    <div className="text-base font-extrabold text-blue-600">{stats.apiKeys.gemini}</div>
-                  </div>
-                </div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Quick Actions */}
-            <div>
-              <h3 className="text-base font-bold text-slate-900 mb-5 uppercase tracking-wide">Quick Actions</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Manage Users */}
-                <button
-                  onClick={() => router.push('/admin/users')}
-                  className="group bg-white rounded-2xl p-6 border border-slate-200/60 hover:border-blue-300/60 hover:shadow-xl transition-all duration-300 text-left"
-                >
-                  <div className="mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              {/* Recent Users */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.32 }}
+                className="lg:col-span-2"
+              >
+                <div className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Recent Users</h3>
+                    <button
+                      onClick={() => router.push('/admin/users')}
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 hover:gap-2 transition-all"
+                    >
+                      View All <ArrowUpRight className="w-3 h-3" strokeWidth={2.5} />
+                    </button>
+                  </div>
+                <div className="space-y-3">
+                  {recentUsers.length === 0 ? (
+                    <div className="text-center py-8 text-slate-400 text-sm">No users yet</div>
+                  ) : (
+                    recentUsers.map((user) => (
+                      <div
+                        key={user.id}
+                        className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/admin/users/${user.id}`)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+                            {user.email[0].toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="text-sm font-semibold text-slate-900">{user.email}</div>
+                            <div className="text-xs text-slate-500 flex items-center gap-2">
+                              <Clock className="w-3 h-3" strokeWidth={2} />
+                              {new Date(user.createdAt).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-xs font-bold text-slate-500">{user.stats.totalMessages} msgs</div>
+                          <div className={`px-3 py-1 rounded-lg text-xs font-bold ${
+                            user.userType === 'ADMIN' ? 'bg-red-100 text-red-700' :
+                            user.userType === 'PLUS' ? 'bg-purple-100 text-purple-700' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {user.userType}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                </div>
+              </motion.div>
+
+              {/* Quick Actions */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+              >
+                <div className="bg-white rounded-2xl p-6 border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
+                  <h3 className="text-base font-bold text-slate-900 mb-6 uppercase tracking-wide">Quick Actions</h3>
+                <div className="space-y-3">
+                  <button
+                    onClick={() => router.push('/admin/users')}
+                    className="w-full group bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl p-4 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center gap-3">
                       <Users className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div>
+                        <div className="font-bold text-white text-sm">Manage Users</div>
+                        <div className="text-xs text-blue-100">View, edit, and delete users</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="font-bold text-base text-slate-900 mb-1.5">Manage Users</div>
-                  <div className="text-[13px] text-slate-500 font-medium">View and manage all users</div>
-                </button>
+                  </button>
 
-                {/* Usage Limits */}
-                <button
-                  onClick={() => router.push('/admin/settings')}
-                  className="group bg-white rounded-2xl p-6 border border-slate-200/60 hover:border-purple-300/60 hover:shadow-xl transition-all duration-300 text-left"
-                >
-                  <div className="mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30 group-hover:scale-110 transition-transform duration-300">
-                      <MessageSquare className="w-6 h-6 text-white" strokeWidth={2.5} />
-                    </div>
-                  </div>
-                  <div className="font-bold text-base text-slate-900 mb-1.5">Usage Limits</div>
-                  <div className="text-[13px] text-slate-500 font-medium">Configure limits</div>
-                </button>
-
-                {/* Analytics */}
-                <button
-                  onClick={() => router.push('/admin/analytics')}
-                  className="group bg-white rounded-2xl p-6 border border-slate-200/60 hover:border-emerald-300/60 hover:shadow-xl transition-all duration-300 text-left"
-                >
-                  <div className="mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+                  <button
+                    onClick={() => router.push('/admin/analytics')}
+                    className="w-full group bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl p-4 shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/40 transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center gap-3">
                       <BarChart3 className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div>
+                        <div className="font-bold text-white text-sm">Analytics</div>
+                        <div className="text-xs text-violet-100">View detailed insights</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="font-bold text-base text-slate-900 mb-1.5">Analytics</div>
-                  <div className="text-[13px] text-slate-500 font-medium">View insights</div>
-                </button>
-              </div>
+                  </button>
+
+                  <button
+                    onClick={() => router.push('/admin/settings')}
+                    className="w-full group bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-4 shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <SettingsIcon className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div>
+                        <div className="font-bold text-white text-sm">Settings</div>
+                        <div className="text-xs text-emerald-100">Configure limits</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   );
 }
