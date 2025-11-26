@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { LiveClock } from '@/components/admin/LiveClock';
 
 // Animated number component
 function AnimatedNumber({ value }: { value: number }) {
@@ -97,17 +98,25 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#FAFAFA]">
-        <div className="text-slate-500 text-sm">Loading...</div>
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-slate-900 text-5xl font-bold">
+            <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+            <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+            <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+          </div>
+        </div>
+      </AdminLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#FAFAFA]">
-        <div className="text-red-600 text-sm">Error: {error}</div>
-      </div>
+      <AdminLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="text-red-600 text-sm">Error: {error}</div>
+        </div>
+      </AdminLayout>
     );
   }
 
@@ -120,17 +129,7 @@ export default function AdminDashboard() {
         <div className="flex items-center gap-4 flex-1">
           <h2 className="text-lg font-bold text-slate-900">Admin Dashboard</h2>
         </div>
-
-        <div className="flex items-center gap-5">
-          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
-          >
-            User Dashboard
-            <span className="text-base">→</span>
-          </button>
-        </div>
+        <LiveClock />
       </div>
 
       {/* Content Area */}

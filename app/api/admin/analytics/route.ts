@@ -62,15 +62,15 @@ export async function GET(req: NextRequest) {
 
     // Get daily content generation for the last 30 days
     const dailyStats = await prisma.$queryRaw<Array<{ date: Date; count: bigint }>>`
-      SELECT DATE(created_at) as date, COUNT(*) as count
+      SELECT DATE("createdAt") as date, COUNT(*) as count
       FROM (
-        SELECT created_at FROM cover_letters WHERE created_at >= ${last30Days}
+        SELECT "createdAt" FROM cover_letters WHERE "createdAt" >= ${last30Days}
         UNION ALL
-        SELECT created_at FROM linkedin_messages WHERE created_at >= ${last30Days}
+        SELECT "createdAt" FROM linkedin_messages WHERE "createdAt" >= ${last30Days}
         UNION ALL
-        SELECT created_at FROM email_messages WHERE created_at >= ${last30Days}
+        SELECT "createdAt" FROM email_messages WHERE "createdAt" >= ${last30Days}
       ) as combined
-      GROUP BY DATE(created_at)
+      GROUP BY DATE("createdAt")
       ORDER BY date ASC
     `;
 

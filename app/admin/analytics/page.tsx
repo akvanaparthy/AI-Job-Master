@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { LiveClock } from '@/components/admin/LiveClock';
 import {
   LineChart,
   Line,
@@ -118,8 +119,12 @@ export default function AdminAnalyticsPage() {
   if (loading) {
     return (
       <AdminLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        <div className="flex items-center justify-center h-full">
+          <div className="text-slate-900 text-5xl font-bold">
+            <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
+            <span className="inline-block animate-bounce" style={{ animationDelay: '150ms' }}>.</span>
+            <span className="inline-block animate-bounce" style={{ animationDelay: '300ms' }}>.</span>
+          </div>
         </div>
       </AdminLayout>
     );
@@ -147,16 +152,7 @@ export default function AdminAnalyticsPage() {
           <h2 className="text-lg font-bold text-slate-900">Analytics</h2>
         </div>
 
-        <div className="flex items-center gap-5">
-          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
-          >
-            User Dashboard
-            <span className="text-base">→</span>
-          </button>
-        </div>
+        <LiveClock />
       </div>
 
       {/* Content Area */}

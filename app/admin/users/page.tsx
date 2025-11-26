@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Shield, Search, ChevronLeft, ChevronRight, Trash2, Crown, Sparkles, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
+import { LiveClock } from '@/components/admin/LiveClock';
 
 interface User {
   id: string;
@@ -159,16 +160,7 @@ export default function AdminUsersPage() {
           <h2 className="text-lg font-bold text-slate-900">User Management</h2>
         </div>
 
-        <div className="flex items-center gap-5">
-          <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
-          >
-            User Dashboard
-            <span className="text-base">→</span>
-          </button>
-        </div>
+        <LiveClock />
       </div>
 
       {/* Content Area */}
