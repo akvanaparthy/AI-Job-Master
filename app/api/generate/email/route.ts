@@ -190,11 +190,16 @@ export async function POST(req: NextRequest) {
     let emailMessageId = null;
     let messageId = null;
     if (saveToHistory) {
-      messageId = generateMessageId('email');
+      try {
+        messageId = generateMessageId('email');
+      } catch (e) {
+        // If message ID generation fails, continue without it
+        messageId = null;
+      }
+
       const emailMessage = await prisma.emailMessage.create({
         data: {
           userId: user.id,
-          messageId,
           resumeId: resumeId || null,
           messageType: messageType as EmailMessageType,
           recipientEmail,

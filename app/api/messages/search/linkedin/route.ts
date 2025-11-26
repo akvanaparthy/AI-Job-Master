@@ -17,16 +17,15 @@ export async function GET(req: NextRequest) {
     const query = searchParams.get('q') || '';
     const messageId = searchParams.get('messageId');
 
-    // If searching by messageId
+    // If searching by messageId or ID
     if (messageId) {
       const message = await prisma.linkedInMessage.findFirst({
         where: {
           userId: user.id,
-          messageId: messageId,
+          id: messageId,
         },
         select: {
           id: true,
-          messageId: true,
           companyName: true,
           positionTitle: true,
           recipientName: true,
@@ -55,12 +54,10 @@ export async function GET(req: NextRequest) {
           { companyName: { contains: query, mode: 'insensitive' } },
           { positionTitle: { contains: query, mode: 'insensitive' } },
           { recipientName: { contains: query, mode: 'insensitive' } },
-          { messageId: { contains: query, mode: 'insensitive' } },
         ],
       },
       select: {
         id: true,
-        messageId: true,
         companyName: true,
         positionTitle: true,
         recipientName: true,

@@ -182,7 +182,7 @@ export default function LinkedInPage() {
           setSearchResults([]);
           toast({
             title: 'Message Loaded',
-            description: `Previous message details loaded. Message ID: ${msg.messageId || 'N/A'}`,
+            description: 'Previous message details loaded successfully',
           });
         }
       }
@@ -276,7 +276,7 @@ export default function LinkedInPage() {
       setSavedMessageId(data.messageId);
       toast({
         title: 'Saved',
-        description: `LinkedIn message saved! Message ID: ${data.messageId || 'N/A'}`
+        description: data.messageId ? `LinkedIn message saved! Message ID: ${data.messageId}` : 'LinkedIn message saved to history!'
       });
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to save message', variant: 'destructive' });
@@ -516,7 +516,7 @@ export default function LinkedInPage() {
                     {searchResults.map((msg) => (
                       <div
                         key={msg.id}
-                        onClick={() => loadMessageDetails(msg.messageId || msg.id)}
+                        onClick={() => loadMessageDetails(msg.id)}
                         className="p-3 bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-200 rounded-lg cursor-pointer transition-all"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -528,9 +528,6 @@ export default function LinkedInPage() {
                               {msg.recipientName && `To: ${msg.recipientName} • `}
                               {new Date(msg.createdAt).toLocaleDateString()}
                             </p>
-                            {msg.messageId && (
-                              <p className="text-xs text-purple-600 mt-1 font-mono">ID: {msg.messageId}</p>
-                            )}
                           </div>
                           <div className="flex-shrink-0">
                             <span className="text-xs px-2 py-1 bg-slate-200 text-slate-700 rounded">
@@ -550,23 +547,6 @@ export default function LinkedInPage() {
             </Card>
           )}
 
-          {/* Previous Message Card - Only shown in follow-up mode when message is loaded */}
-          {previousMessageContent && (
-            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <RefreshCw className="w-5 h-5 text-amber-600" />
-                  Previous Message
-                </h2>
-                <p className="text-sm text-slate-600 mt-0.5">This is the message you sent previously</p>
-              </div>
-              <div className="p-6">
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
-                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{previousMessageContent}</p>
-                </div>
-              </div>
-            </Card>
-          )}
 
           {/* Message Details Card */}
           <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
@@ -790,48 +770,46 @@ export default function LinkedInPage() {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col h-full min-h-[780px] p-6 space-y-6">
-                {/* Previous Message Display - Above Ready to Connect */}
-                {previousMessageContent && messageType === 'FOLLOW_UP' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
-                  >
-                    <h4 className="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4" />
-                      Previous Message Reference
-                    </h4>
-                    <div className="bg-white border border-amber-100 rounded p-3 max-h-48 overflow-y-auto">
-                      <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
-                        {previousMessageContent}
-                      </p>
+              <div className="h-full min-h-[780px]">
+                {/* Previous Message Card - Only shown in follow-up mode when message is loaded */}
+                {previousMessageContent && messageType === 'FOLLOW_UP' ? (
+                  <div className="h-full flex flex-col">
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
+                      <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <RefreshCw className="w-5 h-5 text-amber-600" />
+                        Previous Message
+                      </h2>
+                      <p className="text-sm text-slate-600 mt-0.5">This is the message you sent previously</p>
                     </div>
-                  </motion.div>
+                    <div className="flex-1 p-6 overflow-y-auto">
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{previousMessageContent}</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full p-12">
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.35 }}
+                      className="text-center"
+                    >
+                      <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <MessageSquare className="w-12 h-12 text-blue-600" strokeWidth={1.5} />
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Connect</h3>
+                      <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
+                        Fill in the required fields and click Generate Message to create your personalized LinkedIn outreach
+                      </p>
+                      {savedMessageId && (
+                        <p className="text-xs text-slate-500 mt-4 font-mono">
+                          Last saved: {savedMessageId}
+                        </p>
+                      )}
+                    </motion.div>
+                  </div>
                 )}
-
-                {/* Ready to Connect Box */}
-                <div className="flex-1 flex flex-col items-center justify-center">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.35 }}
-                    className="text-center"
-                  >
-                    <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mx-auto mb-6 shadow-inner">
-                      <MessageSquare className="w-12 h-12 text-blue-600" strokeWidth={1.5} />
-                    </div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Connect</h3>
-                    <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
-                      Fill in the required fields and click Generate Message to create your personalized LinkedIn outreach
-                    </p>
-                    {savedMessageId && (
-                      <p className="text-xs text-slate-500 mt-4 font-mono">
-                        Last saved: {savedMessageId}
-                      </p>
-                    )}
-                  </motion.div>
-                </div>
               </div>
             )}
           </Card>

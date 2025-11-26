@@ -188,11 +188,16 @@ export async function POST(req: NextRequest) {
     let linkedInMessageId = null;
     let messageId = null;
     if (saveToHistory) {
-      messageId = generateMessageId('linkedin');
+      try {
+        messageId = generateMessageId('linkedin');
+      } catch (e) {
+        // If message ID generation fails, continue without it
+        messageId = null;
+      }
+
       const linkedInMessage = await prisma.linkedInMessage.create({
         data: {
           userId: user.id,
-          messageId,
           resumeId: resumeId || null,
           messageType: messageType as LinkedInMessageType,
           linkedinUrl: linkedinUrl || null,

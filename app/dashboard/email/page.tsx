@@ -186,7 +186,7 @@ export default function EmailPage() {
           setSearchResults([]);
           toast({
             title: 'Message Loaded',
-            description: `Previous message details loaded. Message ID: ${msg.messageId || 'N/A'}`,
+            description: 'Previous email details loaded successfully',
           });
         }
       }
@@ -281,7 +281,7 @@ export default function EmailPage() {
       setSavedMessageId(data.messageId);
       toast({
         title: 'Saved',
-        description: `Email saved to history! Message ID: ${data.messageId || 'N/A'}`
+        description: data.messageId ? `Email saved to history! Message ID: ${data.messageId}` : 'Email saved to history!'
       });
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to save email', variant: 'destructive' });
@@ -523,7 +523,7 @@ export default function EmailPage() {
                     {searchResults.map((msg) => (
                       <div
                         key={msg.id}
-                        onClick={() => loadMessageDetails(msg.messageId || msg.id)}
+                        onClick={() => loadMessageDetails(msg.id)}
                         className="p-3 bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-200 rounded-lg cursor-pointer transition-all"
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -535,9 +535,6 @@ export default function EmailPage() {
                               {msg.recipientName && `To: ${msg.recipientName} • `}
                               {new Date(msg.createdAt).toLocaleDateString()}
                             </p>
-                            {msg.messageId && (
-                              <p className="text-xs text-purple-600 mt-1 font-mono">ID: {msg.messageId}</p>
-                            )}
                           </div>
                           <div className="flex-shrink-0">
                             <span className="text-xs px-2 py-1 bg-slate-200 text-slate-700 rounded">
@@ -557,32 +554,6 @@ export default function EmailPage() {
             </Card>
           )}
 
-          {/* Previous Email Card - Only shown in follow-up mode */}
-          {previousMessageBody && (
-            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
-                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <RefreshCw className="w-5 h-5 text-amber-600" />
-                  Previous Email
-                </h2>
-                <p className="text-sm text-slate-600 mt-0.5">This is the email you sent previously</p>
-              </div>
-              <div className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Subject</Label>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                    <p className="text-sm text-slate-700">{previousMessageSubject}</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Body</Label>
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 max-h-64 overflow-y-auto">
-                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{previousMessageBody}</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          )}
 
           {/* Email Details Card */}
           <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
@@ -808,57 +779,55 @@ export default function EmailPage() {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col h-full min-h-[780px] p-6 space-y-6">
-                {/* Previous Message Display - Above Ready to Send */}
-                {previousMessageBody && messageType === 'FOLLOW_UP' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
-                  >
-                    <h4 className="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4" />
-                      Previous Email Reference
-                    </h4>
-                    <div className="space-y-2">
-                      {previousMessageSubject && (
-                        <div className="bg-white border border-amber-100 rounded p-2">
-                          <p className="text-xs font-medium text-slate-600 mb-1">Subject:</p>
-                          <p className="text-xs text-slate-700">{previousMessageSubject}</p>
+              <div className="h-full min-h-[780px]">
+                {/* Previous Email Card - Only shown in follow-up mode when email is loaded */}
+                {previousMessageBody && messageType === 'FOLLOW_UP' ? (
+                  <div className="h-full flex flex-col">
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
+                      <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <RefreshCw className="w-5 h-5 text-amber-600" />
+                        Previous Email
+                      </h2>
+                      <p className="text-sm text-slate-600 mt-0.5">This is the email you sent previously</p>
+                    </div>
+                    <div className="flex-1 p-6 overflow-y-auto space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-900">Subject</Label>
+                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                          <p className="text-sm text-slate-700">{previousMessageSubject}</p>
                         </div>
-                      )}
-                      <div className="bg-white border border-amber-100 rounded p-3 max-h-48 overflow-y-auto">
-                        <p className="text-xs font-medium text-slate-600 mb-1">Body:</p>
-                        <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
-                          {previousMessageBody}
-                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-900">Body</Label>
+                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                          <p className="text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{previousMessageBody}</p>
+                        </div>
                       </div>
                     </div>
-                  </motion.div>
-                )}
-
-                {/* Ready to Send Box */}
-                <div className="flex-1 flex flex-col items-center justify-center">
-                  <motion.div
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.35 }}
-                    className="text-center"
-                  >
-                    <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-6 shadow-inner">
-                      <Mail className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
-                    </div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
-                    <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
-                      Fill in the required fields and click Generate Email to create your professional job application email
-                    </p>
-                    {savedMessageId && (
-                      <p className="text-xs text-slate-500 mt-4 font-mono">
-                        Last saved: {savedMessageId}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full p-12">
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.35 }}
+                      className="text-center"
+                    >
+                      <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                        <Mail className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
+                      <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
+                        Fill in the required fields and click Generate Email to create your professional job application email
                       </p>
-                    )}
-                  </motion.div>
-                </div>
+                      {savedMessageId && (
+                        <p className="text-xs text-slate-500 mt-4 font-mono">
+                          Last saved: {savedMessageId}
+                        </p>
+                      )}
+                    </motion.div>
+                  </div>
+                )}
               </div>
             )}
           </Card>
