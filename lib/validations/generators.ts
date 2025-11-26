@@ -20,7 +20,8 @@ export const linkedInMessageSchema = z.object({
   linkedinUrl: z.string().url('Invalid LinkedIn URL').optional(),
   recipientUsername: z.string().optional(),
   recipientName: z.string().optional(),
-  positionTitle: z.string().min(1, 'Position title is required'),
+  positionTitle: z.string().optional(),
+  areasOfInterest: z.string().optional(),
   companyName: z.string().min(1, 'Company name is required'),
 
   // For follow-ups
@@ -53,7 +54,8 @@ export const emailMessageSchema = z.object({
   // For new messages
   recipientEmail: z.string().email('Invalid email address'),
   recipientName: z.string().optional(),
-  positionTitle: z.string().min(1, 'Position title is required'),
+  positionTitle: z.string().optional(),
+  areasOfInterest: z.string().optional(),
   companyName: z.string().min(1, 'Company name is required'),
 
   // For follow-ups

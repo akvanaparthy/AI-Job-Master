@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2, Eye, Trash2 } from 'lucide-react';
+import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2, Eye, Trash2, RefreshCw } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -189,6 +189,46 @@ export default function HistoryPage() {
       await loadHistory();
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to delete item', variant: 'destructive' });
+    }
+  };
+
+  const handleFollowUp = async (item: HistoryItem) => {
+    // First fetch the full item details to get all fields
+    try {
+      const endpoint =
+        item.type === 'LinkedIn'
+          ? `/api/history/linkedin/${item.id}`
+          : `/api/history/email/${item.id}`;
+
+      const response = await fetch(endpoint);
+      if (!response.ok) throw new Error('Failed to fetch item');
+
+      const data = await response.json();
+      const message = data.message;
+
+      // Build URL parameters
+      const params = new URLSearchParams({
+        followup: 'true',
+        id: item.id,
+        positionTitle: message.positionTitle || '',
+        companyName: message.companyName || '',
+      });
+
+      // Add optional parameters
+      if (message.linkedinUrl) params.append('linkedinUrl', message.linkedinUrl);
+      if (message.recipientEmail) params.append('recipientEmail', message.recipientEmail);
+      if (message.recipientName) params.append('recipientName', message.recipientName);
+      if (message.jobDescription) params.append('jobDescription', message.jobDescription);
+      if (message.companyDescription) params.append('companyDescription', message.companyDescription);
+      if (message.resumeId) params.append('resumeId', message.resumeId);
+      if (message.length) params.append('length', message.length);
+      if (message.llmModel) params.append('llmModel', message.llmModel);
+
+      // Navigate to the appropriate page
+      const targetPage = item.type === 'LinkedIn' ? '/dashboard/linkedin' : '/dashboard/email';
+      window.location.href = `${targetPage}?${params.toString()}`;
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to load message details', variant: 'destructive' });
     }
   };
 
@@ -379,6 +419,17 @@ export default function HistoryPage() {
                               <Eye className="w-3.5 h-3.5 mr-1.5" />
                               View
                             </Button>
+                            {(item.type === 'LinkedIn' || item.type === 'Email') && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleFollowUp(item)}
+                                className="h-8 px-3 border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                              >
+                                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                                Follow-up
+                              </Button>
+                            )}
                             <Button
                               variant="outline"
                               size="sm"

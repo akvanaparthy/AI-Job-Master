@@ -26,19 +26,21 @@ export async function POST(req: NextRequest) {
       linkedinUrl,
       recipientName,
       positionTitle,
+      areasOfInterest,
       companyName,
       jobDescription,
       companyDescription,
       parentMessageId,
       length,
       llmModel,
+      status,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
     // Validate required fields
-    if (!positionTitle || !companyName || !llmModel || !messageType) {
+    if (!companyName || !llmModel || !messageType) {
       return NextResponse.json(
-        { error: 'Position title, company name, message type, and LLM model are required' },
+        { error: 'Company name, message type, and LLM model are required' },
         { status: 400 }
       );
     }
@@ -160,6 +162,7 @@ export async function POST(req: NextRequest) {
       resumeContent,
       recipientName,
       positionTitle,
+      areasOfInterest,
       companyName,
       jobDescription,
       companyDescription,
@@ -188,13 +191,15 @@ export async function POST(req: NextRequest) {
           messageType: messageType as LinkedInMessageType,
           linkedinUrl: linkedinUrl || null,
           recipientName,
-          positionTitle,
+          positionTitle: positionTitle || null,
+          areasOfInterest: areasOfInterest || null,
           companyName,
           jobDescription,
           companyDescription,
           content: generatedContent,
           length: length as Length,
           llmModel,
+          status: status || 'SENT',
           parentMessageId: parentMessageId || null,
         },
       });

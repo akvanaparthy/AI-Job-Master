@@ -52,6 +52,7 @@ export async function GET(req: NextRequest) {
                 OR: [
                   { companyName: { contains: search, mode: 'insensitive' } },
                   { positionTitle: { contains: search, mode: 'insensitive' } },
+                  { areasOfInterest: { contains: search, mode: 'insensitive' } },
                 ],
               }
             : {}),
@@ -76,6 +77,7 @@ export async function GET(req: NextRequest) {
                 OR: [
                   { companyName: { contains: search, mode: 'insensitive' } },
                   { positionTitle: { contains: search, mode: 'insensitive' } },
+                  { areasOfInterest: { contains: search, mode: 'insensitive' } },
                 ],
               }
             : {}),
@@ -108,7 +110,7 @@ export async function GET(req: NextRequest) {
         id: item.id,
         type: 'LinkedIn' as const,
         company: item.companyName,
-        position: item.positionTitle,
+        position: item.positionTitle || 'General Inquiry',
         status: item.status,
         createdAt: item.createdAt.toISOString(),
         content: item.content,
@@ -118,7 +120,7 @@ export async function GET(req: NextRequest) {
         id: item.id,
         type: 'Email' as const,
         company: item.companyName,
-        position: item.positionTitle,
+        position: item.positionTitle || 'General Inquiry',
         status: item.status,
         createdAt: item.createdAt.toISOString(),
         subject: item.subject,

@@ -97,7 +97,8 @@ model LinkedInMessage {
   resumeId           String?
   linkedinUrl        String?
   recipientName      String?
-  positionTitle      String
+  positionTitle      String?
+  areasOfInterest    String?
   companyName        String
   content            String
   messageType        LinkedInMessageType @default(NEW)
@@ -126,7 +127,8 @@ model EmailMessage {
   resumeId           String?
   recipientEmail     String
   recipientName      String?
-  positionTitle      String
+  positionTitle      String?
+  areasOfInterest    String?
   companyName        String
   subject            String
   body               String

@@ -106,7 +106,7 @@ export async function GET(req: NextRequest) {
       csvRows.push([
         'LinkedIn',
         escapeCSV(item.companyName),
-        escapeCSV(item.positionTitle),
+        escapeCSV(item.positionTitle || 'General Inquiry'),
         item.status,
         item.createdAt.toISOString(),
         escapeCSV(item.content),
@@ -122,7 +122,7 @@ export async function GET(req: NextRequest) {
       csvRows.push([
         'Email',
         escapeCSV(item.companyName),
-        escapeCSV(item.positionTitle),
+        escapeCSV(item.positionTitle || 'General Inquiry'),
         item.status,
         item.createdAt.toISOString(),
         escapeCSV(item.subject),

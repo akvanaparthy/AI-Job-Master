@@ -38,14 +38,17 @@ export default function LinkedInPage() {
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [positionTitle, setPositionTitle] = useState('');
+  const [areasOfInterest, setAreasOfInterest] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [length, setLength] = useState<'CONCISE' | 'MEDIUM' | 'LONG'>('CONCISE');
+  const [status, setStatus] = useState<'DRAFT' | 'SENT' | 'DONE' | 'GHOST'>('SENT');
   const [generatedMessage, setGeneratedMessage] = useState('');
   const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [parentMessageId, setParentMessageId] = useState<string | null>(null);
+  const [previousMessageContent, setPreviousMessageContent] = useState('');
 
   useEffect(() => {
     loadResumes();
@@ -80,6 +83,16 @@ export default function LinkedInPage() {
       if (resumeIdParam) setSelectedResumeId(resumeIdParam);
       if (lengthParam) setLength(lengthParam as 'CONCISE' | 'MEDIUM' | 'LONG');
       if (llmModelParam) setLlmModel(llmModelParam);
+
+      // Fetch the previous message content
+      fetch(`/api/history/linkedin/${messageId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message?.content) {
+            setPreviousMessageContent(data.message.content);
+          }
+        })
+        .catch((error) => console.error('Failed to load previous message:', error));
 
       toast({
         title: 'Follow-up mode',
@@ -123,8 +136,8 @@ export default function LinkedInPage() {
   };
 
   const handleGenerate = async () => {
-    if (!positionTitle || !companyName) {
-      toast({ title: 'Error', description: 'Please fill in position and company name', variant: 'destructive' });
+    if (!companyName) {
+      toast({ title: 'Error', description: 'Please fill in company name', variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -138,7 +151,8 @@ export default function LinkedInPage() {
           messageType,
           linkedinUrl: linkedinUrl || undefined,
           recipientName: recipientName || undefined,
-          positionTitle,
+          positionTitle: positionTitle || undefined,
+          areasOfInterest: areasOfInterest || undefined,
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
@@ -179,12 +193,14 @@ export default function LinkedInPage() {
           messageType,
           linkedinUrl: linkedinUrl || undefined,
           recipientName: recipientName || undefined,
-          positionTitle,
+          positionTitle: positionTitle || undefined,
+          areasOfInterest: areasOfInterest || undefined,
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           length,
           llmModel,
+          status,
           saveToHistory: true, // Save to history
         }),
       });
@@ -375,8 +391,45 @@ export default function LinkedInPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">Status</Label>
+                <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg">
+                    {[
+                      ['SENT', 'Sent'],
+                      ['DRAFT', 'Draft'],
+                      ['DONE', 'Done'],
+                      ['GHOST', 'No Response']
+                    ].map(([v, l]) => (
+                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </Card>
+
+          {/* Previous Message Card - Only shown in follow-up mode */}
+          {previousMessageContent && (
+            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-amber-600" />
+                  Previous Message
+                </h2>
+                <p className="text-sm text-slate-600 mt-0.5">This is the message you sent previously</p>
+              </div>
+              <div className="p-6">
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                  <p className="text-sm text-slate-700 whitespace-pre-wrap">{previousMessageContent}</p>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Message Details Card */}
           <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
@@ -423,10 +476,10 @@ export default function LinkedInPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-900">
-                    Position <span className="text-blue-600">*</span>
+                    Position
                   </Label>
                   <Input
-                    placeholder="Software Engineer"
+                    placeholder="e.g., Senior Software Engineer (or leave blank for general inquiry)"
                     value={positionTitle}
                     onChange={(e) => setPositionTitle(e.target.value)}
                     className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
@@ -444,6 +497,19 @@ export default function LinkedInPage() {
                   />
                 </div>
               </div>
+
+              {!positionTitle && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-900">Areas of Interest (Optional)</Label>
+                  <Input
+                    placeholder="e.g., Backend Development, Cloud Infrastructure, AI/ML"
+                    value={areasOfInterest}
+                    onChange={(e) => setAreasOfInterest(e.target.value)}
+                    className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  />
+                  <p className="text-xs text-slate-500">Specify areas you&apos;re interested in to help tailor the message</p>
+                </div>
+              )}
 
               <AnimatePresence mode="wait">
                 {messageType === 'NEW' && (
@@ -480,7 +546,7 @@ export default function LinkedInPage() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={loading || !positionTitle || !companyName || !hasAnyApiKey || !llmModel}
+                disabled={loading || !companyName || !hasAnyApiKey || !llmModel}
                 className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {loading ? (

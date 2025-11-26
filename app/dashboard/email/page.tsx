@@ -38,15 +38,19 @@ export default function EmailPage() {
   const [recipientEmail, setRecipientEmail] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [positionTitle, setPositionTitle] = useState('');
+  const [areasOfInterest, setAreasOfInterest] = useState('');
   const [companyName, setCompanyName] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [companyDescription, setCompanyDescription] = useState('');
   const [length, setLength] = useState<'CONCISE' | 'MEDIUM' | 'LONG'>('MEDIUM');
+  const [status, setStatus] = useState<'DRAFT' | 'SENT' | 'DONE' | 'GHOST'>('SENT');
   const [generatedSubject, setGeneratedSubject] = useState('');
   const [generatedBody, setGeneratedBody] = useState('');
   const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [parentMessageId, setParentMessageId] = useState<string | null>(null);
+  const [previousMessageSubject, setPreviousMessageSubject] = useState('');
+  const [previousMessageBody, setPreviousMessageBody] = useState('');
 
   useEffect(() => {
     loadResumes();
@@ -81,6 +85,17 @@ export default function EmailPage() {
       if (resumeIdParam) setSelectedResumeId(resumeIdParam);
       if (lengthParam) setLength(lengthParam as 'CONCISE' | 'MEDIUM' | 'LONG');
       if (llmModelParam) setLlmModel(llmModelParam);
+
+      // Fetch the previous email content
+      fetch(`/api/history/email/${messageId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.message) {
+            setPreviousMessageSubject(data.message.subject || '');
+            setPreviousMessageBody(data.message.body || '');
+          }
+        })
+        .catch((error) => console.error('Failed to load previous email:', error));
 
       toast({
         title: 'Follow-up mode',
@@ -124,8 +139,8 @@ export default function EmailPage() {
   };
 
   const handleGenerate = async () => {
-    if (!recipientEmail || !positionTitle || !companyName) {
-      toast({ title: 'Error', description: 'Please fill in required fields', variant: 'destructive' });
+    if (!recipientEmail || !companyName) {
+      toast({ title: 'Error', description: 'Please fill in recipient email and company name', variant: 'destructive' });
       return;
     }
     setLoading(true);
@@ -139,7 +154,8 @@ export default function EmailPage() {
           messageType,
           recipientEmail,
           recipientName: recipientName || undefined,
-          positionTitle,
+          positionTitle: positionTitle || undefined,
+          areasOfInterest: areasOfInterest || undefined,
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
@@ -181,12 +197,14 @@ export default function EmailPage() {
           messageType,
           recipientEmail,
           recipientName: recipientName || undefined,
-          positionTitle,
+          positionTitle: positionTitle || undefined,
+          areasOfInterest: areasOfInterest || undefined,
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           length,
           llmModel,
+          status,
           saveToHistory: true, // Save to history
         }),
       });
@@ -379,8 +397,54 @@ export default function EmailPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-slate-900">Status</Label>
+                <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-lg">
+                    {[
+                      ['SENT', 'Sent'],
+                      ['DRAFT', 'Draft'],
+                      ['DONE', 'Done'],
+                      ['GHOST', 'No Response']
+                    ].map(([v, l]) => (
+                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </Card>
+
+          {/* Previous Email Card - Only shown in follow-up mode */}
+          {previousMessageBody && (
+            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-6 py-4">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <RefreshCw className="w-5 h-5 text-amber-600" />
+                  Previous Email
+                </h2>
+                <p className="text-sm text-slate-600 mt-0.5">This is the email you sent previously</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-900">Subject</Label>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                    <p className="text-sm text-slate-700">{previousMessageSubject}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-900">Body</Label>
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+                    <p className="text-sm text-slate-700 whitespace-pre-wrap">{previousMessageBody}</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
 
           {/* Email Details Card */}
           <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
@@ -417,10 +481,10 @@ export default function EmailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-900">
-                    Position <span className="text-slate-600">*</span>
+                    Position
                   </Label>
                   <Input
-                    placeholder="Software Engineer"
+                    placeholder="e.g., Senior Software Engineer (or leave blank for general inquiry)"
                     value={positionTitle}
                     onChange={(e) => setPositionTitle(e.target.value)}
                     className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
@@ -438,6 +502,19 @@ export default function EmailPage() {
                   />
                 </div>
               </div>
+
+              {!positionTitle && (
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-slate-900">Areas of Interest (Optional)</Label>
+                  <Input
+                    placeholder="e.g., Backend Development, Cloud Infrastructure, AI/ML"
+                    value={areasOfInterest}
+                    onChange={(e) => setAreasOfInterest(e.target.value)}
+                    className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  />
+                  <p className="text-xs text-slate-500">Specify areas you&apos;re interested in to help tailor the message</p>
+                </div>
+              )}
 
               <AnimatePresence mode="wait">
                 {messageType === 'NEW' && (
@@ -474,7 +551,7 @@ export default function EmailPage() {
 
               <Button
                 onClick={handleGenerate}
-                disabled={loading || !recipientEmail || !positionTitle || !companyName || !hasAnyApiKey || !llmModel}
+                disabled={loading || !recipientEmail || !companyName || !hasAnyApiKey || !llmModel}
                 className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {loading ? (

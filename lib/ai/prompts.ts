@@ -7,6 +7,7 @@ export interface PromptParams {
   length: Length;
   recipientName?: string;
   positionTitle?: string;
+  areasOfInterest?: string;
   companyName?: string;
   previousMessage?: string;
   messageType?: 'NEW' | 'FOLLOW_UP';
@@ -75,33 +76,67 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
     length,
     recipientName,
     positionTitle,
+    areasOfInterest,
     companyName,
     previousMessage,
     messageType,
   } = params;
 
-  const system = `You are an expert at writing professional LinkedIn outreach messages. Your messages are personable, engaging, and effective at opening doors to new opportunities.
+  // Determine if this is a specific job application or general inquiry
+  const isSpecificRole = !!positionTitle;
+
+  // Dual-strategy system prompt
+  const system = isSpecificRole
+    ? `You are an expert at writing professional LinkedIn outreach messages. Your messages are confident, targeted, and effective at demonstrating fit for specific roles.
 
 Key principles:
-- Professional yet conversational tone
-- Reference specific details from the job or company when available
-- Show genuine interest and value proposition
-- Include a clear call to action
+- Confident and targeted tone
+- Emphasize direct fit for the specific role
+- Be assertive about qualifications and achievements
+- Reference specific details from the job description
+- Show clear value proposition for this particular role
+- Include a strong call to action
 - Appropriate length for LinkedIn platform
-- Not overly salesy or desperate
-- ${lengthInstructions[length]}`;
+- ${lengthInstructions[length]}
+
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. Output ONLY the message itself - NO preambles, introductions, or phrases like "Here's a message" or "I've created"
+2. Do NOT add any explanatory text, notes, or "Key improvements" sections after the message
+3. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
+4. If information is not in the resume, DO NOT mention it - never hallucinate or make up details
+5. Start directly with the message greeting (e.g., "Hi [Name],")
+6. End with just the closing and signature - nothing after that`
+    : `You are an expert at writing professional LinkedIn outreach messages. Your messages are exploratory, relationship-building, and effective at opening doors to new opportunities.
+
+Key principles:
+- Exploratory and curious tone
+- Balance showcasing background with genuine company interest
+- Express interest in the company's mission, culture, or recent work
+- Highlight relevant skills and experience without being pushy
+- Ask about suitable open positions that match your profile
+- Focus on finding mutual fit
+- Not overly assertive or desperate
+- ${lengthInstructions[length]}
+
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. Output ONLY the message itself - NO preambles, introductions, or phrases like "Here's a message" or "I've created"
+2. Do NOT add any explanatory text, notes, or "Key improvements" sections after the message
+3. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
+4. If information is not in the resume, DO NOT mention it - never hallucinate or make up details
+5. Start directly with the message greeting (e.g., "Hi [Name],")
+6. End with just the closing and signature - nothing after that`;
 
   let user = '';
 
   if (messageType === 'FOLLOW_UP' && previousMessage) {
-    user = `Please write a professional follow-up LinkedIn message.
+    user = `Write a professional follow-up LinkedIn message.
 
 PREVIOUS MESSAGE:
 ${previousMessage}
 
 CONTEXT:
 - Recipient: ${recipientName || 'Hiring Manager'}
-- Position: ${positionTitle} at ${companyName}
+${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
 
 Write a polite follow-up that:
@@ -109,7 +144,8 @@ Write a polite follow-up that:
 2. Adds value or new information
 3. Gently prompts for a response
 4. Maintains professional courtesy`;
-  } else {
+  } else if (isSpecificRole) {
+    // Specific job title - confident/targeted approach
     user = `Please write a professional LinkedIn outreach message for the following opportunity:
 
 RECIPIENT: ${recipientName || 'Hiring Manager'}
@@ -120,7 +156,26 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
 
-Create a compelling message that will encourage ${recipientName || 'them'} to respond and consider my application.`;
+Create a compelling message that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to respond and consider your application.`;
+  } else {
+    // General inquiry - exploratory/relationship-building approach
+    user = `Please write a professional LinkedIn outreach message for a general opportunity inquiry:
+
+RECIPIENT: ${recipientName || 'Hiring Manager'}
+COMPANY: ${companyName}
+${areasOfInterest ? `AREAS OF INTEREST: ${areasOfInterest}` : 'LOOKING FOR: Open to various opportunities that match my background'}
+
+${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
+${jobDescription ? `RELEVANT CONTEXT:\n${jobDescription}\n` : ''}
+MY BACKGROUND:
+${resumeContent || 'Not provided'}
+
+Create a compelling message that:
+1. Expresses genuine interest in ${companyName} and their mission/culture/recent work
+2. Highlights your relevant background and skills${areasOfInterest ? ` (especially in: ${areasOfInterest})` : ''}
+3. Asks about suitable open positions that match your profile
+4. Maintains an exploratory, relationship-building tone
+5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities`;
   }
 
   return { system, user };
@@ -137,26 +192,62 @@ export function getEmailPrompt(params: PromptParams): { system: string; user: st
     length,
     recipientName,
     positionTitle,
+    areasOfInterest,
     companyName,
     previousMessage,
     messageType,
   } = params;
 
-  const system = `You are an expert at writing professional job application emails. Your emails are well-structured, compelling, and effective at securing interviews.
+  // Determine if this is a specific job application or general inquiry
+  const isSpecificRole = !!positionTitle;
+
+  // Dual-strategy system prompt
+  const system = isSpecificRole
+    ? `You are an expert at writing professional job application emails. Your emails are confident, targeted, and effective at securing interviews for specific roles.
 
 Key principles:
 - Compelling subject line that gets opened
+- Confident and targeted tone
+- Emphasize direct fit for the specific role
 - Professional email format with proper greeting and closing
-- Clear and concise communication
-- Show value proposition
-- Include a clear call to action
+- Be assertive about qualifications and achievements
+- Show clear value proposition for this particular role
+- Include a strong call to action
 - Proper email etiquette
 - ${lengthInstructions[length]}
 
-IMPORTANT: Format your response as:
-Subject: [your subject line]
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. Output ONLY in this exact format:
+   Subject: [your subject line]
 
-[email body with greeting and closing]`;
+   [email body with greeting and closing]
+2. Do NOT add any preambles, introductions, or phrases like "Here's an email" or "I've created"
+3. Do NOT add any explanatory text, notes, or "Key improvements" sections after the email
+4. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
+5. If information is not in the resume, DO NOT mention it - never hallucinate or make up details`
+    : `You are an expert at writing professional opportunity inquiry emails. Your emails are exploratory, relationship-building, and effective at opening doors to new opportunities.
+
+Key principles:
+- Compelling subject line that gets opened (focus on interest in company, not specific role)
+- Exploratory and curious tone
+- Balance showcasing background with genuine company interest
+- Professional email format with proper greeting and closing
+- Express interest in the company's mission, culture, or recent work
+- Highlight relevant skills without being pushy
+- Ask about suitable opportunities that match your profile
+- Focus on finding mutual fit
+- Proper email etiquette
+- ${lengthInstructions[length]}
+
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. Output ONLY in this exact format:
+   Subject: [your subject line]
+
+   [email body with greeting and closing]
+2. Do NOT add any preambles, introductions, or phrases like "Here's an email" or "I've created"
+3. Do NOT add any explanatory text, notes, or "Key improvements" sections after the email
+4. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
+5. If information is not in the resume, DO NOT mention it - never hallucinate or make up details`;
 
   let user = '';
 
@@ -168,7 +259,7 @@ ${previousMessage}
 
 CONTEXT:
 - Recipient: ${recipientName || 'Hiring Manager'}
-- Position: ${positionTitle} at ${companyName}
+${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
 
 Write a polite follow-up email that:
@@ -176,7 +267,8 @@ Write a polite follow-up email that:
 2. Adds value or expresses continued interest
 3. Gently prompts for a response
 4. Maintains professional courtesy`;
-  } else {
+  } else if (isSpecificRole) {
+    // Specific job title - confident/targeted approach
     user = `Please write a professional job application email for the following opportunity:
 
 RECIPIENT: ${recipientName || 'Hiring Manager'}
@@ -187,7 +279,26 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
 
-Create a compelling email (with subject line) that will encourage ${recipientName || 'them'} to review my application and invite me for an interview.`;
+Create a compelling email (with subject line) that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to review your application and invite you for an interview.`;
+  } else {
+    // General inquiry - exploratory/relationship-building approach
+    user = `Please write a professional opportunity inquiry email:
+
+RECIPIENT: ${recipientName || 'Hiring Manager'}
+COMPANY: ${companyName}
+${areasOfInterest ? `AREAS OF INTEREST: ${areasOfInterest}` : 'LOOKING FOR: Open to various opportunities that match my background'}
+
+${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
+${jobDescription ? `RELEVANT CONTEXT:\n${jobDescription}\n` : ''}
+MY BACKGROUND:
+${resumeContent || 'Not provided'}
+
+Create a compelling email (with subject line) that:
+1. Expresses genuine interest in ${companyName} and their mission/culture/recent work
+2. Highlights your relevant background and skills${areasOfInterest ? ` (especially in: ${areasOfInterest})` : ''}
+3. Asks about suitable open positions that match your profile
+4. Maintains an exploratory, relationship-building tone
+5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities`;
   }
 
   return { system, user };
@@ -208,6 +319,7 @@ export function buildCustomPrompt(template: string, params: PromptParams): strin
     '{lengthInstruction}': lengthInstructions[params.length],
     '{recipientName}': params.recipientName || 'Hiring Manager',
     '{positionTitle}': params.positionTitle || 'the position',
+    '{areasOfInterest}': params.areasOfInterest || 'Not specified',
     '{companyName}': params.companyName || 'the company',
     '{previousMessage}': params.previousMessage || 'Not available',
     '{messageType}': params.messageType || 'NEW',

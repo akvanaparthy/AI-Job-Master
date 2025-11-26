@@ -26,19 +26,21 @@ export async function POST(req: NextRequest) {
       recipientEmail,
       recipientName,
       positionTitle,
+      areasOfInterest,
       companyName,
       jobDescription,
       companyDescription,
       parentMessageId,
       length,
       llmModel,
+      status,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
     // Validate required fields
-    if (!recipientEmail || !positionTitle || !companyName || !llmModel || !messageType) {
+    if (!recipientEmail || !companyName || !llmModel || !messageType) {
       return NextResponse.json(
-        { error: 'Recipient email, position title, company name, message type, and LLM model are required' },
+        { error: 'Recipient email, company name, message type, and LLM model are required' },
         { status: 400 }
       );
     }
@@ -127,6 +129,7 @@ export async function POST(req: NextRequest) {
       resumeContent,
       recipientName,
       positionTitle,
+      areasOfInterest,
       companyName,
       jobDescription,
       companyDescription,
@@ -174,7 +177,9 @@ export async function POST(req: NextRequest) {
     if (!subject || !emailBody) {
       emailBody = generatedContent.replace(/^subject:\s*.+\n*/i, '').trim() || generatedContent;
       if (!subject) {
-        subject = `Application for ${positionTitle} at ${companyName}`;
+        subject = positionTitle
+          ? `Application for ${positionTitle} at ${companyName}`
+          : `Inquiry about opportunities at ${companyName}`;
       }
     }
 
@@ -188,7 +193,8 @@ export async function POST(req: NextRequest) {
           messageType: messageType as EmailMessageType,
           recipientEmail,
           recipientName,
-          positionTitle,
+          positionTitle: positionTitle || null,
+          areasOfInterest: areasOfInterest || null,
           companyName,
           jobDescription,
           companyDescription,
@@ -196,6 +202,7 @@ export async function POST(req: NextRequest) {
           body: emailBody,
           length: length as Length,
           llmModel,
+          status: status || 'SENT',
           parentMessageId: parentMessageId || null,
         },
       });
