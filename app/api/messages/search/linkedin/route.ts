@@ -47,6 +47,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Search by company name, position, or recipient name
+    // Exclude messages that already have followups
     const messages = await prisma.linkedInMessage.findMany({
       where: {
         userId: user.id,
@@ -66,6 +67,11 @@ export async function GET(req: NextRequest) {
         createdAt: true,
         status: true,
         messageType: true,
+        followUpMessages: {
+          select: {
+            id: true,
+          },
+        },
       },
       orderBy: {
         createdAt: 'desc',
@@ -73,7 +79,13 @@ export async function GET(req: NextRequest) {
       take: 20,
     });
 
-    return NextResponse.json({ messages });
+    // Filter out messages that already have followups
+    const filteredMessages = messages.filter(msg => msg.followUpMessages.length === 0);
+
+    // Remove the followUpMessages field from the response
+    const cleanedMessages = filteredMessages.map(({ followUpMessages, ...rest }) => rest);
+
+    return NextResponse.json({ messages: cleanedMessages });
   } catch (error: any) {
     console.error('LinkedIn message search error:', error);
     return NextResponse.json(

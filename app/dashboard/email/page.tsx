@@ -468,25 +468,6 @@ export default function EmailPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Status</Label>
-                <Select value={status} onValueChange={(value: any) => setStatus(value)}>
-                  <SelectTrigger className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-lg">
-                    {[
-                      ['SENT', 'Sent'],
-                      ['DRAFT', 'Draft'],
-                      ['DONE', 'Done'],
-                      ['GHOST', 'No Response']
-                    ].map(([v, l]) => (
-                      <SelectItem key={v} value={v} className="rounded-md">{l}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
           </Card>
 
@@ -578,7 +559,7 @@ export default function EmailPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Recipient Name (Optional)</Label>
+                <Label className="text-sm font-medium text-slate-900">Recipient Name</Label>
                 <Input
                   placeholder="Jane Smith"
                   value={recipientName}
@@ -614,7 +595,7 @@ export default function EmailPage() {
 
               {!positionTitle && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Areas of Interest (Optional)</Label>
+                  <Label className="text-sm font-medium text-slate-900">Areas of Interest</Label>
                   <Input
                     placeholder="e.g., Backend Development, Cloud Infrastructure, AI/ML"
                     value={areasOfInterest}
@@ -636,7 +617,7 @@ export default function EmailPage() {
                   >
                     <div className="space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">Job Description (Optional)</Label>
+                        <Label className="text-sm font-medium text-slate-900">Job Description</Label>
                         <Textarea
                           placeholder="Paste the job description here..."
                           className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
@@ -645,7 +626,7 @@ export default function EmailPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">Company Info (Optional)</Label>
+                        <Label className="text-sm font-medium text-slate-900">Company Info</Label>
                         <Textarea
                           placeholder="What interests you about this company?"
                           className="min-h-[80px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
@@ -667,7 +648,7 @@ export default function EmailPage() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                 >
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-900">Extra Content (Optional)</Label>
+                    <Label className="text-sm font-medium text-slate-900">Extra Content</Label>
                     <Textarea
                       placeholder="Add any additional context or information to include in this follow-up email..."
                       className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
@@ -744,15 +725,26 @@ export default function EmailPage() {
                           Remove
                         </Button>
                       ) : (
-                        <Button
-                          onClick={handleSave}
-                          disabled={saving}
-                          size="sm"
-                          className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
-                        >
-                          {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Save className="mr-2 h-3 w-3" />}
-                          Save to History
-                        </Button>
+                        <div className="flex gap-2">
+                          <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                            <SelectTrigger className="h-8 w-[100px] border-emerald-200">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="SENT">Sent</SelectItem>
+                              <SelectItem value="DRAFT">Draft</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            onClick={handleSave}
+                            disabled={saving}
+                            size="sm"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
+                          >
+                            {saving ? <Loader2 className="mr-2 h-3 w-3 animate-spin" /> : <Save className="mr-2 h-3 w-3" />}
+                            Save to History
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>

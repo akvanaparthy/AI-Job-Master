@@ -31,8 +31,8 @@ model User {
   customPrompts        CustomPrompt[]
   emailMessages        EmailMessage[]
   linkedinMessages     LinkedInMessage[]
-  resumes              Resume[]
   notifications        Notification[]
+  resumes              Resume[]
 
   @@map("users")
 }
@@ -72,7 +72,7 @@ model CustomPrompt {
 }
 
 model CoverLetter {
-  id                 String   @id @default(uuid())
+  id                 String            @id @default(uuid())
   userId             String
   resumeId           String?
   companyName        String?
@@ -80,12 +80,13 @@ model CoverLetter {
   jobDescription     String?
   companyDescription String?
   content            String
-  length             Length   @default(MEDIUM)
+  length             Length            @default(MEDIUM)
   llmModel           String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  resume             Resume?  @relation(fields: [resumeId], references: [id])
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status             ApplicationStatus @default(SENT)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  resume             Resume?           @relation(fields: [resumeId], references: [id])
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
   @@map("cover_letters")
@@ -93,13 +94,11 @@ model CoverLetter {
 
 model LinkedInMessage {
   id                 String              @id @default(uuid())
-  messageId          String?             @unique
   userId             String
   resumeId           String?
   linkedinUrl        String?
   recipientName      String?
   positionTitle      String?
-  areasOfInterest    String?
   companyName        String
   content            String
   messageType        LinkedInMessageType @default(NEW)
@@ -111,6 +110,8 @@ model LinkedInMessage {
   status             ApplicationStatus   @default(SENT)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  areasOfInterest    String?
+  messageId          String?             @unique
   parentMessage      LinkedInMessage?    @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
   followUpMessages   LinkedInMessage[]   @relation("LinkedInFollowUp")
   resume             Resume?             @relation(fields: [resumeId], references: [id])
@@ -125,13 +126,11 @@ model LinkedInMessage {
 
 model EmailMessage {
   id                 String            @id @default(uuid())
-  messageId          String?           @unique
   userId             String
   resumeId           String?
   recipientEmail     String
   recipientName      String?
   positionTitle      String?
-  areasOfInterest    String?
   companyName        String
   subject            String
   body               String
@@ -144,6 +143,8 @@ model EmailMessage {
   status             ApplicationStatus @default(SENT)
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
+  areasOfInterest    String?
+  messageId          String?           @unique
   parentMessage      EmailMessage?     @relation("EmailFollowUp", fields: [parentMessageId], references: [id])
   followUpMessages   EmailMessage[]    @relation("EmailFollowUp")
   resume             Resume?           @relation(fields: [resumeId], references: [id])
@@ -157,29 +158,29 @@ model EmailMessage {
 }
 
 model UsageLimitSettings {
-  id                 String   @id @default(uuid())
-  userType           UserType @unique
-  maxActivities      Int      @default(100)
-  includeFollowups   Boolean  @default(false)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id               String   @id @default(uuid())
+  userType         UserType @unique
+  maxActivities    Int      @default(100)
+  includeFollowups Boolean  @default(false)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@map("usage_limit_settings")
 }
 
 model Notification {
-  id                String             @id @default(uuid())
+  id                String           @id @default(uuid())
   userId            String
-  type              NotificationType   @default(FOLLOWUP_REMINDER)
+  type              NotificationType @default(FOLLOWUP_REMINDER)
   title             String
   message           String
-  isRead            Boolean            @default(false)
+  isRead            Boolean          @default(false)
   linkedInMessageId String?
   emailMessageId    String?
-  createdAt         DateTime           @default(now())
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  linkedInMessage   LinkedInMessage?   @relation(fields: [linkedInMessageId], references: [id], onDelete: Cascade)
-  emailMessage      EmailMessage?      @relation(fields: [emailMessageId], references: [id], onDelete: Cascade)
+  createdAt         DateTime         @default(now())
+  emailMessage      EmailMessage?    @relation(fields: [emailMessageId], references: [id], onDelete: Cascade)
+  linkedInMessage   LinkedInMessage? @relation(fields: [linkedInMessageId], references: [id], onDelete: Cascade)
+  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, isRead])
   @@index([userId, createdAt])

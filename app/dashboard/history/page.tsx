@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -232,6 +233,30 @@ export default function HistoryPage() {
     }
   };
 
+  const handleStatusChange = async (item: HistoryItem, newStatus: string) => {
+    try {
+      const endpoint =
+        item.type === 'Cover Letter'
+          ? `/api/history/cover-letter/${item.id}`
+          : item.type === 'LinkedIn'
+          ? `/api/history/linkedin/${item.id}`
+          : `/api/history/email/${item.id}`;
+
+      const response = await fetch(endpoint, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update status');
+
+      toast({ title: 'Success', description: 'Status updated successfully' });
+      await loadHistory(); // Refresh the list
+    } catch (error) {
+      toast({ title: 'Error', description: 'Failed to update status', variant: 'destructive' });
+    }
+  };
+
   return (
     <div className="max-w-[1400px] mx-auto">
       {/* Header */}
@@ -389,9 +414,20 @@ export default function HistoryPage() {
 
                           <div className="flex items-center gap-3 flex-shrink-0">
                             {item.status && STATUS_CONFIG[item.status] && (
-                              <Badge variant="secondary" className={STATUS_CONFIG[item.status].color}>
-                                {STATUS_CONFIG[item.status].label}
-                              </Badge>
+                              <Select
+                                value={item.status}
+                                onValueChange={(newStatus) => handleStatusChange(item, newStatus)}
+                              >
+                                <SelectTrigger className={`h-7 w-[130px] border-0 ${STATUS_CONFIG[item.status].color} hover:opacity-80 transition-opacity`}>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent className="rounded-lg">
+                                  <SelectItem value="DRAFT" className="rounded-md">Draft</SelectItem>
+                                  <SelectItem value="SENT" className="rounded-md">Sent</SelectItem>
+                                  <SelectItem value="DONE" className="rounded-md">Done</SelectItem>
+                                  <SelectItem value="GHOST" className="rounded-md">No Response</SelectItem>
+                                </SelectContent>
+                              </Select>
                             )}
                             <Badge variant="outline" className={`${config.textColor} ${config.borderColor}`}>
                               {item.type}
@@ -468,6 +504,39 @@ export default function HistoryPage() {
             </div>
           ) : selectedItem ? (
             <div className="space-y-4">
+              {/* Status Update Section */}
+              {selectedItem.status && (
+                <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <Label className="text-sm font-medium text-slate-900">Status:</Label>
+                  <Select
+                    value={selectedItem.status}
+                    onValueChange={(newStatus) => {
+                      const itemType = selectedItem.content ? 'Cover Letter' : selectedItem.subject ? 'Email' : 'LinkedIn';
+                      handleStatusChange({
+                        id: selectedItem.id,
+                        type: itemType as any,
+                        company: selectedItem.company,
+                        position: selectedItem.position,
+                        status: selectedItem.status,
+                        createdAt: selectedItem.createdAt
+                      }, newStatus);
+                      setSelectedItem({ ...selectedItem, status: newStatus });
+                    }}
+                  >
+                    <SelectTrigger className={`h-9 w-[150px] ${STATUS_CONFIG[selectedItem.status]?.color || 'bg-gray-100 text-gray-700'}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-lg">
+                      <SelectItem value="DRAFT" className="rounded-md">Draft</SelectItem>
+                      <SelectItem value="SENT" className="rounded-md">Sent</SelectItem>
+                      <SelectItem value="DONE" className="rounded-md">Done</SelectItem>
+                      <SelectItem value="GHOST" className="rounded-md">No Response</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+
               {selectedItem.content && (
                 <div>
                   <h3 className="text-sm font-semibold text-slate-900 mb-2">Content</h3>
