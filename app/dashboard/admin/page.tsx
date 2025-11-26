@@ -66,7 +66,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Users Management */}
-        <Link href="/dashboard/admin/users">
+        <Link href="/admin/users">
           <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-slate-200">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-xl bg-blue-500 flex items-center justify-center">
@@ -102,20 +102,22 @@ export default function AdminDashboard() {
         </Link>
 
         {/* Analytics */}
-        <Card className="p-6 border-slate-200 opacity-50">
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
+        <Link href="/dashboard/admin/analytics">
+          <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer border-slate-200">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Analytics</h3>
+                <p className="text-sm text-slate-600">Platform insights</p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Analytics</h3>
-              <p className="text-sm text-slate-600">Coming soon</p>
-            </div>
-          </div>
-          <p className="text-sm text-slate-600">
-            View system-wide analytics, usage trends, and performance metrics.
-          </p>
-        </Card>
+            <p className="text-sm text-slate-600">
+              View system-wide analytics, usage trends, and performance metrics.
+            </p>
+          </Card>
+        </Link>
       </div>
 
       {/* Quick Stats */}
@@ -123,7 +125,7 @@ export default function AdminDashboard() {
         <Card className="p-6 border-slate-200">
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
           <div className="flex gap-4">
-            <Link href="/dashboard/admin/users">
+            <Link href="/admin/users">
               <Button variant="outline">
                 <Users className="w-4 h-4 mr-2" />
                 View All Users
@@ -133,6 +135,12 @@ export default function AdminDashboard() {
               <Button variant="outline">
                 <Settings className="w-4 h-4 mr-2" />
                 Configure Limits
+              </Button>
+            </Link>
+            <Link href="/dashboard/admin/analytics">
+              <Button variant="outline">
+                <BarChart3 className="w-4 h-4 mr-2" />
+                View Analytics
               </Button>
             </Link>
           </div>
