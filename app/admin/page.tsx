@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight } from 'lucide-react';
+import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 
 interface Stats {
   users: {
@@ -30,6 +31,8 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [userEmail, setUserEmail] = useState<string>('');
+  const supabase = createClient();
 
   const loadStats = useCallback(async () => {
     try {
@@ -48,9 +51,22 @@ export default function AdminDashboard() {
     }
   }, [router]);
 
+  const loadUser = useCallback(async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      setUserEmail(user.email);
+    }
+  }, [supabase]);
+
   useEffect(() => {
     loadStats();
-  }, [loadStats]);
+    loadUser();
+  }, [loadStats, loadUser]);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth/signin');
+  };
 
   if (loading) {
     return (
@@ -127,62 +143,70 @@ export default function AdminDashboard() {
           <div className="mb-10">
             <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Navigation</div>
             <div className="space-y-1">
-              <button className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group">
+              <button
+                onClick={() => router.push('/admin')}
+                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-md shadow-slate-800/20"
+              >
+                <Shield className="w-[18px] h-[18px]" strokeWidth={2} />
+                <span className="font-semibold">Admin</span>
+              </button>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
+              >
                 <Home className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
                 <span className="font-medium">Dashboard</span>
               </button>
-              <button className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group">
-                <Briefcase className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
-                <span className="font-medium">Interviews</span>
+              <button
+                onClick={() => router.push('/admin/users')}
+                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
+              >
+                <Users className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
+                <span className="font-medium">Users</span>
               </button>
-              <button className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-slate-800 to-slate-700 text-white shadow-md shadow-slate-800/20">
-                <Users className="w-[18px] h-[18px]" strokeWidth={2} />
-                <span className="font-semibold">Candidates</span>
+              <button
+                onClick={() => router.push('/admin/analytics')}
+                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
+              >
+                <BarChart3 className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
+                <span className="font-medium">Analytics</span>
               </button>
-              <button className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group">
+              <button
+                onClick={() => router.push('/admin/settings')}
+                className="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600 group"
+              >
                 <SettingsIcon className="w-[18px] h-[18px] text-slate-400 group-hover:text-slate-600 transition-colors" strokeWidth={2} />
                 <span className="font-medium">Settings</span>
               </button>
             </div>
           </div>
 
-          {/* Departments */}
+          {/* Quick Stats */}
           <div className="mb-10">
-            <div className="flex items-center justify-between mb-4 px-1">
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Departments</div>
-              <button className="text-slate-400 hover:text-slate-600 transition-colors">
-                <Plus className="w-4 h-4" strokeWidth={2.5} />
-              </button>
-            </div>
-            <div className="space-y-1">
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600">
-                <div className="w-2 h-2 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"></div>
-                <span className="text-[13px] font-medium">Design Department</span>
-              </button>
-              <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition-all duration-200 text-sm text-slate-600">
-                <div className="w-2 h-2 rounded-full bg-rose-500 shadow-sm shadow-rose-500/50"></div>
-                <span className="text-[13px] font-medium">Engineering Department</span>
-              </button>
-            </div>
-          </div>
-
-          {/* PRO Card */}
-          <div className="mb-6">
-            <div className="relative p-5 rounded-xl bg-gradient-to-br from-violet-100 via-purple-50 to-fuchsia-100 border border-violet-200/60 shadow-lg shadow-violet-500/10 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-violet-500/5 to-fuchsia-500/5"></div>
-              <div className="relative">
-                <div className="text-sm font-bold text-slate-900 mb-1.5">You're now in PRO mode!</div>
-                <div className="text-xs text-slate-600 mb-4 leading-relaxed">Enjoy advanced features, extended limits, and priority tools</div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-lg p-3 mb-3 border border-violet-200/40">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-extrabold text-violet-700">PRO</span>
-                    <span className="text-xs font-bold text-slate-900">Discount - 50%</span>
-                  </div>
-                  <div className="text-[11px] text-slate-600">for the first month</div>
+            <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Overview</div>
+            <div className="space-y-3 px-1">
+              <div className="p-3 rounded-lg bg-blue-50 border border-blue-100">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-blue-900">Total Users</span>
+                  <Users className="w-3.5 h-3.5 text-blue-600" strokeWidth={2.5} />
                 </div>
-                <button className="w-full bg-gradient-to-r from-slate-900 to-slate-800 text-white py-2.5 rounded-lg text-xs font-bold hover:shadow-lg hover:shadow-slate-900/20 transition-all duration-200 active:scale-[0.98]">
-                  Explore PRO tools
-                </button>
+                <div className="text-2xl font-extrabold text-blue-900">{stats.users.total}</div>
+              </div>
+              <div className="p-3 rounded-lg bg-orange-50 border border-orange-100">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-orange-900">Content</span>
+                  <FileText className="w-3.5 h-3.5 text-orange-600" strokeWidth={2.5} />
+                </div>
+                <div className="text-2xl font-extrabold text-orange-900">{stats.content.totalGenerated}</div>
+              </div>
+              <div className="p-3 rounded-lg bg-purple-50 border border-purple-100">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-xs font-semibold text-purple-900">API Keys</span>
+                  <Shield className="w-3.5 h-3.5 text-purple-600" strokeWidth={2.5} />
+                </div>
+                <div className="text-2xl font-extrabold text-purple-900">
+                  {stats.apiKeys.openai + stats.apiKeys.anthropic + stats.apiKeys.gemini}
+                </div>
               </div>
             </div>
           </div>
@@ -190,13 +214,22 @@ export default function AdminDashboard() {
 
         {/* User Profile */}
         <div className="p-6 border-t border-slate-100">
-          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-all duration-200 cursor-pointer">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex-shrink-0 shadow-md"></div>
+          <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 transition-all duration-200 mb-2">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex-shrink-0 shadow-md flex items-center justify-center">
+              <span className="text-white font-bold text-sm">{userEmail ? userEmail[0].toUpperCase() : 'A'}</span>
+            </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-semibold text-slate-900 truncate">Ashley Curtin</div>
-              <div className="text-[11px] text-slate-500 truncate">ashleycurtin@...</div>
+              <div className="text-sm font-semibold text-slate-900 truncate">Admin</div>
+              <div className="text-[11px] text-slate-500 truncate">{userEmail || 'admin@...'}</div>
             </div>
           </div>
+          <button
+            onClick={handleSignOut}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 transition-all duration-200 text-xs font-semibold text-slate-700"
+          >
+            <LogOut className="w-3.5 h-3.5" strokeWidth={2.5} />
+            Sign Out
+          </button>
         </div>
       </div>
 
@@ -214,26 +247,37 @@ export default function AdminDashboard() {
               />
             </div>
 
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60">
+            <button
+              onClick={() => router.push('/admin/users')}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60"
+            >
               <UserCircle className="w-[17px] h-[17px] text-slate-500" strokeWidth={2} />
-              <span className="text-[13px] font-semibold text-slate-700">Add person</span>
+              <span className="text-[13px] font-semibold text-slate-700">Manage Users</span>
             </button>
 
-            <button className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60">
-              <Bell className="w-[17px] h-[17px] text-slate-500" strokeWidth={2} />
-              <span className="text-[13px] font-semibold text-slate-700">Notifications</span>
+            <button
+              onClick={() => router.push('/admin/analytics')}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200 border border-transparent hover:border-slate-200/60"
+            >
+              <BarChart3 className="w-[17px] h-[17px] text-slate-500" strokeWidth={2} />
+              <span className="text-[13px] font-semibold text-slate-700">Analytics</span>
             </button>
 
-            <button className="p-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200">
-              <MoreHorizontal className="w-5 h-5 text-slate-500" strokeWidth={2} />
+            <button
+              onClick={() => router.push('/admin/settings')}
+              className="p-2.5 rounded-lg hover:bg-slate-50 transition-all duration-200"
+            >
+              <SettingsIcon className="w-5 h-5 text-slate-500" strokeWidth={2} />
             </button>
           </div>
 
           <div className="flex items-center gap-5">
-            <span className="text-[13px] font-semibold text-slate-600">En</span>
-            <span className="text-[13px] font-medium text-slate-500">November 17, 2025</span>
-            <button className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]">
-              Create
+            <span className="text-[13px] font-medium text-slate-500">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="bg-slate-900 text-white px-5 py-2.5 rounded-lg text-[13px] font-bold flex items-center gap-2 hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/20 active:scale-[0.98]"
+            >
+              Go to Dashboard
               <span className="text-base">→</span>
             </button>
           </div>
@@ -242,27 +286,10 @@ export default function AdminDashboard() {
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto bg-[#FAFAFA]">
           <div className="p-8">
-            {/* Breadcrumb */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 text-[13px] text-slate-400 mb-2">
-                <span className="font-medium">Candidates</span>
-                <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-                <span className="font-medium">Junior FrontEnd Developer</span>
-                <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-                <span className="text-slate-700 font-semibold">Round 3</span>
-              </div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Round</h1>
-            </div>
-
-            {/* Admin Dashboard Header Card */}
-            <div className="flex items-center gap-4 mb-8 bg-white p-5 rounded-2xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-red-500/30">
-                <Shield className="w-7 h-7 text-white" strokeWidth={2.5} />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-0.5">Admin Dashboard</h2>
-                <p className="text-[13px] text-slate-500 font-medium">Platform overview and user management</p>
-              </div>
+            {/* Page Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Admin Dashboard</h1>
+              <p className="text-[15px] text-slate-500">Monitor platform statistics and manage your application</p>
             </div>
 
             {/* Stats Grid */}
