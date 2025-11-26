@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { getModelDisplayNameWithProvider } from '@/lib/utils/modelNames';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();

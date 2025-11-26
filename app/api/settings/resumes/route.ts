@@ -5,6 +5,8 @@ import { ensureUserExists } from '@/lib/auth-helpers';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch all resumes for the user
 export async function GET(req: NextRequest) {
   try {

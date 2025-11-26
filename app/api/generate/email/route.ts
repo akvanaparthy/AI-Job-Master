@@ -7,6 +7,8 @@ import { getEmailPrompt } from '@/lib/ai/prompts';
 import { Length, EmailMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
   try {
     // Get authenticated user

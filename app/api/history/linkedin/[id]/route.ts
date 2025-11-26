@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 
+export const dynamic = 'force-dynamic';
+
 // GET - Fetch a single LinkedIn message
 export async function GET(
   req: NextRequest,

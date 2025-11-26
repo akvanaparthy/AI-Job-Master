@@ -4,6 +4,8 @@ import { prisma } from '@/lib/db/prisma';
 import { decrypt } from '@/lib/encryption';
 import { getAvailableModels } from '@/lib/encryption';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
   try {
     const supabase = await createClient();
