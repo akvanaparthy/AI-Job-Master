@@ -45,6 +45,7 @@ export default function CoverLetterPage() {
   useEffect(() => {
     loadResumes();
     loadAvailableModels();
+    loadUserPreferences();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -73,15 +74,31 @@ export default function CoverLetterPage() {
         const data = await response.json();
         setHasAnyApiKey(data.hasAnyKey);
         setAvailableModels(data.models);
-        // Set default model if available
-        if (data.models.length > 0 && !llmModel) {
-          setLlmModel(data.models[0].value);
-        }
       }
     } catch (error) {
       console.error('Failed to load available models:', error);
     } finally {
       setLoadingModels(false);
+    }
+  };
+
+  const loadUserPreferences = async () => {
+    try {
+      const response = await fetch('/api/settings/preferences');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.preferences) {
+          // Set defaults from user preferences
+          if (data.preferences.defaultLlmModel) {
+            setLlmModel(data.preferences.defaultLlmModel);
+          }
+          if (data.preferences.defaultLength) {
+            setLength(data.preferences.defaultLength);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user preferences:', error);
     }
   };
 

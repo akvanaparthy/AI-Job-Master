@@ -64,6 +64,11 @@ export default function LinkedInPage() {
     const isFollowup = params.get('followup') === 'true';
     const messageId = params.get('id');
 
+    // Load user preferences (will be overridden by URL params if in follow-up mode)
+    if (!isFollowup) {
+      loadUserPreferences();
+    }
+
     if (isFollowup && messageId) {
       setMessageType('FOLLOW_UP');
       setParentMessageId(messageId);
@@ -130,14 +135,34 @@ export default function LinkedInPage() {
         const data = await response.json();
         setHasAnyApiKey(data.hasAnyKey);
         setAvailableModels(data.models);
-        if (data.models.length > 0 && !llmModel) {
-          setLlmModel(data.models[0].value);
-        }
       }
     } catch (error) {
       console.error('Failed to load available models:', error);
     } finally {
       setLoadingModels(false);
+    }
+  };
+
+  const loadUserPreferences = async () => {
+    try {
+      const response = await fetch('/api/settings/preferences');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.preferences) {
+          // Set defaults from user preferences
+          if (data.preferences.defaultLlmModel) {
+            setLlmModel(data.preferences.defaultLlmModel);
+          }
+          if (data.preferences.defaultLength) {
+            setLength(data.preferences.defaultLength);
+          }
+          if (data.preferences.defaultStatus) {
+            setStatus(data.preferences.defaultStatus);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user preferences:', error);
     }
   };
 
