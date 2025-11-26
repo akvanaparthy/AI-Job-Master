@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     // Get user data including userType
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { userType: true, isAdmin: true },
+      select: { userType: true },
     });
 
     if (!dbUser) {
