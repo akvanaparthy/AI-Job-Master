@@ -60,11 +60,8 @@ export default function SignupPage() {
           variant: 'destructive',
         });
       } else {
-        toast({
-          title: 'Success',
-          description: 'Account created! Check your email to verify.',
-        });
-        router.push('/auth/login');
+        // Redirect to verification prompt page with email
+        router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
       }
     } catch (error) {
       toast({

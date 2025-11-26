@@ -6,6 +6,7 @@ import type { NextRequest } from 'next/server';
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+  const next = requestUrl.searchParams.get('next');
 
   if (code) {
     const cookieStore = await cookies();
@@ -13,6 +14,8 @@ export async function GET(request: NextRequest) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // Redirect to dashboard after successful auth
-  return NextResponse.redirect(new URL('/dashboard', request.url));
+  // If coming from email verification (no 'next' param), show activation page
+  // Otherwise redirect to the next URL or dashboard
+  const redirectUrl = next || (!requestUrl.searchParams.has('next') ? '/auth/activated' : '/dashboard');
+  return NextResponse.redirect(new URL(redirectUrl, request.url));
 }
