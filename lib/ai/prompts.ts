@@ -10,6 +10,7 @@ export interface PromptParams {
   areasOfInterest?: string;
   companyName?: string;
   previousMessage?: string;
+  extraContent?: string;
   messageType?: 'NEW' | 'FOLLOW_UP';
 }
 
@@ -79,6 +80,7 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
     areasOfInterest,
     companyName,
     previousMessage,
+    extraContent,
     messageType,
   } = params;
 
@@ -138,10 +140,11 @@ CONTEXT:
 - Recipient: ${recipientName || 'Hiring Manager'}
 ${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
+${extraContent ? `\nADDITIONAL CONTEXT FOR THIS FOLLOW-UP:\n${extraContent}\n\nIMPORTANT: Use the additional context above to enhance this follow-up message. This context provides new information or angles to incorporate into the message.` : ''}
 
 Write a polite follow-up that:
 1. References the previous message
-2. Adds value or new information
+2. ${extraContent ? 'Incorporates the additional context provided above' : 'Adds value or new information'}
 3. Gently prompts for a response
 4. Maintains professional courtesy`;
   } else if (isSpecificRole) {
@@ -195,6 +198,7 @@ export function getEmailPrompt(params: PromptParams): { system: string; user: st
     areasOfInterest,
     companyName,
     previousMessage,
+    extraContent,
     messageType,
   } = params;
 
@@ -261,10 +265,11 @@ CONTEXT:
 - Recipient: ${recipientName || 'Hiring Manager'}
 ${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
+${extraContent ? `\nADDITIONAL CONTEXT FOR THIS FOLLOW-UP:\n${extraContent}\n\nIMPORTANT: Use the additional context above to enhance this follow-up email. This context provides new information or angles to incorporate into the email.` : ''}
 
 Write a polite follow-up email that:
 1. References the previous email
-2. Adds value or expresses continued interest
+2. ${extraContent ? 'Incorporates the additional context provided above' : 'Adds value or expresses continued interest'}
 3. Gently prompts for a response
 4. Maintains professional courtesy`;
   } else if (isSpecificRole) {

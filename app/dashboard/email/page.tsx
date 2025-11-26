@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2 } from 'lucide-react';
+import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
 
 interface Resume {
   id: string;
@@ -47,10 +47,15 @@ export default function EmailPage() {
   const [generatedSubject, setGeneratedSubject] = useState('');
   const [generatedBody, setGeneratedBody] = useState('');
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [savedMessageId, setSavedMessageId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [parentMessageId, setParentMessageId] = useState<string | null>(null);
   const [previousMessageSubject, setPreviousMessageSubject] = useState('');
   const [previousMessageBody, setPreviousMessageBody] = useState('');
+  const [extraContent, setExtraContent] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     loadResumes();
@@ -138,6 +143,63 @@ export default function EmailPage() {
     }
   };
 
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setSearching(true);
+    try {
+      const response = await fetch(`/api/messages/search/email?q=${encodeURIComponent(searchQuery)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSearchResults(data.messages || []);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const loadMessageDetails = async (messageId: string) => {
+    try {
+      const response = await fetch(`/api/messages/search/email?messageId=${encodeURIComponent(messageId)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.message) {
+          const msg = data.message;
+          setCompanyName(msg.companyName);
+          setPositionTitle(msg.positionTitle || '');
+          setRecipientName(msg.recipientName || '');
+          setRecipientEmail(msg.recipientEmail || '');
+          setJobDescription(msg.jobDescription || '');
+          setCompanyDescription(msg.companyDescription || '');
+          setAreasOfInterest(msg.areasOfInterest || '');
+          if (msg.resumeId) setSelectedResumeId(msg.resumeId);
+          if (msg.length) setLength(msg.length);
+          if (msg.llmModel) setLlmModel(msg.llmModel);
+          setParentMessageId(msg.id);
+          setPreviousMessageSubject(msg.subject || '');
+          setPreviousMessageBody(msg.body || '');
+          setSearchQuery('');
+          setSearchResults([]);
+          toast({
+            title: 'Message Loaded',
+            description: `Previous message details loaded. Message ID: ${msg.messageId || 'N/A'}`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load message details:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load message details',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handleGenerate = async () => {
     if (!recipientEmail || !companyName) {
       toast({ title: 'Error', description: 'Please fill in recipient email and company name', variant: 'destructive' });
@@ -145,6 +207,7 @@ export default function EmailPage() {
     }
     setLoading(true);
     setSavedId(null); // Reset saved state
+    setSavedMessageId(null);
     try {
       const response = await fetch('/api/generate/email', {
         method: 'POST',
@@ -159,6 +222,8 @@ export default function EmailPage() {
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
+          parentMessageId: parentMessageId || undefined,
+          extraContent: extraContent || undefined,
           length,
           llmModel,
           saveToHistory: false, // Don't auto-save
@@ -202,6 +267,8 @@ export default function EmailPage() {
           companyName,
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
+          parentMessageId: parentMessageId || undefined,
+          extraContent: extraContent || undefined,
           length,
           llmModel,
           status,
@@ -211,7 +278,11 @@ export default function EmailPage() {
       if (!response.ok) throw new Error('Failed to save email');
       const data = await response.json();
       setSavedId(data.id);
-      toast({ title: 'Saved', description: 'Email saved to history!' });
+      setSavedMessageId(data.messageId);
+      toast({
+        title: 'Saved',
+        description: `Email saved to history! Message ID: ${data.messageId || 'N/A'}`
+      });
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to save email', variant: 'destructive' });
     } finally {
@@ -419,6 +490,73 @@ export default function EmailPage() {
             </div>
           </Card>
 
+          {/* Search for Previous Messages - Only shown in follow-up mode */}
+          {messageType === 'FOLLOW_UP' && (
+            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-50 to-indigo-50/80 border-b border-purple-100/50 px-6 py-4">
+                <h2 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <Search className="w-5 h-5 text-purple-600" />
+                  Search Previous Emails
+                </h2>
+                <p className="text-sm text-slate-600 mt-0.5">Find and load a previous email to follow up on</p>
+              </div>
+              <div className="p-6 space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Search by company, position, message ID..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    className="h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  />
+                  <Button
+                    onClick={handleSearch}
+                    disabled={searching || !searchQuery.trim()}
+                    className="h-11 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
+                  >
+                    {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                  </Button>
+                </div>
+
+                {searchResults.length > 0 && (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {searchResults.map((msg) => (
+                      <div
+                        key={msg.id}
+                        onClick={() => loadMessageDetails(msg.messageId || msg.id)}
+                        className="p-3 bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-200 rounded-lg cursor-pointer transition-all"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 truncate">
+                              {msg.companyName} {msg.positionTitle && `- ${msg.positionTitle}`}
+                            </p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {msg.recipientName && `To: ${msg.recipientName} • `}
+                              {new Date(msg.createdAt).toLocaleDateString()}
+                            </p>
+                            {msg.messageId && (
+                              <p className="text-xs text-purple-600 mt-1 font-mono">ID: {msg.messageId}</p>
+                            )}
+                          </div>
+                          <div className="flex-shrink-0">
+                            <span className="text-xs px-2 py-1 bg-slate-200 text-slate-700 rounded">
+                              {msg.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {searchQuery && searchResults.length === 0 && !searching && (
+                  <p className="text-sm text-slate-500 text-center py-4">No emails found</p>
+                )}
+              </div>
+            </Card>
+          )}
+
           {/* Previous Email Card - Only shown in follow-up mode */}
           {previousMessageBody && (
             <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
@@ -549,6 +687,29 @@ export default function EmailPage() {
                 )}
               </AnimatePresence>
 
+              {/* Extra Content Field - Only shown in follow-up mode */}
+              {messageType === 'FOLLOW_UP' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                >
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium text-slate-900">Extra Content (Optional)</Label>
+                    <Textarea
+                      placeholder="Add any additional context or information to include in this follow-up email..."
+                      className="min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                      value={extraContent}
+                      onChange={(e) => setExtraContent(e.target.value)}
+                    />
+                    <p className="text-xs text-slate-500">
+                      This extra context will be used by the AI to enhance your follow-up email with new angles or information
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+
               <Button
                 onClick={handleGenerate}
                 disabled={loading || !recipientEmail || !companyName || !hasAnyApiKey || !llmModel}
@@ -647,21 +808,57 @@ export default function EmailPage() {
                 </div>
               </>
             ) : (
-              <div className="flex flex-col items-center justify-center h-full min-h-[780px] p-12">
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.35 }}
-                  className="text-center"
-                >
-                  <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-6 shadow-inner">
-                    <Mail className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
-                  <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
-                    Fill in the required fields and click Generate Email to create your professional job application email
-                  </p>
-                </motion.div>
+              <div className="flex flex-col h-full min-h-[780px] p-6 space-y-6">
+                {/* Previous Message Display - Above Ready to Send */}
+                {previousMessageBody && messageType === 'FOLLOW_UP' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+                  >
+                    <h4 className="text-sm font-semibold text-amber-900 mb-2 flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4" />
+                      Previous Email Reference
+                    </h4>
+                    <div className="space-y-2">
+                      {previousMessageSubject && (
+                        <div className="bg-white border border-amber-100 rounded p-2">
+                          <p className="text-xs font-medium text-slate-600 mb-1">Subject:</p>
+                          <p className="text-xs text-slate-700">{previousMessageSubject}</p>
+                        </div>
+                      )}
+                      <div className="bg-white border border-amber-100 rounded p-3 max-h-48 overflow-y-auto">
+                        <p className="text-xs font-medium text-slate-600 mb-1">Body:</p>
+                        <p className="text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                          {previousMessageBody}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Ready to Send Box */}
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.35 }}
+                    className="text-center"
+                  >
+                    <div className="w-24 h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-6 shadow-inner">
+                      <Mail className="w-12 h-12 text-slate-600" strokeWidth={1.5} />
+                    </div>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
+                    <p className="text-slate-600 max-w-sm mx-auto leading-relaxed">
+                      Fill in the required fields and click Generate Email to create your professional job application email
+                    </p>
+                    {savedMessageId && (
+                      <p className="text-xs text-slate-500 mt-4 font-mono">
+                        Last saved: {savedMessageId}
+                      </p>
+                    )}
+                  </motion.div>
+                </div>
               </div>
             )}
           </Card>

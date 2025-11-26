@@ -93,6 +93,7 @@ model CoverLetter {
 
 model LinkedInMessage {
   id                 String              @id @default(uuid())
+  messageId          String?             @unique
   userId             String
   resumeId           String?
   linkedinUrl        String?
@@ -118,11 +119,13 @@ model LinkedInMessage {
 
   @@index([userId, status])
   @@index([userId, linkedinUrl])
+  @@index([messageId])
   @@map("linkedin_messages")
 }
 
 model EmailMessage {
   id                 String            @id @default(uuid())
+  messageId          String?           @unique
   userId             String
   resumeId           String?
   recipientEmail     String
@@ -149,6 +152,7 @@ model EmailMessage {
 
   @@index([userId, status])
   @@index([userId, recipientEmail])
+  @@index([messageId])
   @@map("email_messages")
 }
 

@@ -5,6 +5,7 @@ import { decrypt } from '@/lib/encryption';
 import { generateContent, getProviderFromModel } from '@/lib/ai/providers';
 import { getLinkedInPrompt } from '@/lib/ai/prompts';
 import { Length, LinkedInMessageType } from '@prisma/client';
+import { generateMessageId } from '@/lib/utils/message-id';
 
 export async function POST(req: NextRequest) {
   try {
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
       jobDescription,
       companyDescription,
       parentMessageId,
+      extraContent,
       length,
       llmModel,
       status,
@@ -167,6 +169,7 @@ export async function POST(req: NextRequest) {
       jobDescription,
       companyDescription,
       previousMessage,
+      extraContent,
       length: length as Length,
     });
 
@@ -183,10 +186,13 @@ export async function POST(req: NextRequest) {
 
     // Save to database only if requested
     let linkedInMessageId = null;
+    let messageId = null;
     if (saveToHistory) {
+      messageId = generateMessageId('linkedin');
       const linkedInMessage = await prisma.linkedInMessage.create({
         data: {
           userId: user.id,
+          messageId,
           resumeId: resumeId || null,
           messageType: messageType as LinkedInMessageType,
           linkedinUrl: linkedinUrl || null,
@@ -210,6 +216,7 @@ export async function POST(req: NextRequest) {
       success: true,
       content: generatedContent,
       id: linkedInMessageId,
+      messageId: messageId,
       saved: saveToHistory,
     });
   } catch (error: any) {
