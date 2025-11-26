@@ -17,12 +17,19 @@ interface Preferences {
   followupReminderDays: number;
 }
 
+interface ModelOption {
+  value: string;
+  label: string;
+  provider: string;
+}
+
 export default function UserPreferencesManager() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
   const [preferences, setPreferences] = useState<Preferences>({
-    defaultLlmModel: 'gpt-4o',
+    defaultLlmModel: '',
     defaultLength: 'MEDIUM',
     autoSave: true,
     defaultStatus: 'SENT',
@@ -31,6 +38,8 @@ export default function UserPreferencesManager() {
 
   useEffect(() => {
     loadPreferences();
+    loadAvailableModels();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadPreferences = async () => {
@@ -40,13 +49,28 @@ export default function UserPreferencesManager() {
       if (response.ok) {
         const data = await response.json();
         if (data.preferences) {
-          setPreferences(data.preferences);
+          setPreferences({
+            ...data.preferences,
+            defaultLlmModel: data.preferences.defaultLlmModel || '',
+          });
         }
       }
     } catch (error) {
       console.error('Failed to load preferences:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadAvailableModels = async () => {
+    try {
+      const response = await fetch('/api/settings/available-models');
+      if (response.ok) {
+        const data = await response.json();
+        setAvailableModels(data.models || []);
+      }
+    } catch (error) {
+      console.error('Failed to load available models:', error);
     }
   };
 
@@ -104,27 +128,29 @@ export default function UserPreferencesManager() {
               onValueChange={(value) =>
                 setPreferences((prev) => ({ ...prev, defaultLlmModel: value }))
               }
+              disabled={availableModels.length === 0}
             >
               <SelectTrigger>
-                <SelectValue />
+                <SelectValue placeholder={availableModels.length === 0 ? "No models available - Add API keys first" : "Select a model"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gpt-4o">GPT-4o (OpenAI)</SelectItem>
-                <SelectItem value="gpt-4o-mini">GPT-4o Mini (OpenAI)</SelectItem>
-                <SelectItem value="claude-3-5-sonnet-20241022">
-                  Claude 3.5 Sonnet (Anthropic)
-                </SelectItem>
-                <SelectItem value="claude-3-5-haiku-20241022">
-                  Claude 3.5 Haiku (Anthropic)
-                </SelectItem>
-                <SelectItem value="gemini-2.0-flash-exp">
-                  Gemini 2.0 Flash (Google)
-                </SelectItem>
-                <SelectItem value="gemini-exp-1206">Gemini Exp (Google)</SelectItem>
+                {availableModels.length === 0 ? (
+                  <SelectItem value="none" disabled>
+                    No models available - Add API keys in the API Keys tab
+                  </SelectItem>
+                ) : (
+                  availableModels.map((model) => (
+                    <SelectItem key={model.value} value={model.value}>
+                      {model.label}
+                    </SelectItem>
+                  ))
+                )}
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              This model will be selected by default in all generators
+              {availableModels.length === 0
+                ? "Add API keys in the API Keys tab to see available models"
+                : "This model will be selected by default in all generators"}
             </p>
           </div>
 

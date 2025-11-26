@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       // Return defaults if user not found
       return NextResponse.json({
         preferences: {
-          defaultLlmModel: 'gpt-4o',
+          defaultLlmModel: null,
           defaultLength: 'MEDIUM',
           autoSave: true,
           defaultStatus: 'SENT',
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       preferences: {
-        defaultLlmModel: dbUser.defaultLlmModel || 'gpt-4o',
+        defaultLlmModel: dbUser.defaultLlmModel || null,
         defaultLength: dbUser.defaultLength || 'MEDIUM',
         autoSave: dbUser.autoSave !== null ? dbUser.autoSave : true,
         defaultStatus: dbUser.defaultStatus || 'SENT',
