@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Mail, MessageSquare, History, Settings, User, LayoutDashboard, KeyRound, LogOut, ChevronDown, Shield, Crown } from 'lucide-react';
+import { FileText, Mail, MessageSquare, History, Settings, User, LayoutDashboard, KeyRound, LogOut, ChevronDown, Shield, Crown, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,9 @@ export default function DashboardLayout({
   const [userType, setUserType] = useState<string>('FREE');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   // Helper function to format user type for display
   const formatUserType = (type: string) => {
@@ -48,6 +51,22 @@ export default function DashboardLayout({
     };
     return typeMap[type] || type;
   };
+
+  // Load sidebar state from localStorage after component mounts
+  useEffect(() => {
+    setIsMounted(true);
+    const saved = localStorage.getItem('sidebarCollapsed');
+    if (saved !== null) {
+      setIsSidebarCollapsed(saved === 'true');
+    }
+  }, []);
+
+  // Save sidebar state to localStorage whenever it changes
+  useEffect(() => {
+    if (isMounted) {
+      localStorage.setItem('sidebarCollapsed', String(isSidebarCollapsed));
+    }
+  }, [isSidebarCollapsed, isMounted]);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -103,27 +122,65 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Sidebar - Hidden on mobile, visible on lg+ */}
-      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-[280px] lg:bg-[#f5f5f5] lg:flex lg:flex-col">
+      {/* Overlay for mobile sidebar */}
+      {isMobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Collapsible on desktop, drawer on mobile */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 bg-[#f5f5f5] flex flex-col transition-all duration-300 ease-in-out z-50",
+        isSidebarCollapsed ? "w-[80px]" : "w-[280px]",
+        "lg:translate-x-0",
+        isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
         {/* Logo */}
-        <div className="flex items-center gap-3 px-6 pt-6 pb-8">
+        <Link href="/" className="flex items-center gap-3 px-6 pt-6 pb-8 hover:opacity-80 transition-opacity relative">
           <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
             <span className="text-white text-lg font-bold">AJ</span>
           </div>
-          <span className="text-xl font-bold text-gray-900">AI Job Master</span>
-        </div>
+          <span className={cn(
+            "text-xl font-bold text-gray-900 whitespace-nowrap transition-all duration-300 ease-in-out",
+            isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
+          )}>AI Job Master</span>
+        </Link>
+
+        {/* Collapse button - Desktop only */}
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="hidden lg:flex absolute -right-3 top-24 w-6 h-6 bg-white border border-gray-300 rounded-full items-center justify-center hover:bg-gray-50 hover:shadow-lg transition-all shadow-md z-[60]"
+        >
+          {isSidebarCollapsed ? (
+            <ChevronRight className="w-3.5 h-3.5 text-gray-700" strokeWidth={2.5} />
+          ) : (
+            <ChevronLeft className="w-3.5 h-3.5 text-gray-700" strokeWidth={2.5} />
+          )}
+        </button>
+
+        {/* Close button - Mobile only */}
+        <button
+          onClick={() => setIsMobileSidebarOpen(false)}
+          className="lg:hidden absolute right-4 top-4 p-2 hover:bg-white/40 rounded-lg transition-colors"
+        >
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
 
         {/* Navigation */}
-        <nav className="flex-1 px-4 overflow-y-auto">
+        <nav className="flex-1 px-4 overflow-y-auto overflow-x-hidden">
           {/* Main Section */}
           <div className="mb-6">
-            <div className="px-3 mb-3">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Tools</span>
+            <div className={cn(
+              "px-3 mb-3 transition-all duration-300 ease-in-out",
+              isSidebarCollapsed ? "opacity-0 h-0 mb-0 overflow-hidden" : "opacity-100 h-auto"
+            )}>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Tools</span>
             </div>
             <div className="space-y-1">
               {navigation.map((item) => {
                 const Icon = item.icon;
-                // Dashboard should only be active when exactly on /dashboard, not on sub-pages
                 const isActive = item.href === '/dashboard'
                   ? pathname === '/dashboard'
                   : pathname === item.href || pathname?.startsWith(item.href + '/');
@@ -132,15 +189,21 @@ export default function DashboardLayout({
                   <Link
                     key={item.name}
                     href={item.href}
+                    onClick={() => setIsMobileSidebarOpen(false)}
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                       isActive
                         ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-white/40"
+                        : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                      isSidebarCollapsed && "justify-center"
                     )}
+                    title={isSidebarCollapsed ? item.name : undefined}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
-                    <span>{item.name}</span>
+                    <span className={cn(
+                      "whitespace-nowrap transition-all duration-300 ease-in-out",
+                      isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
+                    )}>{item.name}</span>
                   </Link>
                 );
               })}
@@ -149,34 +212,49 @@ export default function DashboardLayout({
 
           {/* Settings Section */}
           <div>
-            <div className="px-3 mb-3">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Other</span>
+            <div className={cn(
+              "px-3 mb-3 transition-all duration-300 ease-in-out",
+              isSidebarCollapsed ? "opacity-0 h-0 mb-0 overflow-hidden" : "opacity-100 h-auto"
+            )}>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Other</span>
             </div>
             <div className="space-y-1">
               <Link
                 href="/settings"
+                onClick={() => setIsMobileSidebarOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                   pathname === '/settings'
                     ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-white/40"
+                    : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                  isSidebarCollapsed && "justify-center"
                 )}
+                title={isSidebarCollapsed ? "Settings" : undefined}
               >
                 <Settings className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
-                <span>Settings</span>
+                <span className={cn(
+                  "whitespace-nowrap transition-all duration-300 ease-in-out",
+                  isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
+                )}>Settings</span>
               </Link>
               {isAdmin && (
                 <Link
                   href="/admin"
+                  onClick={() => setIsMobileSidebarOpen(false)}
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                     pathname?.startsWith('/admin')
                       ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-white/40"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                    isSidebarCollapsed && "justify-center"
                   )}
+                  title={isSidebarCollapsed ? "Admin Dashboard" : undefined}
                 >
                   <Shield className="w-5 h-5 flex-shrink-0" strokeWidth={1.5} />
-                  <span>Admin Dashboard</span>
+                  <span className={cn(
+                    "whitespace-nowrap transition-all duration-300 ease-in-out",
+                    isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
+                  )}>Admin Dashboard</span>
                 </Link>
               )}
             </div>
@@ -184,29 +262,54 @@ export default function DashboardLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-gray-300/50 mt-auto">
+        <div className="p-4 border-t border-gray-300/50 mt-auto flex-shrink-0">
           <DropdownMenu onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-3 px-3 py-2.5 mb-3 w-full rounded-xl hover:bg-white/40 transition-all">
+              <button className={cn(
+                "flex items-center rounded-xl hover:bg-white/40 transition-all w-full mb-3",
+                isSidebarCollapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5"
+              )}>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center flex-shrink-0 shadow-md">
                   <span className="text-white font-bold text-sm">{userEmail ? userEmail[0].toUpperCase() : 'U'}</span>
                 </div>
-                <div className="flex-1 min-w-0 text-left">
-                  <p className="text-[13px] font-semibold text-gray-900 truncate">{userEmail || 'Loading...'}</p>
+                <div className={cn(
+                  "flex-1 min-w-0 text-left transition-all duration-300 ease-in-out",
+                  isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
+                )}>
+                  <p className="text-[13px] font-semibold text-gray-900 truncate whitespace-nowrap">{userEmail || 'Loading...'}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600" strokeWidth={2.5} />}
-                    {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600" strokeWidth={2.5} />}
-                    <span className={`text-[10px] font-bold tracking-wide ${
+                    {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600 flex-shrink-0" strokeWidth={2.5} />}
+                    {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600 flex-shrink-0" strokeWidth={2.5} />}
+                    <span className={cn(
+                      "text-[10px] font-bold tracking-wide whitespace-nowrap",
                       userType === 'ADMIN' ? 'text-red-600' :
                       userType === 'PLUS' ? 'text-purple-600' :
                       'text-gray-500'
-                    }`}>{formatUserType(userType)}</span>
+                    )}>{formatUserType(userType)}</span>
                   </div>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                {!isSidebarCollapsed && (
+                  <ChevronDown className={`w-4 h-4 text-gray-500 flex-shrink-0 transition-transform duration-200 ${isDropdownOpen ? 'rotate-0' : 'rotate-180'}`} />
+                )}
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
+              {isSidebarCollapsed && (
+                <>
+                  <div className="px-2 py-2 text-sm border-b border-gray-200">
+                    <p className="font-semibold text-gray-900 truncate">{userEmail || 'Loading...'}</p>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600" strokeWidth={2.5} />}
+                      {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600" strokeWidth={2.5} />}
+                      <span className={`text-xs font-bold ${
+                        userType === 'ADMIN' ? 'text-red-600' :
+                        userType === 'PLUS' ? 'text-purple-600' :
+                        'text-gray-500'
+                      }`}>{formatUserType(userType)}</span>
+                    </div>
+                  </div>
+                </>
+              )}
               <DropdownMenuItem className="cursor-pointer">
                 <KeyRound className="w-4 h-4 mr-2" />
                 Change Password
@@ -221,25 +324,43 @@ export default function DashboardLayout({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <button className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-50 transition-colors">
+          <button className={cn(
+            "px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-50 transition-all duration-300 ease-in-out",
+            isSidebarCollapsed ? "opacity-0 h-0 p-0 overflow-hidden border-0" : "opacity-100 h-auto w-full"
+          )}>
             Upgrade
           </button>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-[280px] flex flex-col min-h-screen">
+      <div className={cn(
+        "flex flex-col min-h-screen transition-all duration-300",
+        isSidebarCollapsed ? "lg:pl-[80px]" : "lg:pl-[280px]"
+      )}>
         {/* Top header bar - Mobile navigation + notifications */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex items-center justify-between lg:justify-end">
-            {/* Mobile logo & menu - shown only on mobile */}
+          <div className="flex items-center justify-between">
+            {/* Mobile menu button and logo */}
             <div className="flex items-center gap-3 lg:hidden">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-                <span className="text-white text-sm sm:text-lg font-bold">AJ</span>
-              </div>
-              <span className="text-base sm:text-xl font-bold text-gray-900">AI Job Master</span>
+              <button
+                onClick={() => setIsMobileSidebarOpen(true)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
+              </button>
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                  <span className="text-white text-sm sm:text-lg font-bold">AJ</span>
+                </div>
+                <span className="text-base sm:text-xl font-bold text-gray-900">AI Job Master</span>
+              </Link>
             </div>
-            <NotificationsBell />
+            
+            {/* Notifications - always on right */}
+            <div className="lg:ml-auto">
+              <NotificationsBell />
+            </div>
           </div>
         </div>
 
