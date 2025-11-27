@@ -124,7 +124,7 @@ export default function CustomPromptsManager() {
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <Tabs defaultValue="coverLetter">
-            <TabsList className="grid w-full grid-cols-3 h-auto">-auto">
+            <TabsList className="grid w-full grid-cols-3 h-auto">
               <TabsTrigger value="coverLetter" className="text-xs sm:text-sm py-2">Cover Letter</TabsTrigger>
               <TabsTrigger value="linkedIn" className="text-xs sm:text-sm py-2">LinkedIn</TabsTrigger>
               <TabsTrigger value="email" className="text-xs sm:text-sm py-2">Email</TabsTrigger>

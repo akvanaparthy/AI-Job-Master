@@ -362,20 +362,19 @@ export default function EmailPage() {
         className="mb-4 sm:mb-6"
       >
         <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)}>
-          <TabsList className="bg-white border border-slate-200 p-1 sm:p-1.5 rounded-xl shadow-sm w-full">
+          <TabsList className="bg-white border border-slate-200 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
             <TabsTrigger
               value="NEW"
-              className="rounded-lg px-3 sm:px-6 text-sm sm:text-base data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
             >
               New Email
             </TabsTrigger>
             <TabsTrigger
               value="FOLLOW_UP"
-              className="rounded-lg px-3 sm:px-6 text-sm sm:text-base data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
             >
-              <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Follow-up Email</span>
-              <span className="xs:hidden">Follow-up</span>
+              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              Follow-up
             </TabsTrigger>
           </TabsList>
         </Tabs>
