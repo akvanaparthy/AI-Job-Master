@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { Footer } from '@/components/Footer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -227,7 +228,7 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="pl-[280px]">
+      <div className="pl-[280px] flex flex-col min-h-screen">
         {/* Top header bar */}
         <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-4">
           <div className="flex items-center justify-end">
@@ -235,9 +236,12 @@ export default function DashboardLayout({
           </div>
         </div>
 
-        <main className="min-h-screen p-8 bg-white">
+        <main className="flex-1 p-8 bg-white">
           {children}
         </main>
+
+        {/* Footer */}
+        <Footer variant="compact" isDark={false} />
       </div>
     </div>
   );

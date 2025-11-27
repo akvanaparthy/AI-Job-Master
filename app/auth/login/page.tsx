@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { AuthLayout } from '@/components/AuthLayout';
 import { Sparkles } from 'lucide-react';
 
 export default function LoginPage() {
@@ -56,7 +57,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] flex items-center justify-center p-4">
+    <AuthLayout>
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -147,6 +148,6 @@ export default function LoginPage() {
           </Link>
         </motion.div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AuthLayout } from '@/components/AuthLayout';
 import { Sparkles, Mail, CheckCircle } from 'lucide-react';
 
 function VerifyEmailContent() {
@@ -14,7 +15,7 @@ function VerifyEmailContent() {
   const email = searchParams.get('email') || 'your email';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] flex items-center justify-center p-4">
+    <AuthLayout>
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -96,7 +97,7 @@ function VerifyEmailContent() {
           </Link>
         </motion.div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
 

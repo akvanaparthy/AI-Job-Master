@@ -13,6 +13,14 @@ const nextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.ignoreWarnings = [
+        { module: /node_modules\/@supabase/ },
+      ];
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { Footer } from '@/components/Footer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -225,10 +226,13 @@ export default function SettingsLayout({
       </aside>
 
       {/* Main content */}
-      <div className="pl-[280px]">
-        <main className="min-h-screen p-8 bg-white">
+      <div className="pl-[280px] flex flex-col min-h-screen">
+        <main className="flex-1 p-8 bg-white">
           {children}
         </main>
+
+        {/* Footer */}
+        <Footer variant="compact" isDark={false} />
       </div>
     </div>
   );

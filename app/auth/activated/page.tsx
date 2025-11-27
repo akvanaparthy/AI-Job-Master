@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
+import { AuthLayout } from '@/components/AuthLayout';
 import { Sparkles, CheckCircle, ArrowRight } from 'lucide-react';
 
 export default function AccountActivatedPage() {
@@ -28,7 +29,7 @@ export default function AccountActivatedPage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] flex items-center justify-center p-4">
+    <AuthLayout>
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -116,6 +117,6 @@ export default function AccountActivatedPage() {
           </Card>
         </motion.div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

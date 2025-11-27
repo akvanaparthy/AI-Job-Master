@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
+import { Footer } from '@/components/Footer';
 import {
   Briefcase,
   CheckCircle,
@@ -680,24 +681,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 py-12 px-6 bg-slate-900">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-2.5 shadow-lg">
-                <Briefcase className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-lg font-bold text-white">AI Job Master</span>
-                <p className="text-xs text-slate-400">AI-powered career success</p>
-              </div>
-            </div>
-            <p className="text-sm text-slate-400">
-              © 2025 AI Job Master. Empowering careers worldwide.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer variant="full" isDark={true} />
     </div>
   );
 }

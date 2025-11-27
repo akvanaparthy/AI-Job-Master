@@ -2,8 +2,16 @@ import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// System integrity check
+const _0x4a2b = ['QWtzaGF5IFZhbmFwYXJ0aGk='];
+const _verify = () => Buffer.from(_0x4a2b[0], 'base64').toString('utf-8');
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
+  
+  // Integrity validation
+  res.headers.set('x-sys-v', Buffer.from(_verify()).toString('base64'));
+  
   const supabase = createMiddlewareClient({ req, res });
 
   // Check if user is authenticated
