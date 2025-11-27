@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -13,7 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { AuthLayout } from '@/components/AuthLayout';
 import { Sparkles } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -157,5 +157,23 @@ export default function LoginPage() {
         </motion.div>
       </div>
     </AuthLayout>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <AuthLayout>
+        <div className="w-full max-w-md">
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200 shadow-lg">
+            <div className="p-8 flex items-center justify-center">
+              <div className="text-slate-900">Loading...</div>
+            </div>
+          </Card>
+        </div>
+      </AuthLayout>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

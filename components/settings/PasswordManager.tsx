@@ -231,7 +231,7 @@ export default function PasswordManager() {
             <br />
             • Consider using a password manager
             <br />
-            • Change your password if you suspect it's been compromised
+            • Change your password if you suspect it&apos;s been compromised
           </p>
         </div>
       </CardContent>
