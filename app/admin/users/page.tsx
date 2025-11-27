@@ -62,10 +62,10 @@ export default function AdminUsersPage() {
       setUsers(data.users);
       setTotalPages(data.pagination.totalPages);
       setTotalCount(data.pagination.totalCount);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to load users',
+        description: error.message || 'Failed to load users',
         variant: 'destructive',
       });
     } finally {
@@ -96,10 +96,10 @@ export default function AdminUsersPage() {
       });
 
       loadUsers();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to update user',
+        description: error.message || 'Failed to update user',
         variant: 'destructive',
       });
     }
@@ -124,10 +124,10 @@ export default function AdminUsersPage() {
       });
 
       loadUsers();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to delete user',
+        description: error.message || 'Failed to delete user',
         variant: 'destructive',
       });
     }

@@ -101,10 +101,10 @@ export default function AdminAnalyticsPage() {
 
       const analyticsData = await response.json();
       setData(analyticsData);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to load analytics',
+        description: error.message || 'Failed to load analytics',
         variant: 'destructive',
       });
     } finally {

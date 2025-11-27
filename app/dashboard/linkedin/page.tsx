@@ -255,8 +255,8 @@ export default function LinkedInPage() {
       const data = await response.json();
       setGeneratedMessage(data.content);
       toast({ title: 'Success', description: 'LinkedIn message generated successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate message', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to generate message', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -304,8 +304,8 @@ export default function LinkedInPage() {
         title: 'Saved',
         description: data.messageId ? `LinkedIn message saved! Message ID: ${data.messageId}` : 'LinkedIn message saved to history!'
       });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to save message', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to save message', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -321,8 +321,8 @@ export default function LinkedInPage() {
       if (!response.ok) throw new Error('Failed to remove message');
       setSavedId(null);
       toast({ title: 'Removed', description: 'LinkedIn message removed from history' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to remove message', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to remove message', variant: 'destructive' });
     } finally {
       setSaving(false);
     }

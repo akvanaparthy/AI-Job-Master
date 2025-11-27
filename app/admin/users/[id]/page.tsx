@@ -102,10 +102,10 @@ export default function UserActivityPage() {
 
       const userData = await response.json();
       setData(userData);
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to load user activity',
+        description: error.message || 'Failed to load user activity',
         variant: 'destructive',
       });
     } finally {

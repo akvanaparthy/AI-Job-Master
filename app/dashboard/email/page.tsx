@@ -260,8 +260,8 @@ export default function EmailPage() {
       setGeneratedSubject(data.subject);
       setGeneratedBody(data.body);
       toast({ title: 'Success', description: 'Email generated successfully!' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to generate email', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to generate email', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -309,8 +309,8 @@ export default function EmailPage() {
         title: 'Saved',
         description: data.messageId ? `Email saved to history! Message ID: ${data.messageId}` : 'Email saved to history!'
       });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to save email', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to save email', variant: 'destructive' });
     } finally {
       setSaving(false);
     }
@@ -326,8 +326,8 @@ export default function EmailPage() {
       if (!response.ok) throw new Error('Failed to remove email');
       setSavedId(null);
       toast({ title: 'Removed', description: 'Email removed from history' });
-    } catch (error) {
-      toast({ title: 'Error', description: error instanceof Error ? error.message : 'Failed to remove email', variant: 'destructive' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to remove email', variant: 'destructive' });
     } finally {
       setSaving(false);
     }

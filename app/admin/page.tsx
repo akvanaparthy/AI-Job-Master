@@ -75,8 +75,8 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error('Failed to load stats');
       const data = await response.json();
       setStats(data);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred');
+    } catch (error: any) {
+      setError(error.message);
     }
   }, [router]);
 
@@ -308,7 +308,7 @@ export default function AdminDashboard() {
                     <h3 className="text-base font-bold text-slate-900 uppercase tracking-wide">Recent Users</h3>
                     <button
                       onClick={() => router.push('/admin/users')}
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1 hover:gap-2 transition-all"
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 flex items-center gap-1 hover:gap-2 transition-all"
                     >
                       View All <ArrowUpRight className="w-3 h-3" strokeWidth={2.5} />
                     </button>

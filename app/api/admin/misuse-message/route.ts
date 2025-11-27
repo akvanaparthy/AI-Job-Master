@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { getMisuseMessage, setMisuseMessage } from '@/lib/ai/misuse-detection';
-import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -33,10 +32,10 @@ export async function GET(req: NextRequest) {
     const message = await getMisuseMessage();
 
     return NextResponse.json({ message });
-  } catch (error) {
-    logger.error('Get misuse message error', error);
+  } catch (error: any) {
+    console.error('Get misuse message error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch misuse message' },
+      { error: error.message || 'Failed to fetch misuse message' },
       { status: 500 }
     );
   }
@@ -79,10 +78,10 @@ export async function PUT(req: NextRequest) {
     await setMisuseMessage(message);
 
     return NextResponse.json({ success: true, message });
-  } catch (error) {
-    logger.error('Update misuse message error', error);
+  } catch (error: any) {
+    console.error('Update misuse message error:', error);
     return NextResponse.json(
-      { error: 'Failed to update misuse message' },
+      { error: error.message || 'Failed to update misuse message' },
       { status: 500 }
     );
   }

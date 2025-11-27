@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { UserType } from '@prisma/client';
-import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -67,10 +66,10 @@ export async function PATCH(
       success: true,
       user: updatedUser,
     });
-  } catch (error) {
-    logger.error('Admin update user error', error);
+  } catch (error: any) {
+    console.error('Admin update user error:', error);
     return NextResponse.json(
-      { error: 'Failed to update user' },
+      { error: error.message || 'Failed to update user' },
       { status: 500 }
     );
   }
@@ -115,10 +114,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    logger.error('Admin delete user error', error);
+  } catch (error: any) {
+    console.error('Admin delete user error:', error);
     return NextResponse.json(
-      { error: 'Failed to delete user' },
+      { error: error.message || 'Failed to delete user' },
       { status: 500 }
     );
   }
