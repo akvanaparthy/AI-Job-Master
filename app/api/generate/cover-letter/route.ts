@@ -7,6 +7,7 @@ import { getCoverLetterPrompt } from '@/lib/ai/prompts';
 import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length } from '@prisma/client';
 import { logger } from '@/lib/logger';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -21,6 +22,29 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Rate limiting check
+    const rateLimitResult = checkRateLimit(
+      `cover-letter-gen:${user.id}`,
+      RATE_LIMITS.generation
+    );
+
+    if (!rateLimitResult.allowed) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded. Please try again later.',
+          resetAt: rateLimitResult.resetAt,
+        },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': RATE_LIMITS.generation.maxRequests.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
+          },
+        }
+      );
     }
 
     // Parse request body

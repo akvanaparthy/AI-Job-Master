@@ -33,10 +33,47 @@ export default function SignupPage() {
       return;
     }
 
-    if (password.length < 6) {
+    // Strong password validation
+    if (password.length < 8) {
       toast({
         title: 'Error',
-        description: 'Password must be at least 6 characters',
+        description: 'Password must be at least 8 characters',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      toast({
+        title: 'Error',
+        description: 'Password must contain at least one uppercase letter',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      toast({
+        title: 'Error',
+        description: 'Password must contain at least one lowercase letter',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      toast({
+        title: 'Error',
+        description: 'Password must contain at least one number',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!/[^A-Za-z0-9]/.test(password)) {
+      toast({
+        title: 'Error',
+        description: 'Password must contain at least one special character',
         variant: 'destructive',
       });
       return;
@@ -129,6 +166,9 @@ export default function SignupPage() {
                     disabled={loading}
                     className="h-11 bg-white border-slate-200 rounded-[16px]"
                   />
+                  <p className="text-xs text-slate-500">
+                    Must include: 8+ characters, uppercase, lowercase, number, special character
+                  </p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">Confirm Password</Label>
