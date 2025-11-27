@@ -68,6 +68,9 @@ export async function GET(req: NextRequest) {
           createdAt: true,
           content: true,
           messageType: true,
+          followUpMessages: {
+            select: { id: true },
+          },
         },
       }),
       prisma.emailMessage.findMany({
@@ -94,6 +97,9 @@ export async function GET(req: NextRequest) {
           subject: true,
           body: true,
           messageType: true,
+          followUpMessages: {
+            select: { id: true },
+          },
         },
       }),
     ]);
@@ -117,6 +123,7 @@ export async function GET(req: NextRequest) {
         createdAt: item.createdAt.toISOString(),
         content: item.content,
         messageType: item.messageType,
+        hasFollowUp: item.followUpMessages.length > 0,
       })),
       ...emailMessages.map((item) => ({
         id: item.id,
@@ -128,6 +135,7 @@ export async function GET(req: NextRequest) {
         subject: item.subject,
         body: item.body,
         messageType: item.messageType,
+        hasFollowUp: item.followUpMessages.length > 0,
       })),
     ];
 

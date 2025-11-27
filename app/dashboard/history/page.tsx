@@ -29,6 +29,8 @@ interface HistoryItem {
   content?: string;
   subject?: string;
   body?: string;
+  messageType?: string;
+  hasFollowUp?: boolean;
 }
 
 const TYPE_CONFIG = {
@@ -447,7 +449,7 @@ export default function HistoryPage() {
                               minute: '2-digit',
                             })}
                           </p>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 items-center">
                             <Button
                               variant="outline"
                               size="sm"
@@ -457,7 +459,10 @@ export default function HistoryPage() {
                               <Eye className="w-3.5 h-3.5 mr-1.5" />
                               View
                             </Button>
-                            {(item.type === 'LinkedIn' || item.type === 'Email') && (
+                            {/* Follow-up button for NEW messages without follow-ups */}
+                            {(item.type === 'LinkedIn' || item.type === 'Email') &&
+                             item.messageType === 'NEW' &&
+                             !item.hasFollowUp && (
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -468,14 +473,31 @@ export default function HistoryPage() {
                                 Follow-up
                               </Button>
                             )}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleDeleteItem(item)}
-                              className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
+                            {/* "Followed up" status for NEW messages that have follow-ups */}
+                            {(item.type === 'LinkedIn' || item.type === 'Email') &&
+                             item.messageType === 'NEW' &&
+                             item.hasFollowUp && (
+                              <Badge variant="secondary" className="text-xs">
+                                Followed up
+                              </Badge>
+                            )}
+                            {/* "Follow-up sent" status for follow-up messages */}
+                            {item.messageType === 'FOLLOW_UP' && (
+                              <Badge variant="outline" className="text-xs">
+                                Follow-up sent
+                              </Badge>
+                            )}
+                            {/* Delete button only for cover letters and NEW messages (not follow-ups) */}
+                            {(item.type === 'Cover Letter' || item.messageType === 'NEW') && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleDeleteItem(item)}
+                                className="h-8 px-3 border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </div>
                       </div>

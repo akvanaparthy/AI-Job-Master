@@ -87,6 +87,9 @@ export async function GET(req: NextRequest) {
             resumeId: true,
             length: true,
             llmModel: true,
+            followUpMessages: {
+              select: { id: true },
+            },
           },
         }),
         prisma.emailMessage.findMany({
@@ -109,6 +112,9 @@ export async function GET(req: NextRequest) {
             resumeId: true,
             length: true,
             llmModel: true,
+            followUpMessages: {
+              select: { id: true },
+            },
           },
         }),
       ]),
@@ -125,6 +131,7 @@ export async function GET(req: NextRequest) {
         wordCount: item.content.split(/\s+/).length,
         status: null,
         messageType: null,
+        hasFollowUp: false,
         data: null,
       })),
       ...recentActivity[1].map(item => ({
@@ -136,6 +143,7 @@ export async function GET(req: NextRequest) {
         wordCount: item.content.split(/\s+/).length,
         status: item.status,
         messageType: item.messageType,
+        hasFollowUp: item.followUpMessages.length > 0,
         data: {
           linkedinUrl: item.linkedinUrl,
           recipientName: item.recipientName,
@@ -155,6 +163,7 @@ export async function GET(req: NextRequest) {
         wordCount: item.body.split(/\s+/).length,
         status: item.status,
         messageType: item.messageType,
+        hasFollowUp: item.followUpMessages.length > 0,
         data: {
           recipientEmail: item.recipientEmail,
           recipientName: item.recipientName,

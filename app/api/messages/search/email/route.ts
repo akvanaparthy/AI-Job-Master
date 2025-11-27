@@ -50,10 +50,11 @@ export async function GET(req: NextRequest) {
     }
 
     // Search by company name, position, recipient name, or email
-    // Exclude messages that already have followups
+    // Only return NEW messages (not follow-ups) that don't have follow-ups yet
     const messages = await prisma.emailMessage.findMany({
       where: {
         userId: user.id,
+        messageType: 'NEW', // Only search NEW messages, not follow-ups
         OR: [
           { companyName: { contains: query, mode: 'insensitive' } },
           { positionTitle: { contains: query, mode: 'insensitive' } },

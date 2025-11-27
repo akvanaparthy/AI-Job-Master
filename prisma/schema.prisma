@@ -112,7 +112,7 @@ model LinkedInMessage {
   updatedAt          DateTime            @updatedAt
   areasOfInterest    String?
   messageId          String?             @unique
-  parentMessage      LinkedInMessage?    @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id])
+  parentMessage      LinkedInMessage?    @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id], onDelete: Cascade)
   followUpMessages   LinkedInMessage[]   @relation("LinkedInFollowUp")
   resume             Resume?             @relation(fields: [resumeId], references: [id])
   user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -145,7 +145,7 @@ model EmailMessage {
   updatedAt          DateTime          @updatedAt
   areasOfInterest    String?
   messageId          String?           @unique
-  parentMessage      EmailMessage?     @relation("EmailFollowUp", fields: [parentMessageId], references: [id])
+  parentMessage      EmailMessage?     @relation("EmailFollowUp", fields: [parentMessageId], references: [id], onDelete: Cascade)
   followUpMessages   EmailMessage[]    @relation("EmailFollowUp")
   resume             Resume?           @relation(fields: [resumeId], references: [id])
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)

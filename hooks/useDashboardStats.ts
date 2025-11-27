@@ -17,6 +17,7 @@ export interface DashboardStats {
     wordCount: number;
     status: string | null;
     messageType: string | null;
+    hasFollowUp: boolean;
     data: any | null;
   }>;
 }

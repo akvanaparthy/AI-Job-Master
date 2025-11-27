@@ -394,9 +394,10 @@ export default function DashboardPage() {
                               </td>
                               <td className="text-center py-5 px-4">
                                 <div className="flex items-center justify-center gap-2">
-                                  {/* Follow-up button for LinkedIn/Email NEW messages */}
+                                  {/* Follow-up button for LinkedIn/Email NEW messages without follow-ups */}
                                   {(activity.type === 'LinkedIn' || activity.type === 'Email') &&
-                                   activity.messageType === 'NEW' && (
+                                   activity.messageType === 'NEW' &&
+                                   !activity.hasFollowUp && (
                                     <Button
                                       size="sm"
                                       variant="outline"
@@ -408,8 +409,24 @@ export default function DashboardPage() {
                                     </Button>
                                   )}
 
-                                  {/* Delete button for cover letters or follow-up messages */}
-                                  {(activity.type === 'Cover Letter' || activity.messageType === 'FOLLOW_UP') && (
+                                  {/* "Followed up" status for NEW messages that have follow-ups */}
+                                  {(activity.type === 'LinkedIn' || activity.type === 'Email') &&
+                                   activity.messageType === 'NEW' &&
+                                   activity.hasFollowUp && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      Followed up
+                                    </Badge>
+                                  )}
+
+                                  {/* "Follow-up sent" status for follow-up messages */}
+                                  {activity.messageType === 'FOLLOW_UP' && (
+                                    <Badge variant="outline" className="text-xs">
+                                      Follow-up sent
+                                    </Badge>
+                                  )}
+
+                                  {/* Delete button only for cover letters and NEW messages (not follow-ups) */}
+                                  {(activity.type === 'Cover Letter' || activity.messageType === 'NEW') && (
                                     <Button
                                       size="sm"
                                       variant="ghost"
