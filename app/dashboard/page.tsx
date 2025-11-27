@@ -148,7 +148,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Stats & Content Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5 lg:gap-6 mb-6 md:mb-8">
         {/* Quick Action Cards */}
         {QUICK_ACTIONS.map((action, index) => {
           const Icon = action.icon;
@@ -164,15 +164,15 @@ export default function DashboardPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.08 }}
             >
-              <Link href={action.href}>
-                <Card className={`relative overflow-hidden border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group ${action.bgColor}`}>
-                  <div className="p-4 sm:p-6">
-                    <div className="flex items-start justify-between mb-4 sm:mb-6">
-                      <div>
-                        <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-0.5">
+              <Link href={action.href} className="block h-full">
+                <Card className={`relative overflow-hidden border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group h-full ${action.bgColor}`}>
+                  <div className="p-4 sm:p-5 md:p-6 h-full flex flex-col">
+                    <div className="flex items-start justify-between mb-4 md:mb-5 lg:mb-6">
+                      <div className="flex-1">
+                        <h3 className="text-sm md:text-base font-semibold text-slate-900 mb-0.5 line-clamp-1">
                           {action.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-600">{action.description}</p>
+                        <p className="text-xs md:text-sm text-slate-600 line-clamp-1">{action.description}</p>
                       </div>
                       <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-[12px] sm:rounded-[14px] ${action.iconBg} flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity flex-shrink-0`}>
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
@@ -206,14 +206,14 @@ export default function DashboardPage() {
           transition={{ delay: 0.24 }}
         >
           <Card className="bg-gradient-to-br from-slate-900 to-slate-800 border-0 text-white shadow-lg h-full">
-            <div className="p-6 flex flex-col justify-between h-full">
+            <div className="p-4 sm:p-5 md:p-6 flex flex-col justify-between h-full">
               <div>
-                <div className="flex items-center gap-2.5 mb-6">
-                  <div className="w-11 h-11 rounded-[14px] bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-white" strokeWidth={2.5} />
+                <div className="flex items-center gap-2 md:gap-2.5 mb-4 md:mb-5 lg:mb-6">
+                  <div className="w-9 h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-[12px] md:rounded-[14px] bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                    <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-white" strokeWidth={2.5} />
                   </div>
-                  <div>
-                    <p className="text-[32px] font-bold leading-none">
+                  <div className="min-w-0">
+                    <p className="text-2xl md:text-[28px] lg:text-[32px] font-bold leading-none">
                       {loading ? (
                         <>
                           <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
@@ -230,12 +230,12 @@ export default function DashboardPage() {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-11 h-11 rounded-[14px] bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-white" strokeWidth={2.5} />
+              <div className="flex items-center gap-2 md:gap-2.5">
+                <div className="w-9 h-9 md:w-10 md:h-10 lg:w-11 lg:h-11 rounded-[12px] md:rounded-[14px] bg-white/10 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-4 h-4 md:w-5 md:h-5 text-white" strokeWidth={2.5} />
                 </div>
-                <div>
-                  <p className="text-[32px] font-bold leading-none">
+                <div className="min-w-0">
+                  <p className="text-2xl md:text-[28px] lg:text-[32px] font-bold leading-none">
                     {loading ? (
                       <>
                         <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
@@ -252,21 +252,21 @@ export default function DashboardPage() {
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
         {/* Main Content - Left Side (2/3) */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="xl:col-span-2 space-y-6 md:space-y-8">
           {/* Recent Activity */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <div className="flex items-center justify-between mb-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0 mb-4 md:mb-5">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">
+                <h2 className="text-xl md:text-2xl font-bold text-slate-900 mb-1">
                   Latest activity
                 </h2>
-                <p className="text-sm text-slate-500">Track your recent generations</p>
+                <p className="text-xs md:text-sm text-slate-500">Track your recent generations</p>
               </div>
               <Link href="/dashboard/history">
                 <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
@@ -309,8 +309,9 @@ export default function DashboardPage() {
                 </div>
               </Card>
             ) : (
-              <div className="space-y-4">
-                <Card className="bg-white border-slate-200/60 overflow-hidden">
+              <>
+                {/* Desktop Table View */}
+                <Card className="hidden lg:block bg-white border-slate-200/60 overflow-hidden">
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
@@ -445,13 +446,129 @@ export default function DashboardPage() {
                     </table>
                   </div>
                 </Card>
-              </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden space-y-3">
+                  {stats?.recentActivity.map((activity, index) => {
+                    const Icon =
+                      activity.type === 'Cover Letter'
+                        ? FileText
+                        : activity.type === 'LinkedIn'
+                        ? MessageSquare
+                        : Mail;
+                    const iconBg =
+                      activity.type === 'Cover Letter'
+                        ? 'bg-gradient-to-br from-amber-400 to-orange-500'
+                        : activity.type === 'LinkedIn'
+                        ? 'bg-gradient-to-br from-blue-400 to-indigo-500'
+                        : 'bg-gradient-to-br from-slate-400 to-gray-500';
+
+                    return (
+                      <motion.div
+                        key={activity.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 + index * 0.1 }}
+                      >
+                        <Card className="bg-white border-slate-200/60 hover:border-slate-300 transition-colors">
+                          <div className="p-4">
+                            <div className="flex items-start gap-3 mb-3">
+                              <div className={`w-12 h-12 rounded-[12px] ${iconBg} flex items-center justify-center flex-shrink-0 shadow-sm`}>
+                                <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-slate-900 text-sm mb-0.5 truncate">
+                                  {activity.position}
+                                </p>
+                                <p className="text-xs text-slate-600 truncate">
+                                  {activity.company}
+                                </p>
+                                <p className="text-xs text-slate-500 mt-1">
+                                  {new Date(activity.createdAt).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
+                              <div className="flex items-center gap-2 flex-1">
+                                {activity.type === 'Cover Letter' ? (
+                                  <span className="text-xs text-slate-400">No status</span>
+                                ) : (
+                                  <Badge
+                                    variant={
+                                      activity.status === 'SENT' ? 'default' :
+                                      activity.status === 'DONE' ? 'secondary' :
+                                      activity.status === 'GHOST' ? 'destructive' : 'outline'
+                                    }
+                                    className="text-xs font-medium"
+                                  >
+                                    {activity.status}
+                                  </Badge>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-1.5">
+                                {/* Follow-up button for LinkedIn/Email NEW messages without follow-ups */}
+                                {(activity.type === 'LinkedIn' || activity.type === 'Email') &&
+                                 activity.messageType === 'NEW' &&
+                                 !activity.hasFollowUp && (
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => handleFollowup(activity)}
+                                    className="h-8 text-xs px-2"
+                                  >
+                                    <Reply className="w-3 h-3 mr-1" />
+                                    Follow-up
+                                  </Button>
+                                )}
+
+                                {/* "Followed up" status for NEW messages that have follow-ups */}
+                                {(activity.type === 'LinkedIn' || activity.type === 'Email') &&
+                                 activity.messageType === 'NEW' &&
+                                 activity.hasFollowUp && (
+                                  <Badge variant="secondary" className="text-xs">
+                                    Followed up
+                                  </Badge>
+                                )}
+
+                                {/* "Follow-up sent" status for follow-up messages */}
+                                {activity.messageType === 'FOLLOW_UP' && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Follow-up sent
+                                  </Badge>
+                                )}
+
+                                {/* Delete button only for cover letters and NEW messages (not follow-ups) */}
+                                {(activity.type === 'Cover Letter' || activity.messageType === 'NEW') && (
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    onClick={() => handleDelete(activity)}
+                                    className="h-8 w-8 p-0"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-600" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </>
             )}
           </motion.div>
         </div>
 
         {/* Right Sidebar - Stats */}
-        <div className="space-y-6">
+        <div className="space-y-4 md:space-y-6">
           {/* Usage Card */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -459,9 +576,9 @@ export default function DashboardPage() {
             transition={{ delay: 0.35 }}
           >
             <Card className="bg-white border-slate-200/60">
-              <div className="p-7">
-                <h3 className="text-lg font-semibold text-slate-900 mb-1">Your usage</h3>
-                <p className="text-sm text-slate-500 mb-7">
+              <div className="p-5 md:p-6 lg:p-7">
+                <h3 className="text-base md:text-lg font-semibold text-slate-900 mb-1">Your usage</h3>
+                <p className="text-xs md:text-sm text-slate-500 mb-5 md:mb-6 lg:mb-7">
                   Current plan: {loading ? (
                     <span className="inline-block w-12 h-4 bg-slate-200 rounded animate-pulse"></span>
                   ) : (
@@ -470,8 +587,8 @@ export default function DashboardPage() {
                 </p>
 
                 {/* Gauge Chart */}
-                <div className="flex items-center justify-center mb-7">
-                  <div className="relative w-56 h-32">
+                <div className="flex items-center justify-center mb-5 md:mb-6 lg:mb-7">
+                  <div className="relative w-48 h-28 md:w-52 md:h-30 lg:w-56 lg:h-32">
                     {/* Background arc */}
                     <svg className="w-full h-full" viewBox="0 0 200 110">
                       <path
@@ -502,8 +619,8 @@ export default function DashboardPage() {
                         </linearGradient>
                       </defs>
                     </svg>
-                    <div className="absolute inset-0 flex items-end justify-center pb-2">
-                      <span className="text-[56px] font-bold text-slate-900 leading-none">
+                    <div className="absolute inset-0 flex items-end justify-center pb-1 md:pb-2">
+                      <span className="text-[44px] md:text-[50px] lg:text-[56px] font-bold text-slate-900 leading-none">
                         {loading ? (
                           <>
                             <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
@@ -513,7 +630,7 @@ export default function DashboardPage() {
                         ) : (
                           <>
                             <AnimatedNumber value={stats?.usagePercentage || 0} />
-                            <span className="text-3xl text-slate-600">%</span>
+                            <span className="text-2xl md:text-3xl text-slate-600">%</span>
                           </>
                         )}
                       </span>
@@ -535,11 +652,11 @@ export default function DashboardPage() {
                   )}
                 </p>
 
-                <div className="flex gap-2.5">
-                  <Button variant="outline" size="sm" className="flex-1 text-sm h-10">
+                <div className="flex flex-col sm:flex-row gap-2 md:gap-2.5">
+                  <Button variant="outline" size="sm" className="flex-1 text-xs md:text-sm h-9 md:h-10">
                     Pricing plans
                   </Button>
-                  <Button size="sm" className="flex-1 bg-slate-900 hover:bg-slate-800 text-sm h-10">
+                  <Button size="sm" className="flex-1 bg-slate-900 hover:bg-slate-800 text-xs md:text-sm h-9 md:h-10">
                     Upgrade
                   </Button>
                 </div>
@@ -554,14 +671,14 @@ export default function DashboardPage() {
             transition={{ delay: 0.4 }}
           >
             <Card className="bg-gradient-to-br from-blue-50 to-indigo-50/80 border-blue-200/60">
-              <div className="p-6">
-                <div className="w-10 h-10 rounded-[12px] bg-blue-500 flex items-center justify-center mb-4">
-                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <div className="p-4 md:p-5 lg:p-6">
+                <div className="w-9 h-9 md:w-10 md:h-10 rounded-[10px] md:rounded-[12px] bg-blue-500 flex items-center justify-center mb-3 md:mb-4">
+                  <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3 className="text-base font-semibold text-slate-900 mb-2.5">Pro tip</h3>
-                <p className="text-[15px] text-slate-700 leading-relaxed">
+                <h3 className="text-sm md:text-base font-semibold text-slate-900 mb-2 md:mb-2.5">Pro tip</h3>
+                <p className="text-xs md:text-sm lg:text-[15px] text-slate-700 leading-relaxed">
                   Upload your resume in{' '}
                   <Link href="/settings" className="text-blue-600 font-medium hover:underline">
                     Settings
