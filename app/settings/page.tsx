@@ -26,15 +26,15 @@ function SettingsContent() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        className="mb-6 sm:mb-8"
       >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-12 h-12 rounded-[14px] bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
-            <SettingsIcon className="w-6 h-6 text-white" strokeWidth={2.5} />
+        <div className="flex items-center gap-2 sm:gap-3 mb-3">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[12px] sm:rounded-[14px] bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg">
+            <SettingsIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Settings</h1>
-            <p className="text-lg text-slate-500">
+            <h1 className="text-2xl sm:text-[42px] font-bold text-slate-900 leading-tight">Settings</h1>
+            <p className="text-sm sm:text-lg text-slate-500">
               Manage your API keys, resumes, custom prompts, and preferences
             </p>
           </div>
@@ -46,34 +46,34 @@ function SettingsContent() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="bg-white border border-slate-200 p-1 rounded-lg grid grid-cols-4 gap-1">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
+          <TabsList className="bg-white border border-slate-200 p-1 rounded-lg grid grid-cols-4 gap-0.5 sm:gap-1">
             <TabsTrigger
               value="api-keys"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
             >
-              <Key className="h-4 w-4" />
+              <Key className="h-4 w-4 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">API Keys</span>
             </TabsTrigger>
             <TabsTrigger
               value="resumes"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
             >
-              <FileText className="h-4 w-4" />
+              <FileText className="h-4 w-4 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Resumes</span>
             </TabsTrigger>
             <TabsTrigger
               value="prompts"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
             >
-              <MessageSquare className="h-4 w-4" />
+              <MessageSquare className="h-4 w-4 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Prompts</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center gap-2"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
             >
-              <SettingsIcon className="h-4 w-4" />
+              <SettingsIcon className="h-4 w-4 sm:h-4 sm:w-4" />
               <span className="hidden sm:inline">Preferences</span>
             </TabsTrigger>
           </TabsList>

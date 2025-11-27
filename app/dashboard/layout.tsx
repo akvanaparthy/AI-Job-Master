@@ -103,8 +103,8 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 w-[280px] bg-[#f5f5f5] flex flex-col">
+      {/* Sidebar - Hidden on mobile, visible on lg+ */}
+      <aside className="hidden lg:fixed lg:inset-y-0 lg:left-0 lg:w-[280px] lg:bg-[#f5f5f5] lg:flex lg:flex-col">
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 pt-6 pb-8">
           <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
@@ -228,15 +228,50 @@ export default function DashboardLayout({
       </aside>
 
       {/* Main content */}
-      <div className="pl-[280px] flex flex-col min-h-screen">
-        {/* Top header bar */}
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-8 py-4">
-          <div className="flex items-center justify-end">
+      <div className="lg:pl-[280px] flex flex-col min-h-screen">
+        {/* Top header bar - Mobile navigation + notifications */}
+        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center justify-between lg:justify-end">
+            {/* Mobile logo & menu - shown only on mobile */}
+            <div className="flex items-center gap-3 lg:hidden">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                <span className="text-white text-sm sm:text-lg font-bold">AJ</span>
+              </div>
+              <span className="text-base sm:text-xl font-bold text-gray-900">AI Job Master</span>
+            </div>
             <NotificationsBell />
           </div>
         </div>
 
-        <main className="flex-1 p-8 bg-white">
+        {/* Mobile bottom navigation */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+          <div className="grid grid-cols-5 gap-1 px-2 py-2">
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = item.href === '/dashboard'
+                ? pathname === '/dashboard'
+                : pathname === item.href || pathname?.startsWith(item.href + '/');
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-colors",
+                    isActive
+                      ? "text-blue-600 bg-blue-50"
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                  )}
+                >
+                  <Icon className="w-5 h-5" strokeWidth={1.5} />
+                  <span className="text-[10px] font-medium">{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-white pb-20 lg:pb-8">
           {children}
         </main>
 

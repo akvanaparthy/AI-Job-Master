@@ -112,17 +112,17 @@ export default function UserPreferencesManager() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Default Settings</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">Default Settings</CardTitle>
+          <CardDescription className="text-sm">
             Set your default preferences for content generation
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label>Default AI Model</Label>
+            <Label className="text-sm sm:text-base">Default AI Model</Label>
             <Select
               value={preferences.defaultLlmModel}
               onValueChange={(value) =>
@@ -130,7 +130,7 @@ export default function UserPreferencesManager() {
               }
               disabled={availableModels.length === 0}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                 <SelectValue placeholder={availableModels.length === 0 ? "No models available - Add API keys first" : "Select a model"} />
               </SelectTrigger>
               <SelectContent>
@@ -155,14 +155,14 @@ export default function UserPreferencesManager() {
           </div>
 
           <div className="space-y-2">
-            <Label>Default Content Length</Label>
+            <Label className="text-sm sm:text-base">Default Content Length</Label>
             <Select
               value={preferences.defaultLength}
               onValueChange={(value) =>
                 setPreferences((prev) => ({ ...prev, defaultLength: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -177,14 +177,14 @@ export default function UserPreferencesManager() {
           </div>
 
           <div className="space-y-2">
-            <Label>Default Status</Label>
+            <Label className="text-sm sm:text-base">Default Status</Label>
             <Select
               value={preferences.defaultStatus}
               onValueChange={(value) =>
                 setPreferences((prev) => ({ ...prev, defaultStatus: value }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -200,17 +200,17 @@ export default function UserPreferencesManager() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Behavior Settings</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">Behavior Settings</CardTitle>
+          <CardDescription className="text-sm">
             Configure how the application behaves
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label>Auto-save Generated Content</Label>
-              <p className="text-sm text-muted-foreground">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-0.5 flex-1">
+              <Label className="text-sm sm:text-base">Auto-save Generated Content</Label>
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Automatically save generated content to history
               </p>
             </div>
@@ -223,14 +223,14 @@ export default function UserPreferencesManager() {
           </div>
 
           <div className="space-y-2">
-            <Label>Follow-up Reminder Days</Label>
+            <Label className="text-sm sm:text-base">Follow-up Reminder Days</Label>
             <Select
               value={preferences.followupReminderDays.toString()}
               onValueChange={(value) =>
                 setPreferences((prev) => ({ ...prev, followupReminderDays: parseInt(value) }))
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -248,7 +248,7 @@ export default function UserPreferencesManager() {
         </CardContent>
       </Card>
 
-      <Button onClick={handleSave} disabled={saving} className="w-full">
+      <Button onClick={handleSave} disabled={saving} className="w-full h-10 sm:h-11 text-sm sm:text-base">
         {saving ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -262,8 +262,8 @@ export default function UserPreferencesManager() {
         )}
       </Button>
 
-      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
-        <p className="text-sm text-blue-600 dark:text-blue-400">
+      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 sm:p-4">
+        <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
           <strong>Note:</strong> These preferences will be applied as defaults across all generators.
           You can still override them for individual generations.
         </p>

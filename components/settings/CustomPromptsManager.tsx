@@ -114,23 +114,23 @@ export default function CustomPromptsManager() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>Custom Prompts</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">Custom Prompts</CardTitle>
+          <CardDescription className="text-sm">
             Customize the AI prompts for each type of content generation. Leave blank to use default prompts.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           <Tabs defaultValue="coverLetter">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="coverLetter">Cover Letter</TabsTrigger>
-              <TabsTrigger value="linkedIn">LinkedIn</TabsTrigger>
-              <TabsTrigger value="email">Email</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-auto">-auto">
+              <TabsTrigger value="coverLetter" className="text-xs sm:text-sm py-2">Cover Letter</TabsTrigger>
+              <TabsTrigger value="linkedIn" className="text-xs sm:text-sm py-2">LinkedIn</TabsTrigger>
+              <TabsTrigger value="email" className="text-xs sm:text-sm py-2">Email</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="coverLetter" className="space-y-4 mt-4">
+            <TabsContent value="coverLetter" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <Label>Cover Letter System Prompt</Label>
@@ -157,16 +157,17 @@ export default function CustomPromptsManager() {
               </div>
             </TabsContent>
 
-            <TabsContent value="linkedIn" className="space-y-4 mt-4">
+            <TabsContent value="linkedIn" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label>LinkedIn System Prompt</Label>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                  <Label className="text-sm sm:text-base">LinkedIn System Prompt</Label>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleReset('linkedIn')}
+                    className="self-start text-xs sm:text-sm h-8"
                   >
-                    <RotateCcw className="h-4 w-4 mr-2" />
+                    <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Reset to Default
                   </Button>
                 </div>
@@ -176,7 +177,7 @@ export default function CustomPromptsManager() {
                     setPrompts((prev) => ({ ...prev, linkedIn: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
-                  className="min-h-[200px] font-mono text-sm"
+                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
                   This prompt guides how the AI generates LinkedIn messages. Keep it concise for shorter outputs.
@@ -184,16 +185,17 @@ export default function CustomPromptsManager() {
               </div>
             </TabsContent>
 
-            <TabsContent value="email" className="space-y-4 mt-4">
+            <TabsContent value="email" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label>Email System Prompt</Label>
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                  <Label className="text-sm sm:text-base">Email System Prompt</Label>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleReset('email')}
+                    className="self-start text-xs sm:text-sm h-8"
                   >
-                    <RotateCcw className="h-4 w-4 mr-2" />
+                    <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Reset to Default
                   </Button>
                 </div>
@@ -203,7 +205,7 @@ export default function CustomPromptsManager() {
                     setPrompts((prev) => ({ ...prev, email: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
-                  className="min-h-[200px] font-mono text-sm"
+                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
                   This prompt guides how the AI generates email messages including subject lines.
@@ -212,8 +214,8 @@ export default function CustomPromptsManager() {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-6">
-            <Button onClick={handleSave} disabled={saving} className="w-full">
+          <div className="mt-4 sm:mt-6">
+            <Button onClick={handleSave} disabled={saving} className="w-full h-10 sm:h-11 text-sm sm:text-base">
               {saving ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -230,8 +232,8 @@ export default function CustomPromptsManager() {
         </CardContent>
       </Card>
 
-      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
-        <p className="text-sm text-blue-600 dark:text-blue-400">
+      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 sm:p-4">
+        <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
           <strong>Tip:</strong> Custom prompts override the default behavior. You can use placeholders like
           {' '}<code className="bg-blue-500/20 px-1 rounded">{'{{resume}}'}</code>,{' '}
           <code className="bg-blue-500/20 px-1 rounded">{'{{jobDescription}}'}</code>, and{' '}

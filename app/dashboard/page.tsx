@@ -148,7 +148,7 @@ export default function DashboardPage() {
       </motion.div>
 
       {/* Stats & Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {/* Quick Action Cards */}
         {QUICK_ACTIONS.map((action, index) => {
           const Icon = action.icon;
@@ -166,20 +166,20 @@ export default function DashboardPage() {
             >
               <Link href={action.href}>
                 <Card className={`relative overflow-hidden border border-slate-200/60 hover:border-slate-300 shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer group ${action.bgColor}`}>
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-6">
+                  <div className="p-4 sm:p-6">
+                    <div className="flex items-start justify-between mb-4 sm:mb-6">
                       <div>
-                        <h3 className="text-base font-semibold text-slate-900 mb-0.5">
+                        <h3 className="text-sm sm:text-base font-semibold text-slate-900 mb-0.5">
                           {action.title}
                         </h3>
-                        <p className="text-sm text-slate-600">{action.description}</p>
+                        <p className="text-xs sm:text-sm text-slate-600">{action.description}</p>
                       </div>
-                      <div className={`w-11 h-11 rounded-[14px] ${action.iconBg} flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity`}>
-                        <Icon className="w-5 h-5 text-white" strokeWidth={2.5} />
+                      <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-[12px] sm:rounded-[14px] ${action.iconBg} flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity flex-shrink-0`}>
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
                       </div>
                     </div>
                     <div className="flex items-end justify-between">
-                      <span className={`text-[56px] font-bold leading-none ${action.textColor}`}>
+                      <span className={`text-[40px] sm:text-[56px] font-bold leading-none ${action.textColor}`}>
                         {loading ? (
                           <>
                             <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
@@ -188,8 +188,8 @@ export default function DashboardPage() {
                           </>
                         ) : <AnimatedNumber value={count} />}
                       </span>
-                      <div className="w-10 h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
-                        <ArrowUpRight className="w-5 h-5 text-white" strokeWidth={2.5} />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-slate-900/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
+                        <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
                       </div>
                     </div>
                   </div>

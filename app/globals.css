@@ -68,6 +68,21 @@
   }
 }
 
+/* Mobile responsive utilities */
+@layer utilities {
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .text-responsive {
+    @apply text-sm sm:text-base;
+  }
+  
+  .heading-responsive {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+  }
+}
+
 /* Custom animations */
 @keyframes gradient-shift {
   0%, 100% {

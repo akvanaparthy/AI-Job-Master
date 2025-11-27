@@ -213,40 +213,42 @@ export default function ResumeManager() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Upload Section */}
       <Card>
-        <CardHeader>
-          <CardTitle>Upload Resume</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">Upload Resume</CardTitle>
+          <CardDescription className="text-sm">
             Upload up to 3 resumes. Supported formats: PDF, DOCX, TXT (max 5MB)
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="resume-title">Resume Title</Label>
+            <Label htmlFor="resume-title" className="text-sm sm:text-base">Resume Title</Label>
             <Input
               id="resume-title"
               placeholder="e.g., Software Engineer Resume"
               value={resumeTitle}
               onChange={(e) => setResumeTitle(e.target.value)}
               disabled={uploading}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="resume-file">Resume File</Label>
+            <Label htmlFor="resume-file" className="text-sm sm:text-base">Resume File</Label>
             <Input
               id="resume-file"
               type="file"
               accept=".pdf,.docx,.txt"
               onChange={handleFileChange}
               disabled={uploading || resumes.length >= 3}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
           </div>
 
           {selectedFile && (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-xs sm:text-sm text-muted-foreground">
               Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(2)} KB)
             </div>
           )}
@@ -254,7 +256,7 @@ export default function ResumeManager() {
           <Button
             onClick={handleUpload}
             disabled={uploading || !selectedFile || resumes.length >= 3}
-            className="w-full"
+            className="w-full h-10 sm:h-11 text-sm sm:text-base"
           >
             {uploading ? (
               <>
@@ -270,8 +272,8 @@ export default function ResumeManager() {
           </Button>
 
           {resumes.length >= 3 && (
-            <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-3">
-              <p className="text-sm text-yellow-600 dark:text-yellow-400">
+            <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-2.5 sm:p-3">
+              <p className="text-xs sm:text-sm text-yellow-600 dark:text-yellow-400">
                 Maximum of 3 resumes reached. Delete one to upload a new resume.
               </p>
             </div>
@@ -281,48 +283,49 @@ export default function ResumeManager() {
 
       {/* Resumes List */}
       <Card>
-        <CardHeader>
-          <CardTitle>Your Resumes ({resumes.length}/3)</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">Your Resumes ({resumes.length}/3)</CardTitle>
+          <CardDescription className="text-sm">
             Manage your stored resumes. Set one as default to use it automatically.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6">
           {resumes.length === 0 ? (
             <div className="text-center py-8">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
               <p className="text-muted-foreground">No resumes uploaded yet</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {resumes.map((resume) => (
                 <div
                   key={resume.id}
-                  className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 sm:p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex items-center gap-3 flex-1">
-                    <FileText className="h-5 w-5 text-muted-foreground" />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{resume.title}</p>
+                  <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-medium text-sm sm:text-base truncate">{resume.title}</p>
                         {resume.isDefault && (
-                          <span className="flex items-center gap-1 text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5 rounded">
+                          <span className="flex items-center gap-1 text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-0.5 rounded flex-shrink-0">
                             <Check className="h-3 w-3" />
                             Default
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {new Date(resume.createdAt).toLocaleDateString()}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 self-end sm:self-center">
                     {!resume.isDefault && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleSetDefault(resume.id)}
+                        className="text-xs sm:text-sm h-8 sm:h-9"
                       >
                         Set as Default
                       </Button>
@@ -331,8 +334,9 @@ export default function ResumeManager() {
                       variant="destructive"
                       size="sm"
                       onClick={() => handleDelete(resume.id)}
+                      className="h-8 sm:h-9"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
                   </div>
                 </div>
@@ -342,8 +346,8 @@ export default function ResumeManager() {
         </CardContent>
       </Card>
 
-      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
-        <p className="text-sm text-blue-600 dark:text-blue-400">
+      <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 sm:p-4">
+        <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
           <strong>Note:</strong> Resume content is extracted automatically and stored securely.
           Your default resume will be used for generating cover letters and messages.
         </p>

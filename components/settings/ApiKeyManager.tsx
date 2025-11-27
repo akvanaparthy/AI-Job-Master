@@ -139,35 +139,35 @@ export default function ApiKeyManager() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <Card>
-        <CardHeader>
-          <CardTitle>API Keys</CardTitle>
-          <CardDescription>
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg">API Keys</CardTitle>
+          <CardDescription className="text-sm">
             Add your AI provider API keys. Keys are encrypted before storage.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           {/* OpenAI */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="openai">OpenAI API Key</Label>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="openai" className="text-sm sm:text-base">OpenAI API Key</Label>
+              <div className="flex items-center gap-1 sm:gap-2">
                 {hasOpenaiKey && (
                   <>
-                    <div className="flex items-center gap-1 text-sm text-green-600">
-                      <Check className="h-4 w-4" />
-                      Configured
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-green-600">
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Configured</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveKey('openai')}
                       disabled={saving}
-                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-6 px-1.5 sm:px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
-                      <X className="h-3 w-3 mr-1" />
-                      Remove
+                      <X className="h-3 w-3 sm:mr-1" />
+                      <span className="hidden sm:inline">Remove</span>
                     </Button>
                   </>
                 )}
@@ -180,6 +180,7 @@ export default function ApiKeyManager() {
               value={openaiKey}
               onChange={(e) => setOpenaiKey(e.target.value)}
               disabled={saving}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}
@@ -196,24 +197,24 @@ export default function ApiKeyManager() {
 
           {/* Anthropic */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="anthropic">Anthropic (Claude) API Key</Label>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="anthropic" className="text-sm sm:text-base">Anthropic (Claude) API Key</Label>
+              <div className="flex items-center gap-1 sm:gap-2">
                 {hasAnthropicKey && (
                   <>
-                    <div className="flex items-center gap-1 text-sm text-green-600">
-                      <Check className="h-4 w-4" />
-                      Configured
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-green-600">
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Configured</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveKey('anthropic')}
                       disabled={saving}
-                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-6 px-1.5 sm:px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
-                      <X className="h-3 w-3 mr-1" />
-                      Remove
+                      <X className="h-3 w-3 sm:mr-1" />
+                      <span className="hidden sm:inline">Remove</span>
                     </Button>
                   </>
                 )}
@@ -226,6 +227,7 @@ export default function ApiKeyManager() {
               value={anthropicKey}
               onChange={(e) => setAnthropicKey(e.target.value)}
               disabled={saving}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}
@@ -242,24 +244,24 @@ export default function ApiKeyManager() {
 
           {/* Gemini */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="gemini">Google Gemini API Key</Label>
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="gemini" className="text-sm sm:text-base">Google Gemini API Key</Label>
+              <div className="flex items-center gap-1 sm:gap-2">
                 {hasGeminiKey && (
                   <>
-                    <div className="flex items-center gap-1 text-sm text-green-600">
-                      <Check className="h-4 w-4" />
-                      Configured
+                    <div className="flex items-center gap-1 text-xs sm:text-sm text-green-600">
+                      <Check className="h-3 w-3 sm:h-4 sm:w-4" />
+                      <span className="hidden sm:inline">Configured</span>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleRemoveKey('gemini')}
                       disabled={saving}
-                      className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-6 px-1.5 sm:px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50"
                     >
-                      <X className="h-3 w-3 mr-1" />
-                      Remove
+                      <X className="h-3 w-3 sm:mr-1" />
+                      <span className="hidden sm:inline">Remove</span>
                     </Button>
                   </>
                 )}
@@ -272,6 +274,7 @@ export default function ApiKeyManager() {
               value={geminiKey}
               onChange={(e) => setGeminiKey(e.target.value)}
               disabled={saving}
+              className="h-10 sm:h-11 text-sm sm:text-base"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}
@@ -286,7 +289,7 @@ export default function ApiKeyManager() {
             </p>
           </div>
 
-          <Button onClick={handleSave} disabled={saving} className="w-full">
+          <Button onClick={handleSave} disabled={saving} className="w-full h-10 sm:h-11 text-sm sm:text-base">
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -300,8 +303,8 @@ export default function ApiKeyManager() {
             )}
           </Button>
 
-          <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-4">
-            <p className="text-sm text-blue-600 dark:text-blue-400">
+          <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
               <strong>Security:</strong> Your API keys are encrypted using AES-256 before being stored in the database.
             </p>
           </div>

@@ -98,16 +98,16 @@ export default function Home() {
             />
 
             <div className={`relative flex items-center justify-between transition-all duration-700 ${
-              scrolled ? 'px-6 py-2.5' : 'px-8 py-4'
+              scrolled ? 'px-3 sm:px-6 py-2.5' : 'px-4 sm:px-8 py-4'
             }`}>
               {/* Logo - Left side */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl flex items-center justify-center shadow-lg px-3 py-1.5">
-                  <Briefcase className="text-white w-5 h-5" />
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+                <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl flex items-center justify-center shadow-lg px-2 sm:px-3 py-1.5">
+                  <Briefcase className="text-white w-4 h-4 sm:w-5 sm:h-5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-bold text-slate-900 leading-tight text-[17px]">AI Job</span>
-                  <span className="font-bold text-slate-900 leading-tight text-[17px]">Master</span>
+                  <span className="font-bold text-slate-900 leading-tight text-[14px] sm:text-[17px]">AI Job</span>
+                  <span className="font-bold text-slate-900 leading-tight text-[14px] sm:text-[17px]">Master</span>
                 </div>
               </div>
 
@@ -130,12 +130,13 @@ export default function Home() {
               {/* CTA Button - Right side with gradient outline on hover */}
               <div className="relative group flex-shrink-0">
                 {/* Animated gradient outline */}
-                <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 animate-gradient-shift" />
+                <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 animate-gradient-shift" />
                 <Link
                   href="/auth/signup"
-                  className="relative inline-block bg-slate-900 text-white font-semibold rounded-[20px] shadow-lg transition-all duration-300 hover:shadow-xl text-[15px] px-8 py-3.5"
+                  className="relative inline-block bg-slate-900 text-white font-semibold rounded-[16px] sm:rounded-[20px] shadow-lg transition-all duration-300 hover:shadow-xl text-[13px] sm:text-[15px] px-4 sm:px-8 py-2.5 sm:py-3.5"
                 >
-                  Get Started
+                  <span className="hidden sm:inline">Get Started</span>
+                  <span className="sm:hidden">Start</span>
                 </Link>
               </div>
             </div>
@@ -173,23 +174,23 @@ export default function Home() {
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-screen flex items-center px-6 pb-32 pt-32">
+      <section className="relative z-10 min-h-screen flex items-center px-4 sm:px-6 pb-20 sm:pb-32 pt-24 sm:pt-32">
         <div className="max-w-5xl mx-auto text-center w-full">
           {/* Social Proof with Avatars */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-3 mb-8"
+            className="inline-flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8"
           >
             {/* Avatar circles */}
             <div className="flex -space-x-2">
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-orange-300 to-orange-400 border-[3px] border-white shadow-md" />
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-pink-300 to-pink-400 border-[3px] border-white shadow-md" />
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-green-300 to-green-400 border-[3px] border-white shadow-md" />
-              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-300 to-purple-400 border-[3px] border-white shadow-md" />
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-orange-300 to-orange-400 border-2 sm:border-[3px] border-white shadow-md" />
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-pink-300 to-pink-400 border-2 sm:border-[3px] border-white shadow-md" />
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-green-300 to-green-400 border-2 sm:border-[3px] border-white shadow-md" />
+              <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-purple-300 to-purple-400 border-2 sm:border-[3px] border-white shadow-md" />
             </div>
-            <p className="text-[15px] text-slate-700 font-medium">
+            <p className="text-xs sm:text-sm md:text-[15px] text-slate-700 font-medium">
               <span className="text-teal-600 font-bold">{userCount}</span> job seekers trust us
             </p>
           </motion.div>
@@ -209,16 +210,16 @@ export default function Home() {
             }}
             className="mb-8"
           >
-            <h1 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1] mb-0">
+            <h1 className="text-[36px] sm:text-[52px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1] mb-0">
               Land{' '}
               <span className="inline-flex items-center justify-center align-middle">
-                <span className="inline-block bg-gradient-to-br from-purple-500 to-purple-600 p-4 rounded-[28px] shadow-2xl mx-3 mb-2">
-                  <Briefcase className="w-[52px] h-[52px] text-white" strokeWidth={2.5} />
+                <span className="inline-block bg-gradient-to-br from-purple-500 to-purple-600 p-2 sm:p-3 md:p-4 rounded-[16px] sm:rounded-[22px] md:rounded-[28px] shadow-2xl mx-1 sm:mx-2 md:mx-3 mb-1 sm:mb-2">
+                  <Briefcase className="w-[28px] h-[28px] sm:w-[38px] sm:h-[38px] md:w-[52px] md:h-[52px] text-white" strokeWidth={2.5} />
                 </span>
               </span>
               Your Dream Job
             </h1>
-            <h2 className="text-[64px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1]">
+            <h2 className="text-[36px] sm:text-[52px] md:text-[80px] lg:text-[88px] font-bold text-slate-900 leading-[1.1]">
               With AI-Powered Apps
             </h2>
           </motion.div>
@@ -228,10 +229,11 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="text-[17px] text-slate-700 max-w-2xl mx-auto mb-10 leading-relaxed"
+            className="text-[14px] sm:text-[16px] md:text-[17px] text-slate-700 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-4"
           >
             Generate personalized cover letters, emails, and LinkedIn messages in seconds.
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             Track every application and never miss a follow-up. AI does the heavy lifting.
           </motion.p>
 
@@ -240,14 +242,14 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="mb-20"
+            className="mb-12 sm:mb-16 md:mb-20"
           >
             <div className="relative group inline-block">
               {/* Animated gradient outline - tighter */}
-              <div className="absolute -inset-[1.5px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[23px] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500 animate-gradient-shift" />
+              <div className="absolute -inset-[1.5px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[23px] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500 animate-gradient-shift" />
               <Link
                 href="/auth/signup"
-                className="relative inline-block bg-slate-900 text-white text-[16px] font-semibold px-10 py-4 rounded-[22px] shadow-2xl transition-all duration-300 hover:shadow-3xl"
+                className="relative inline-block bg-slate-900 text-white text-sm sm:text-base md:text-[16px] font-semibold px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-[16px] sm:rounded-[22px] shadow-2xl transition-all duration-300 hover:shadow-3xl"
               >
                 Start For Free
               </Link>
@@ -259,7 +261,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8 }}
-            className="flex items-center justify-center gap-8 max-w-3xl mx-auto relative"
+            className="hidden lg:flex items-center justify-center gap-8 max-w-3xl mx-auto relative"
           >
             {/* Left Card - Application Success */}
             <div
@@ -323,27 +325,57 @@ export default function Home() {
               </div>
             </div>
           </motion.div>
+
+          {/* Mobile Stats - Simplified */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="lg:hidden grid grid-cols-2 gap-4 max-w-md mx-auto px-4"
+          >
+            {/* Left Stat */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/60">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-gradient-to-br from-orange-300 to-orange-400 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg mb-3">
+                  <TrendingUp className="w-6 h-6 text-white" strokeWidth={2} />
+                </div>
+                <p className="text-2xl font-bold text-slate-900 leading-none mb-1">3x</p>
+                <p className="text-xs font-semibold text-slate-700">More Callbacks</p>
+              </div>
+            </div>
+
+            {/* Right Stat */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-4 shadow-xl border border-white/60">
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-gradient-to-br from-emerald-400 to-green-500 w-12 h-12 rounded-xl flex items-center justify-center shadow-lg mb-3">
+                  <Clock className="w-6 h-6 text-white" strokeWidth={2.5} />
+                </div>
+                <p className="text-2xl font-bold text-slate-900 leading-none mb-1">85%</p>
+                <p className="text-xs font-semibold text-slate-700">Time Saved</p>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Problem Section */}
-      <section id="features" className="relative z-10 py-24 px-6 bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
+      <section id="features" className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-slate-900 via-purple-900 to-blue-900">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
               We Understand Your <span className="text-red-400">Challenges</span>
             </h2>
-            <p className="text-xl text-purple-200 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-purple-200 max-w-3xl mx-auto px-4">
               The job search journey can be overwhelming. You&apos;re qualified and talented, yet...
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8 px-4">
             {[
               {
                 emoji: "😓",
@@ -367,13 +399,13 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.15 }}
-                className="bg-white/10 backdrop-blur-lg rounded-[28px] p-8 border border-white/20 hover:bg-white/15 transition-all"
+                className="bg-white/10 backdrop-blur-lg rounded-2xl sm:rounded-[24px] md:rounded-[28px] p-6 sm:p-7 md:p-8 border border-white/20 hover:bg-white/15 transition-all"
               >
-                <div className="text-6xl mb-5">{problem.emoji}</div>
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <div className="text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 md:mb-5">{problem.emoji}</div>
+                <h3 className="text-xl sm:text-xl md:text-2xl font-bold text-white mb-3 sm:mb-4">
                   {problem.title}
                 </h3>
-                <p className="text-purple-200 leading-relaxed">
+                <p className="text-sm sm:text-base text-purple-200 leading-relaxed">
                   {problem.description}
                 </p>
               </motion.div>
@@ -383,45 +415,46 @@ export default function Home() {
       </section>
 
       {/* Solution Section */}
-      <section id="how-it-works" className="relative z-10 py-24 px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <section id="how-it-works" className="relative z-10 py-16 sm:py-20 md:py-24 px-4 sm:px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-20"
+            className="text-center mb-12 sm:mb-16 md:mb-20"
           >
-            <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 px-4">
               Your Personal AI <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Career Assistant</span>
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto px-4">
               Imagine having an assistant who crafts perfect messages, knows what to say, and keeps everything organized. That&apos;s us.
             </p>
           </motion.div>
 
-          <div className="space-y-24">
+          <div className="space-y-12 sm:space-y-16 md:space-y-20 lg:space-y-24">
             {/* Step 1 */}
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
+                className="px-4 sm:px-0"
               >
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-purple-100 text-purple-700 font-bold mb-6 shadow-lg">
-                  <span className="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-sm font-bold">1</span>
+                <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-purple-100 text-purple-700 font-bold mb-4 sm:mb-6 shadow-lg text-sm sm:text-base">
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs sm:text-sm font-bold">1</span>
                   Upload Resume
                 </div>
-                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 md:mb-5">
                   Start With Your Experience
                 </h3>
-                <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                <p className="text-base sm:text-lg text-slate-600 mb-4 sm:mb-6 leading-relaxed">
                   Upload your resume (PDF or DOCX). Our AI analyzes your skills, experience, and achievements instantly. Manage up to 3 versions for different roles.
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {["Fast upload process", "Bank-level encryption", "Multiple resume versions"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="font-medium">{item}</span>
+                    <li key={i} className="flex items-center gap-2 sm:gap-3 text-slate-700">
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                      <span className="font-medium text-sm sm:text-base">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -430,15 +463,15 @@ export default function Home() {
                 initial={{ opacity: 0, x: 60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="relative"
+                className="relative px-4 sm:px-0"
               >
-                <div className="bg-gradient-to-br from-purple-200 to-blue-200 rounded-[32px] p-12 shadow-2xl">
-                  <div className="bg-white rounded-[24px] p-10 shadow-xl">
-                    <FileText className="w-28 h-28 text-purple-600 mx-auto mb-6" strokeWidth={1.5} />
-                    <div className="space-y-3">
-                      <div className="h-3 bg-purple-200 rounded-full w-3/4 mx-auto" />
-                      <div className="h-3 bg-blue-200 rounded-full w-full mx-auto" />
-                      <div className="h-3 bg-purple-200 rounded-full w-2/3 mx-auto" />
+                <div className="bg-gradient-to-br from-purple-200 to-blue-200 rounded-2xl sm:rounded-3xl md:rounded-[32px] p-6 sm:p-8 md:p-12 shadow-2xl">
+                  <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-[24px] p-6 sm:p-8 md:p-10 shadow-xl">
+                    <FileText className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 text-purple-600 mx-auto mb-4 sm:mb-6" strokeWidth={1.5} />
+                    <div className="space-y-2 sm:space-y-3">
+                      <div className="h-2 sm:h-2.5 md:h-3 bg-purple-200 rounded-full w-3/4 mx-auto" />
+                      <div className="h-2 sm:h-2.5 md:h-3 bg-blue-200 rounded-full w-full mx-auto" />
+                      <div className="h-2 sm:h-2.5 md:h-3 bg-purple-200 rounded-full w-2/3 mx-auto" />
                     </div>
                   </div>
                 </div>
@@ -446,34 +479,34 @@ export default function Home() {
             </div>
 
             {/* Step 2 */}
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="md:order-2"
+                className="md:order-2 px-4 sm:px-0"
               >
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-100 text-blue-700 font-bold mb-6 shadow-lg">
-                  <span className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-bold">2</span>
+                <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-blue-100 text-blue-700 font-bold mb-4 sm:mb-6 shadow-lg text-sm sm:text-base">
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs sm:text-sm font-bold">2</span>
                   AI Generation
                 </div>
-                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 md:mb-5">
                   Let AI Work Its Magic
                 </h3>
-                <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                <p className="text-base sm:text-lg text-slate-600 mb-4 sm:mb-6 leading-relaxed">
                   Paste the job description. Select your AI (OpenAI, Claude, Gemini). Get perfectly tailored content in seconds that highlights your fit.
                 </p>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4">
                   {[
                     { icon: FileText, label: "Cover Letters", color: "from-blue-500 to-cyan-500" },
                     { icon: Mail, label: "Emails", color: "from-orange-500 to-red-500" },
                     { icon: MessageSquare, label: "LinkedIn", color: "from-purple-500 to-pink-500" }
                   ].map((item, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-5 shadow-lg border border-slate-200">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.color} p-2.5 mx-auto mb-3 shadow-md`}>
+                    <div key={i} className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 md:p-5 shadow-lg border border-slate-200">
+                      <div className={`w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${item.color} p-1.5 sm:p-2 md:p-2.5 mx-auto mb-2 sm:mb-3 shadow-md`}>
                         <item.icon className="w-full h-full text-white" />
                       </div>
-                      <p className="text-xs font-semibold text-slate-700 text-center">{item.label}</p>
+                      <p className="text-[10px] sm:text-xs font-semibold text-slate-700 text-center leading-tight">{item.label}</p>
                     </div>
                   ))}
                 </div>
@@ -482,16 +515,16 @@ export default function Home() {
                 initial={{ opacity: 0, x: 60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="md:order-1"
+                className="md:order-1 px-4 sm:px-0"
               >
-                <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded-[32px] p-12 shadow-2xl">
-                  <div className="bg-white rounded-[24px] p-10 shadow-xl relative overflow-hidden">
-                    <Sparkles className="w-28 h-28 text-blue-600 mx-auto mb-6 animate-pulse" strokeWidth={1.5} />
+                <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded-2xl sm:rounded-3xl md:rounded-[32px] p-6 sm:p-8 md:p-12 shadow-2xl">
+                  <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-[24px] p-6 sm:p-8 md:p-10 shadow-xl relative overflow-hidden">
+                    <Sparkles className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 text-blue-600 mx-auto mb-4 sm:mb-6 animate-pulse" strokeWidth={1.5} />
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 animate-pulse" />
-                    <div className="relative space-y-3">
-                      <div className="h-2.5 bg-blue-200 rounded-full w-full" />
-                      <div className="h-2.5 bg-purple-200 rounded-full w-5/6" />
-                      <div className="h-2.5 bg-blue-200 rounded-full w-4/6" />
+                    <div className="relative space-y-2 sm:space-y-3">
+                      <div className="h-2 sm:h-2.5 bg-blue-200 rounded-full w-full" />
+                      <div className="h-2 sm:h-2.5 bg-purple-200 rounded-full w-5/6" />
+                      <div className="h-2 sm:h-2.5 bg-blue-200 rounded-full w-4/6" />
                     </div>
                   </div>
                 </div>
@@ -499,27 +532,28 @@ export default function Home() {
             </div>
 
             {/* Step 3 */}
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
               <motion.div
                 initial={{ opacity: 0, x: -60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
+                className="px-4 sm:px-0"
               >
-                <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-green-100 text-green-700 font-bold mb-6 shadow-lg">
-                  <span className="w-7 h-7 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-bold">3</span>
+                <div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-green-100 text-green-700 font-bold mb-4 sm:mb-6 shadow-lg text-sm sm:text-base">
+                  <span className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-green-600 text-white flex items-center justify-center text-xs sm:text-sm font-bold">3</span>
                   Track Progress
                 </div>
-                <h3 className="text-4xl font-bold text-slate-900 mb-5">
+                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4 md:mb-5">
                   Stay Organized & Follow Up
                 </h3>
-                <p className="text-lg text-slate-600 mb-6 leading-relaxed">
+                <p className="text-base sm:text-lg text-slate-600 mb-4 sm:mb-6 leading-relaxed">
                   All applications in one dashboard. Track statuses, schedule follow-ups, and watch your progress. Never miss an opportunity.
                 </p>
-                <ul className="space-y-3">
+                <ul className="space-y-2 sm:space-y-3">
                   {["Complete history", "Status tracking (Sent, Draft, Done, Ghost)", "Export anytime"].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <span className="font-medium">{item}</span>
+                    <li key={i} className="flex items-center gap-2 sm:gap-3 text-slate-700">
+                      <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                      <span className="font-medium text-sm sm:text-base">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -528,19 +562,20 @@ export default function Home() {
                 initial={{ opacity: 0, x: 60 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
+                className="px-4 sm:px-0"
               >
-                <div className="bg-gradient-to-br from-green-200 to-emerald-200 rounded-[32px] p-12 shadow-2xl">
-                  <div className="bg-white rounded-[24px] p-10 shadow-xl">
-                    <TrendingUp className="w-28 h-28 text-green-600 mx-auto mb-6" strokeWidth={1.5} />
-                    <div className="space-y-4">
+                <div className="bg-gradient-to-br from-green-200 to-emerald-200 rounded-2xl sm:rounded-3xl md:rounded-[32px] p-6 sm:p-8 md:p-12 shadow-2xl">
+                  <div className="bg-white rounded-xl sm:rounded-2xl md:rounded-[24px] p-6 sm:p-8 md:p-10 shadow-xl">
+                    <TrendingUp className="w-16 h-16 sm:w-20 sm:h-20 md:w-28 md:h-28 text-green-600 mx-auto mb-4 sm:mb-6" strokeWidth={1.5} />
+                    <div className="space-y-3 sm:space-y-4">
                       {[
                         { color: 'bg-green-500', width: 'w-full' },
                         { color: 'bg-blue-500', width: 'w-4/5' },
                         { color: 'bg-orange-500', width: 'w-3/5' }
                       ].map((bar, i) => (
-                        <div key={i} className="flex items-center gap-3">
-                          <div className={`w-2.5 h-2.5 rounded-full ${bar.color}`} />
-                          <div className={`h-2.5 ${bar.color} bg-opacity-20 rounded-full ${bar.width}`} />
+                        <div key={i} className="flex items-center gap-2 sm:gap-3">
+                          <div className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full ${bar.color}`} />
+                          <div className={`h-2 sm:h-2.5 ${bar.color} bg-opacity-20 rounded-full ${bar.width}`} />
                         </div>
                       ))}
                     </div>
@@ -553,23 +588,23 @@ export default function Home() {
       </section>
 
       {/* Benefits */}
-      <section id="about" className="relative z-10 py-24 px-6 bg-white">
+      <section id="about" className="relative z-10 py-12 sm:py-16 md:py-20 lg:py-24 px-4 sm:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-12 md:mb-16"
           >
-            <h2 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-3 sm:mb-4 md:mb-6 px-4">
               Why Choose AI Job Master
             </h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto px-4">
               More than software—your competitive advantage
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {[
               {
                 icon: Zap,
@@ -614,15 +649,15 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="group bg-gradient-to-br from-slate-50 to-purple-50/50 rounded-[28px] p-8 border border-slate-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                className="group bg-gradient-to-br from-slate-50 to-purple-50/50 rounded-xl sm:rounded-2xl md:rounded-[28px] p-5 sm:p-6 md:p-8 border border-slate-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
               >
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${benefit.color} p-3.5 mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br ${benefit.color} p-2.5 sm:p-3 md:p-3.5 mb-4 sm:mb-5 md:mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
                   <benefit.icon className="w-full h-full text-white" strokeWidth={2} />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">
                   {benefit.title}
                 </h3>
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
                   {benefit.description}
                 </p>
               </motion.div>
@@ -632,7 +667,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section id="pricing" className="relative z-10 py-28 px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
+      <section id="pricing" className="relative z-10 py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-0 left-0 w-full h-full bg-white rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
           <div className="absolute bottom-0 right-0 w-full h-full bg-white rounded-full blur-[150px] translate-x-1/2 translate-y-1/2" />
@@ -644,37 +679,37 @@ export default function Home() {
           viewport={{ once: true }}
           className="relative max-w-4xl mx-auto text-center"
         >
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
             Your Dream Job Awaits
           </h2>
-          <p className="text-xl text-purple-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-purple-100 mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
             Stop wasting hours on repetitive work. Let AI handle the writing while you focus on what matters—landing interviews and getting hired.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
             <Link
               href="/auth/signup"
-              className="inline-block bg-white text-purple-600 text-lg font-bold px-12 py-4 rounded-[22px] shadow-2xl transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
+              className="w-full sm:w-auto inline-block bg-white text-purple-600 text-base sm:text-lg font-bold px-8 sm:px-10 md:px-12 py-3 sm:py-3.5 md:py-4 rounded-2xl sm:rounded-[22px] shadow-2xl transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] text-center"
             >
               Start Free Today
             </Link>
-            <p className="text-purple-100 text-sm font-medium">
+            <p className="text-purple-100 text-xs sm:text-sm font-medium text-center">
               No credit card • Free forever • 2-minute setup
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-10 opacity-90">
-            <div className="flex items-center gap-2.5 text-white">
-              <Shield className="w-5 h-5" />
-              <span className="text-sm font-medium">Secure & Encrypted</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-10 opacity-90 px-4">
+            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm font-medium">Secure & Encrypted</span>
             </div>
-            <div className="flex items-center gap-2.5 text-white">
-              <Users className="w-5 h-5" />
-              <span className="text-sm font-medium">{userCount} Users</span>
+            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm font-medium">{userCount} Users</span>
             </div>
-            <div className="flex items-center gap-2.5 text-white">
-              <Zap className="w-5 h-5" />
-              <span className="text-sm font-medium">Instant Results</span>
+            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="text-xs sm:text-sm font-medium">Instant Results</span>
             </div>
           </div>
         </motion.div>
