@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Export history error:', error);
+    logger.error('Export history error', error);
     return NextResponse.json(
       { error: error.message || 'Failed to export history' },
       { status: 500 }

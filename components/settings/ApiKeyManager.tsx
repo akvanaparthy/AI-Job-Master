@@ -7,11 +7,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Key, Check, X } from 'lucide-react';
+import { logger } from '@/lib/logger';
 
 export default function ApiKeyManager() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [validating, setValidating] = useState(false);
 
   const [openaiKey, setOpenaiKey] = useState('');
   const [anthropicKey, setAnthropicKey] = useState('');
@@ -21,12 +23,39 @@ export default function ApiKeyManager() {
   const [hasAnthropicKey, setHasAnthropicKey] = useState(false);
   const [hasGeminiKey, setHasGeminiKey] = useState(false);
 
+  // Only load API key status once on mount
   useEffect(() => {
-    loadApiKeyStatus();
-  }, []);
+    let mounted = true;
+    
+    const loadApiKeyStatus = async () => {
+      try {
+        const response = await fetch('/api/settings/api-keys');
+        if (response.ok && mounted) {
+          const data = await response.json();
+          setHasOpenaiKey(data.hasOpenaiKey);
+          setHasAnthropicKey(data.hasAnthropicKey);
+          setHasGeminiKey(data.hasGeminiKey);
+        }
+      } catch (error) {
+        if (mounted) {
+          logger.error('Failed to load API key status', error);
+        }
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
 
-  const loadApiKeyStatus = async () => {
-    setLoading(true);
+    loadApiKeyStatus();
+
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty dependency array - only run once
+
+  const updateApiKeyStatus = async () => {
+    // Lightweight status update after save/delete
     try {
       const response = await fetch('/api/settings/api-keys');
       if (response.ok) {
@@ -36,14 +65,23 @@ export default function ApiKeyManager() {
         setHasGeminiKey(data.hasGeminiKey);
       }
     } catch (error) {
-      console.error('Failed to load API key status:', error);
-    } finally {
-      setLoading(false);
+      logger.error('Failed to update API key status', error);
     }
   };
 
   const handleSave = async () => {
+    // Check if any key is provided
+    if (openaiKey === '' && anthropicKey === '' && geminiKey === '') {
+      toast({
+        title: 'No keys provided',
+        description: 'Please enter at least one API key',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setSaving(true);
+    setValidating(true);
     try {
       const payload: any = {};
 
@@ -68,11 +106,11 @@ export default function ApiKeyManager() {
 
       toast({
         title: 'Success',
-        description: 'API keys saved and models fetched successfully!',
+        description: 'API keys validated and saved successfully! Available models have been fetched.',
       });
 
-      // Reload status to reflect changes
-      await loadApiKeyStatus();
+      // Update status to reflect changes
+      await updateApiKeyStatus();
 
       // Clear input fields
       setOpenaiKey('');
@@ -80,6 +118,7 @@ export default function ApiKeyManager() {
       setGeminiKey('');
 
     } catch (error: any) {
+      logger.error('Failed to save API keys', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -87,6 +126,7 @@ export default function ApiKeyManager() {
       });
     } finally {
       setSaving(false);
+      setValidating(false);
     }
   };
 
@@ -116,10 +156,11 @@ export default function ApiKeyManager() {
         description: `${provider} API key removed successfully!`,
       });
 
-      // Reload status to reflect changes
-      await loadApiKeyStatus();
+      // Update status to reflect changes
+      await updateApiKeyStatus();
 
     } catch (error: any) {
+      logger.error('Failed to remove API key', error);
       toast({
         title: 'Error',
         description: error.message,
@@ -293,19 +334,19 @@ export default function ApiKeyManager() {
             {saving ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
+                {validating ? 'Validating & Saving...' : 'Saving...'}
               </>
             ) : (
               <>
                 <Key className="mr-2 h-4 w-4" />
-                Save API Keys
+                Save & Validate API Keys
               </>
             )}
           </Button>
 
           <div className="rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 sm:p-4">
             <p className="text-xs sm:text-sm text-blue-600 dark:text-blue-400">
-              <strong>Security:</strong> Your API keys are encrypted using AES-256 before being stored in the database.
+              <strong>Security & Validation:</strong> Your API keys are validated by fetching available models before being encrypted with AES-256 and stored securely.
             </p>
           </div>
         </CardContent>

@@ -81,6 +81,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate file type (only PDF and DOCX)
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!allowedTypes.includes(file.type)) {
+      return NextResponse.json(
+        { error: 'Invalid file type. Only PDF and DOCX files are allowed.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size (max 3MB)
+    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
+    if (file.size > maxSize) {
+      return NextResponse.json(
+        { error: 'File size exceeds 3MB limit. Please upload a smaller file.' },
+        { status: 400 }
+      );
+    }
+
     // Extract text from file
     const content = await extractTextFromFile(file);
 

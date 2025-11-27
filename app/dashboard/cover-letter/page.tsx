@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Copy, FileText, Sparkles, CheckCircle2, Save, Trash2 } from 'lucide-react';
 
 interface Resume {
@@ -61,7 +62,7 @@ export default function CoverLetterPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load resumes:', error);
+      logger.error('Failed to load resumes', error);
     } finally {
       setLoadingResumes(false);
     }
@@ -76,7 +77,7 @@ export default function CoverLetterPage() {
         setAvailableModels(data.models);
       }
     } catch (error) {
-      console.error('Failed to load available models:', error);
+      logger.error('Failed to load available models', error);
     } finally {
       setLoadingModels(false);
     }
@@ -98,7 +99,7 @@ export default function CoverLetterPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load user preferences:', error);
+      logger.error('Failed to load user preferences', error);
     }
   };
 

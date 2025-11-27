@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Save } from 'lucide-react';
 
 interface Preferences {
@@ -56,7 +57,7 @@ export default function UserPreferencesManager() {
         }
       }
     } catch (error) {
-      console.error('Failed to load preferences:', error);
+      logger.error('Failed to load preferences', error);
     } finally {
       setLoading(false);
     }

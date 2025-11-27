@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
 
 interface Resume {
@@ -105,7 +106,7 @@ export default function EmailPage() {
             setPreviousMessageBody(data.message.body || '');
           }
         })
-        .catch((error) => console.error('Failed to load previous email:', error));
+        .catch((error) => logger.error('Failed to load previous email', error));
 
       toast({
         title: 'Follow-up mode',
@@ -125,7 +126,7 @@ export default function EmailPage() {
         if (defaultResume) setSelectedResumeId(defaultResume.id);
       }
     } catch (error) {
-      console.error('Failed to load resumes:', error);
+      logger.error('Failed to load resumes', error);
     } finally {
       setLoadingResumes(false);
     }
@@ -140,7 +141,7 @@ export default function EmailPage() {
         setAvailableModels(data.models);
       }
     } catch (error) {
-      console.error('Failed to load available models:', error);
+      logger.error('Failed to load available models', error);
     } finally {
       setLoadingModels(false);
     }
@@ -165,7 +166,7 @@ export default function EmailPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load user preferences:', error);
+      logger.error('Failed to load user preferences', error);
     }
   };
 
@@ -182,7 +183,7 @@ export default function EmailPage() {
         setSearchResults(data.messages || []);
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed', error);
     } finally {
       setSearching(false);
     }

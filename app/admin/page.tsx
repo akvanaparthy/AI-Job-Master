@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
+import { logger } from '@/lib/logger';
 
 // Animated number component
 function AnimatedNumber({ value }: { value: number }) {
@@ -88,7 +89,7 @@ export default function AdminDashboard() {
         setRecentUsers(data.users);
       }
     } catch (error) {
-      console.error('Failed to load recent users:', error);
+      logger.error('Failed to load recent users', error);
     }
   }, []);
 

@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -25,13 +26,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         const response = await fetch('/api/admin/stats');
 
         if (response.status === 403) {
-          console.log('[ADMIN LAYOUT] Access denied - not an admin');
+          logger.info('Admin access denied - not an admin');
           router.push('/dashboard');
           return;
         }
 
         if (!response.ok) {
-          console.error('[ADMIN LAYOUT] Error checking admin status');
+          logger.error('Error checking admin status');
           router.push('/dashboard');
           return;
         }
@@ -39,7 +40,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         // User is authorized
         setIsAuthorized(true);
       } catch (error) {
-        console.error('[ADMIN LAYOUT] Error:', error);
+        logger.error('Admin layout error', error);
         router.push('/dashboard');
       } finally {
         setIsLoading(false);

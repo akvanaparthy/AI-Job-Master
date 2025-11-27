@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ message });
   } catch (error: any) {
-    console.error('Get misuse message error:', error);
+    logger.error('Get misuse message error', error);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch misuse message' },
       { status: 500 }
@@ -79,7 +79,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json({ success: true, message });
   } catch (error: any) {
-    console.error('Update misuse message error:', error);
+    logger.error('Update misuse message error', error);
     return NextResponse.json(
       { error: error.message || 'Failed to update misuse message' },
       { status: 500 }

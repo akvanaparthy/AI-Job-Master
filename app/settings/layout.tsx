@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
+import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { Footer } from '@/components/Footer';
@@ -72,7 +73,7 @@ export default function SettingsLayout({
             setUserType(data.userType || 'FREE');
           }
         } catch (error) {
-          console.error('Failed to load user type:', error);
+          logger.error('Failed to load user type', error);
         }
       }
     };

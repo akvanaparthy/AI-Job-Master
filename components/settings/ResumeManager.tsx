@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Upload, FileText, Trash2, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -37,7 +38,7 @@ export default function ResumeManager() {
         setResumes(data.resumes);
       }
     } catch (error) {
-      console.error('Failed to load resumes:', error);
+      logger.error('Failed to load resumes', error);
     } finally {
       setLoading(false);
     }
@@ -81,6 +82,32 @@ export default function ResumeManager() {
       toast({
         title: 'No file selected',
         description: 'Please select a resume file to upload',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!allowedTypes.includes(selectedFile.type)) {
+      toast({
+        title: 'Invalid file type',
+        description: 'Only PDF and DOCX files are allowed',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    // Validate file size (3MB limit)
+    const maxSize = 3 * 1024 * 1024; // 3MB in bytes
+    if (selectedFile.size > maxSize) {
+      toast({
+        title: 'File too large',
+        description: 'File size must be less than 3MB',
         variant: 'destructive',
       });
       return;
@@ -219,7 +246,7 @@ export default function ResumeManager() {
         <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
           <CardTitle className="text-base sm:text-lg">Upload Resume</CardTitle>
           <CardDescription className="text-sm">
-            Upload up to 3 resumes. Supported formats: PDF, DOCX, TXT (max 5MB)
+            Upload up to 3 resumes. Supported formats: PDF, DOCX (max 3MB)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
@@ -240,11 +267,14 @@ export default function ResumeManager() {
             <Input
               id="resume-file"
               type="file"
-              accept=".pdf,.docx,.txt"
+              accept=".pdf,.docx"
               onChange={handleFileChange}
               disabled={uploading || resumes.length >= 3}
               className="h-10 sm:h-11 text-sm sm:text-base"
             />
+            <p className="text-xs text-muted-foreground">
+              Only PDF and DOCX files are allowed. Maximum file size: 3MB
+            </p>
           </div>
 
           {selectedFile && (

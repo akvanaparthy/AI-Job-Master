@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2, Eye, Trash2, RefreshCw } from 'lucide-react';
 import {
   Dialog,
@@ -92,7 +93,7 @@ export default function HistoryPage() {
         setHistory(data.history || []);
       }
     } catch (error) {
-      console.error('Failed to load history:', error);
+      logger.error('Failed to load history', error);
       toast({ title: 'Error', description: 'Failed to load history', variant: 'destructive' });
     } finally {
       setLoading(false);

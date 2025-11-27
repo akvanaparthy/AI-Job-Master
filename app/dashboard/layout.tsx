@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
+import { logger } from '@/lib/logger';
 import { Footer } from '@/components/Footer';
 import {
   DropdownMenu,
@@ -92,7 +93,7 @@ export default function DashboardLayout({
             setUserType(data.userType || 'FREE');
           }
         } catch (error) {
-          console.error('Failed to load user type:', error);
+          logger.error('Failed to load user type', error);
         }
       }
     };

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Copy, MessageSquare, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
 
 interface Resume {
@@ -102,7 +103,7 @@ export default function LinkedInPage() {
             setPreviousMessageContent(data.message.content);
           }
         })
-        .catch((error) => console.error('Failed to load previous message:', error));
+        .catch((error) => logger.error('Failed to load previous message', error));
 
       toast({
         title: 'Follow-up mode',
@@ -122,7 +123,7 @@ export default function LinkedInPage() {
         if (defaultResume) setSelectedResumeId(defaultResume.id);
       }
     } catch (error) {
-      console.error('Failed to load resumes:', error);
+      logger.error('Failed to load resumes', error);
     } finally {
       setLoadingResumes(false);
     }
@@ -137,7 +138,7 @@ export default function LinkedInPage() {
         setAvailableModels(data.models);
       }
     } catch (error) {
-      console.error('Failed to load available models:', error);
+      logger.error('Failed to load available models', error);
     } finally {
       setLoadingModels(false);
     }
@@ -162,7 +163,7 @@ export default function LinkedInPage() {
         }
       }
     } catch (error) {
-      console.error('Failed to load user preferences:', error);
+      logger.error('Failed to load user preferences', error);
     }
   };
 
@@ -179,7 +180,7 @@ export default function LinkedInPage() {
         setSearchResults(data.messages || []);
       }
     } catch (error) {
-      console.error('Search failed:', error);
+      logger.error('Search failed', error);
     } finally {
       setSearching(false);
     }

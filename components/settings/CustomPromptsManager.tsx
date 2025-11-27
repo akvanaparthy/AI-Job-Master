@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { logger } from '@/lib/logger';
 import { Loader2, Save, RotateCcw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -63,7 +64,7 @@ export default function CustomPromptsManager() {
         });
       }
     } catch (error) {
-      console.error('Failed to load prompts:', error);
+      logger.error('Failed to load prompts', error);
     } finally {
       setLoading(false);
     }

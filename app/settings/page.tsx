@@ -47,34 +47,34 @@ function SettingsContent() {
         transition={{ delay: 0.1 }}
       >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 sm:space-y-6">
-          <TabsList className="bg-white border border-slate-200 p-1 rounded-lg grid grid-cols-4 gap-0.5 sm:gap-1">
+          <TabsList className="bg-white/50 backdrop-blur-sm border border-slate-200/60 p-1 rounded-xl grid grid-cols-4 w-full h-auto">
             <TabsTrigger
               value="api-keys"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-slate-600 data-[state=inactive]:hover:bg-slate-100"
             >
-              <Key className="h-4 w-4 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">API Keys</span>
+              <Key className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">API Keys</span>
             </TabsTrigger>
             <TabsTrigger
               value="resumes"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-slate-600 data-[state=inactive]:hover:bg-slate-100"
             >
-              <FileText className="h-4 w-4 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Resumes</span>
+              <FileText className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">Resumes</span>
             </TabsTrigger>
             <TabsTrigger
               value="prompts"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-slate-600 data-[state=inactive]:hover:bg-slate-100"
             >
-              <MessageSquare className="h-4 w-4 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Prompts</span>
+              <MessageSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">Prompts</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
-              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white flex items-center justify-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 sm:py-2.5"
+              className="rounded-lg data-[state=active]:bg-slate-900 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-200 flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 text-slate-600 data-[state=inactive]:hover:bg-slate-100"
             >
-              <SettingsIcon className="h-4 w-4 sm:h-4 sm:w-4" />
-              <span className="hidden sm:inline">Preferences</span>
+              <SettingsIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="text-xs sm:text-sm font-medium">Preferences</span>
             </TabsTrigger>
           </TabsList>
 

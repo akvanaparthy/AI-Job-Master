@@ -3,6 +3,7 @@ import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { QueryProvider } from "@/components/providers/QueryProvider";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -29,10 +30,12 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${dmSans.variable} ${spaceGrotesk.variable} font-sans`}>
-        <QueryProvider>
-          {children}
-          <Toaster />
-        </QueryProvider>
+        <ErrorBoundary>
+          <QueryProvider>
+            {children}
+            <Toaster />
+          </QueryProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
