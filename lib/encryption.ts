@@ -1,4 +1,6 @@
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import { logger } from './logger';
 
 const SALT_ROUNDS = 10;
 
@@ -17,9 +19,6 @@ export async function encryptApiKey(apiKey: string): Promise<string> {
  * IMPORTANT: In a real implementation, use reversible encryption (AES)
  * so you can decrypt the API key when making AI API calls.
  */
-
-// For actual implementation, use crypto for reversible encryption
-import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-cbc';
 // AES-256 requires exactly 32 bytes (256 bits). If hex string is provided, convert it.
@@ -45,13 +44,31 @@ export function encrypt(text: string): string {
  * Decrypts data encrypted with AES-256-CBC
  */
 export function decrypt(text: string): string {
-  const textParts = text.split(':');
-  const iv = Buffer.from(textParts.shift()!, 'hex');
-  const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-  const decipher = crypto.createDecipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
+  try {
+    if (!text || typeof text !== 'string') {
+      throw new Error('Invalid encrypted text');
+    }
+
+    const textParts = text.split(':');
+    if (textParts.length < 2) {
+      throw new Error('Malformed encrypted text');
+    }
+
+    const ivHex = textParts.shift()!;
+    if (ivHex.length !== IV_LENGTH * 2) {
+      throw new Error('Invalid IV length');
+    }
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv(ALGORITHM, ENCRYPTION_KEY, iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  } catch (error) {
+    logger.error('Decryption failed', error);
+    throw new Error('Failed to decrypt data');
+  }
 }
 
 /**
@@ -85,7 +102,7 @@ export async function validateApiKey(apiKey: string, provider: 'openai' | 'anthr
         return false;
     }
   } catch (error) {
-    console.error(`API key validation failed for ${provider}:`, error);
+    logger.error(`API key validation failed for ${provider}`, error);
     return false;
   }
 }
@@ -127,7 +144,7 @@ export async function getAvailableModels(apiKey: string, provider: 'openai' | 'a
         return [];
     }
   } catch (error) {
-    console.error(`Failed to get models for ${provider}:`, error);
+    logger.error(`Failed to get models for ${provider}`, error);
     return [];
   }
 }

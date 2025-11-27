@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -37,10 +38,10 @@ export async function GET(
     }
 
     return NextResponse.json({ message });
-  } catch (error: any) {
-    console.error('Fetch LinkedIn message error:', error);
+  } catch (error) {
+    logger.error('Fetch LinkedIn message error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch LinkedIn message' },
+      { error: error instanceof Error ? error.message : 'Failed to fetch LinkedIn message' },
       { status: 500 }
     );
   }
@@ -99,10 +100,10 @@ export async function PATCH(
         updatedAt: updated.updatedAt,
       },
     });
-  } catch (error: any) {
-    console.error('Update LinkedIn message status error:', error);
+  } catch (error) {
+    logger.error('Update LinkedIn message status error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update LinkedIn message status' },
+      { error: error instanceof Error ? error.message : 'Failed to update LinkedIn message status' },
       { status: 500 }
     );
   }
@@ -144,10 +145,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Delete LinkedIn message error:', error);
+  } catch (error) {
+    logger.error('Delete LinkedIn message error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to delete LinkedIn message' },
+      { error: error instanceof Error ? error.message : 'Failed to delete LinkedIn message' },
       { status: 500 }
     );
   }

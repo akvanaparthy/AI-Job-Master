@@ -142,10 +142,10 @@ export default function CoverLetterPage() {
         title: 'Success',
         description: 'Cover letter generated successfully!',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to generate cover letter',
+        description: error instanceof Error ? error.message : 'Failed to generate cover letter',
         variant: 'destructive',
       });
     } finally {
@@ -185,10 +185,10 @@ export default function CoverLetterPage() {
         title: 'Saved',
         description: 'Cover letter saved to history!',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to save cover letter',
+        description: error instanceof Error ? error.message : 'Failed to save cover letter',
         variant: 'destructive',
       });
     } finally {
@@ -216,10 +216,10 @@ export default function CoverLetterPage() {
         title: 'Removed',
         description: 'Cover letter removed from history',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to remove from history',
+        description: error instanceof Error ? error.message : 'Failed to remove from history',
         variant: 'destructive',
       });
     } finally {

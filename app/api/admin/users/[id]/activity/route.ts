@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -134,10 +135,10 @@ export async function GET(
         resumes: resumes.length,
       },
     });
-  } catch (error: any) {
-    console.error('Get user activity error:', error);
+  } catch (error) {
+    logger.error('Get user activity error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch user activity' },
+      { error: 'Failed to fetch user activity' },
       { status: 500 }
     );
   }

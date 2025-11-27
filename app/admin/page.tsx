@@ -75,8 +75,8 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error('Failed to load stats');
       const data = await response.json();
       setStats(data);
-    } catch (error: any) {
-      setError(error.message);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An error occurred');
     }
   }, [router]);
 

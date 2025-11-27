@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -158,10 +159,10 @@ export async function GET(req: NextRequest) {
         'Content-Disposition': `attachment; filename="job-applications-${new Date().toISOString().split('T')[0]}.csv"`,
       },
     });
-  } catch (error: any) {
-    console.error('Export history error:', error);
+  } catch (error) {
+    logger.error('Export history error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to export history' },
+      { error: 'Failed to export history' },
       { status: 500 }
     );
   }

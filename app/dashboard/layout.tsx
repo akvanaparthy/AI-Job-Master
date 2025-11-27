@@ -91,10 +91,10 @@ export default function DashboardLayout({
       
       router.push('/');
       router.refresh();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to logout',
+        description: error instanceof Error ? error.message : 'Failed to logout',
         variant: 'destructive',
       });
     }

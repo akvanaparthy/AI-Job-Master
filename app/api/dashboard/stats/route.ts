@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -202,10 +203,10 @@ export async function GET(req: NextRequest) {
       userType: dbUser.userType,
       recentActivity: allActivity,
     });
-  } catch (error: any) {
-    console.error('Dashboard stats error:', error);
+  } catch (error) {
+    logger.error('Dashboard stats error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch dashboard stats' },
+      { error: 'Failed to fetch dashboard stats' },
       { status: 500 }
     );
   }

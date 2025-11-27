@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -33,10 +34,10 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ limits });
-  } catch (error: any) {
-    console.error('Get usage limits error:', error);
+  } catch (error) {
+    logger.error('Get usage limits error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch usage limits' },
+      { error: 'Failed to fetch usage limits' },
       { status: 500 }
     );
   }
@@ -86,10 +87,10 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({ limit: updated });
-  } catch (error: any) {
-    console.error('Update usage limit error:', error);
+  } catch (error) {
+    logger.error('Update usage limit error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update usage limit' },
+      { error: 'Failed to update usage limit' },
       { status: 500 }
     );
   }

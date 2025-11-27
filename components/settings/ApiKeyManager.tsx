@@ -79,10 +79,10 @@ export default function ApiKeyManager() {
       setAnthropicKey('');
       setGeminiKey('');
 
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to save API keys',
         variant: 'destructive',
       });
     } finally {
@@ -119,10 +119,10 @@ export default function ApiKeyManager() {
       // Reload status to reflect changes
       await loadApiKeyStatus();
 
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to remove API key',
         variant: 'destructive',
       });
     } finally {

@@ -44,10 +44,10 @@ export default function AdminSettingsPage() {
 
       const data = await response.json();
       setLimits(data.limits);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to load usage limits',
+        description: error instanceof Error ? error.message : 'Failed to load usage limits',
         variant: 'destructive',
       });
     } finally {
@@ -66,10 +66,10 @@ export default function AdminSettingsPage() {
 
       const data = await response.json();
       setMisuseMessage(data.message);
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to load misuse message',
+        description: error instanceof Error ? error.message : 'Failed to load misuse message',
         variant: 'destructive',
       });
     }
@@ -100,10 +100,10 @@ export default function AdminSettingsPage() {
       });
 
       loadLimits();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to update usage limit',
+        description: error instanceof Error ? error.message : 'Failed to update usage limit',
         variant: 'destructive',
       });
     } finally {
@@ -155,10 +155,10 @@ export default function AdminSettingsPage() {
         title: 'Success',
         description: 'Misuse message updated successfully',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to update misuse message',
+        description: error instanceof Error ? error.message : 'Failed to update misuse message',
         variant: 'destructive',
       });
     } finally {

@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { encrypt, getAvailableModels } from '@/lib/encryption';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-export async function GET(req: NextRequest) {
+interface ApiKeyStatusResponse {
+  hasOpenaiKey: boolean;
+  hasAnthropicKey: boolean;
+  hasGeminiKey: boolean;
+}
+
+export async function GET(req: NextRequest): Promise<NextResponse<ApiKeyStatusResponse | { error: string }>> {
   try {
     const supabase = await createClient();
     const {
@@ -37,16 +44,31 @@ export async function GET(req: NextRequest) {
       hasAnthropicKey: !!dbUser.anthropicApiKey,
       hasGeminiKey: !!dbUser.geminiApiKey,
     });
-  } catch (error: any) {
-    console.error('Get API keys error:', error);
+  } catch (error) {
+    logger.error('Get API keys error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get API keys' },
+      { error: 'Failed to get API keys' },
       { status: 500 }
     );
   }
 }
 
-export async function POST(req: NextRequest) {
+interface ApiKeyUpdateRequest {
+  openaiApiKey?: string;
+  anthropicApiKey?: string;
+  geminiApiKey?: string;
+}
+
+interface ApiKeyUpdateData {
+  openaiApiKey?: string | null;
+  anthropicApiKey?: string | null;
+  geminiApiKey?: string | null;
+  openaiModels?: string[];
+  anthropicModels?: string[];
+  geminiModels?: string[];
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const supabase = await createClient();
     const {
@@ -57,11 +79,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await req.json();
+    let body: ApiKeyUpdateRequest;
+    try {
+      body = await req.json();
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
+
     const { openaiApiKey, anthropicApiKey, geminiApiKey } = body;
 
     // Prepare update data (only encrypt if key is provided)
-    const updateData: any = {};
+    const updateData: ApiKeyUpdateData = {};
 
     // OpenAI - encrypt key and fetch models
     if (openaiApiKey !== undefined) {
@@ -72,7 +103,7 @@ export async function POST(req: NextRequest) {
           const models = await getAvailableModels(openaiApiKey, 'openai');
           updateData.openaiModels = models;
         } catch (error) {
-          console.error('Failed to fetch OpenAI models:', error);
+          logger.error('Failed to fetch OpenAI models', error);
           return NextResponse.json(
             { error: 'Invalid OpenAI API key or failed to fetch models' },
             { status: 400 }
@@ -94,7 +125,7 @@ export async function POST(req: NextRequest) {
           const models = await getAvailableModels(anthropicApiKey, 'anthropic');
           updateData.anthropicModels = models;
         } catch (error) {
-          console.error('Failed to fetch Anthropic models:', error);
+          logger.error('Failed to fetch Anthropic models', error);
           return NextResponse.json(
             { error: 'Invalid Anthropic API key or failed to fetch models' },
             { status: 400 }
@@ -116,7 +147,7 @@ export async function POST(req: NextRequest) {
           const models = await getAvailableModels(geminiApiKey, 'gemini');
           updateData.geminiModels = models;
         } catch (error) {
-          console.error('Failed to fetch Gemini models:', error);
+          logger.error('Failed to fetch Gemini models', error);
           return NextResponse.json(
             { error: 'Invalid Gemini API key or failed to fetch models' },
             { status: 400 }
@@ -144,10 +175,10 @@ export async function POST(req: NextRequest) {
       success: true,
       message: 'API keys saved successfully',
     });
-  } catch (error: any) {
-    console.error('Save API keys error:', error);
+  } catch (error) {
+    logger.error('Save API keys error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to save API keys' },
+      { error: 'Failed to save API keys' },
       { status: 500 }
     );
   }

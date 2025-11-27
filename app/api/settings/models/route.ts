@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { decrypt } from '@/lib/encryption';
 import { getAvailableModels } from '@/lib/encryption';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -71,10 +72,10 @@ export async function GET(req: NextRequest) {
       provider,
       models,
     });
-  } catch (error: any) {
-    console.error('Get models error:', error);
+  } catch (error) {
+    logger.error('Get models error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get available models' },
+      { error: error instanceof Error ? error.message : 'Failed to get available models' },
       { status: 500 }
     );
   }

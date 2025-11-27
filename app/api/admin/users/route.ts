@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -103,10 +104,10 @@ export async function GET(req: NextRequest) {
         totalPages: Math.ceil(totalCount / limit),
       },
     });
-  } catch (error: any) {
-    console.error('Admin get users error:', error);
+  } catch (error) {
+    logger.error('Admin get users error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch users' },
+      { error: 'Failed to fetch users' },
       { status: 500 }
     );
   }
@@ -157,10 +158,10 @@ export async function PUT(req: NextRequest) {
     });
 
     return NextResponse.json({ user: updated });
-  } catch (error: any) {
-    console.error('Admin update user error:', error);
+  } catch (error) {
+    logger.error('Admin update user error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update user' },
+      { error: 'Failed to update user' },
       { status: 500 }
     );
   }

@@ -135,10 +135,10 @@ export default function ResumeManager() {
 
       // Reload resumes
       await loadResumes();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to upload resume',
         variant: 'destructive',
       });
     } finally {
@@ -167,10 +167,10 @@ export default function ResumeManager() {
       });
 
       await loadResumes();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to delete resume',
         variant: 'destructive',
       });
     }
@@ -195,10 +195,10 @@ export default function ResumeManager() {
       });
 
       await loadResumes();
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to set default resume',
         variant: 'destructive',
       });
     }

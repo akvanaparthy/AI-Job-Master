@@ -87,10 +87,10 @@ export default function CustomPromptsManager() {
         title: 'Success',
         description: 'Custom prompts saved successfully!',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to save prompts',
         variant: 'destructive',
       });
     } finally {

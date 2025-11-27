@@ -7,6 +7,7 @@ import { getLinkedInPrompt } from '@/lib/ai/prompts';
 import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length, LinkedInMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -240,10 +241,10 @@ export async function POST(req: NextRequest) {
       messageId: messageId,
       saved: saveToHistory,
     });
-  } catch (error: any) {
-    console.error('LinkedIn message generation error:', error);
+  } catch (error) {
+    logger.error('LinkedIn message generation error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate LinkedIn message' },
+      { error: 'Failed to generate LinkedIn message' },
       { status: 500 }
     );
   }

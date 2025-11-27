@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,10 +29,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Delete LinkedIn message error:', error);
+  } catch (error) {
+    logger.error('Delete LinkedIn message error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to delete LinkedIn message' },
+      { error: 'Failed to delete LinkedIn message' },
       { status: 500 }
     );
   }

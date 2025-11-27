@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -33,10 +34,10 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ resumes });
-  } catch (error: any) {
-    console.error('Get resumes error:', error);
+  } catch (error) {
+    logger.error('Get resumes error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get resumes' },
+      { error: error instanceof Error ? error.message : 'Failed to get resumes' },
       { status: 500 }
     );
   }
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('Supabase storage upload error:', uploadError);
+      logger.error('Supabase storage upload error:', uploadError);
       return NextResponse.json(
         { error: 'Failed to upload resume file to storage' },
         { status: 500 }
@@ -139,10 +140,10 @@ export async function POST(req: NextRequest) {
         createdAt: resume.createdAt,
       },
     });
-  } catch (error: any) {
-    console.error('Upload resume error:', error);
+  } catch (error) {
+    logger.error('Upload resume error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to upload resume' },
+      { error: error instanceof Error ? error.message : 'Failed to upload resume' },
       { status: 500 }
     );
   }
@@ -196,7 +197,7 @@ export async function DELETE(req: NextRequest) {
           await supabase.storage.from('resumes').remove([filePath]);
         }
       } catch (storageError) {
-        console.error('Failed to delete file from storage:', storageError);
+        logger.error('Failed to delete file from storage:', storageError);
         // Continue with database deletion even if storage deletion fails
       }
     }
@@ -222,10 +223,10 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Delete resume error:', error);
+  } catch (error) {
+    logger.error('Delete resume error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to delete resume' },
+      { error: error instanceof Error ? error.message : 'Failed to delete resume' },
       { status: 500 }
     );
   }
@@ -248,7 +249,7 @@ async function extractTextFromFile(file: File): Promise<string> {
       const data = await pdf(pdfBuffer);
       return data.text.trim();
     } catch (error) {
-      console.error('PDF parsing error:', error);
+      logger.error('PDF parsing error:', error);
       throw new Error('Failed to parse PDF file. Please ensure it is a valid PDF document.');
     }
   }
@@ -260,7 +261,7 @@ async function extractTextFromFile(file: File): Promise<string> {
       const result = await mammoth.extractRawText({ buffer: docxBuffer });
       return result.value.trim();
     } catch (error) {
-      console.error('DOCX parsing error:', error);
+      logger.error('DOCX parsing error:', error);
       throw new Error('Failed to parse DOCX file. Please ensure it is a valid Word document.');
     }
   }

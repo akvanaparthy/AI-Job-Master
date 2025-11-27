@@ -6,6 +6,7 @@ import { generateContent, getProviderFromModel } from '@/lib/ai/providers';
 import { getCoverLetterPrompt } from '@/lib/ai/prompts';
 import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length } from '@prisma/client';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -164,10 +165,10 @@ export async function POST(req: NextRequest) {
       id: coverLetterId,
       saved: saveToHistory,
     });
-  } catch (error: any) {
-    console.error('Cover letter generation error:', error);
+  } catch (error) {
+    logger.error('Cover letter generation error', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate cover letter' },
+      { error: 'Failed to generate cover letter' },
       { status: 500 }
     );
   }

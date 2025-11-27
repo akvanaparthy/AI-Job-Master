@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/db/prisma';
 import { MISUSE_MARKER } from './prompts';
+import { logger } from '@/lib/logger';
 
 /**
  * Default misuse message shown to users
@@ -33,7 +34,7 @@ export async function getMisuseMessage(): Promise<string> {
 
     return DEFAULT_MISUSE_MESSAGE;
   } catch (error) {
-    console.error('Error fetching misuse message:', error);
+    logger.error('Error fetching misuse message', error);
     return DEFAULT_MISUSE_MESSAGE;
   }
 }

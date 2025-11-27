@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -74,10 +75,10 @@ export async function GET(req: NextRequest) {
         gemini: usersWithGemini,
       },
     });
-  } catch (error: any) {
-    console.error('Admin get stats error:', error);
+  } catch (error) {
+    logger.error('Admin get stats error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch statistics' },
+      { error: 'Failed to fetch statistics' },
       { status: 500 }
     );
   }

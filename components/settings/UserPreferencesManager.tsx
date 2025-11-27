@@ -92,10 +92,10 @@ export default function UserPreferencesManager() {
         title: 'Success',
         description: 'Preferences saved successfully!',
       });
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Error',
-        description: error.message,
+        description: error instanceof Error ? error.message : 'Failed to save preferences',
         variant: 'destructive',
       });
     } finally {

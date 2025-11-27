@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -40,10 +41,10 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json({ notifications });
-  } catch (error: any) {
-    console.error('Get notifications error:', error);
+  } catch (error) {
+    logger.error('Get notifications error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch notifications' },
+      { error: error instanceof Error ? error.message : 'Failed to fetch notifications' },
       { status: 500 }
     );
   }
@@ -85,10 +86,10 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Update notification error:', error);
+  } catch (error) {
+    logger.error('Update notification error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update notification' },
+      { error: error instanceof Error ? error.message : 'Failed to update notification' },
       { status: 500 }
     );
   }
