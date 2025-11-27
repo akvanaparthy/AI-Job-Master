@@ -395,7 +395,7 @@ export default function AdminSettingsPage() {
               <div className="flex-1">
                 <h3 className="text-xl font-semibold text-slate-900 mb-1">Custom Misuse Message</h3>
                 <p className="text-sm text-slate-600">
-                  This message is shown to users when the AI detects they're trying to use custom prompts for non-career purposes
+                  This message is shown to users when the AI detects they&apos;re trying to use custom prompts for non-career purposes
                 </p>
               </div>
             </div>
@@ -463,7 +463,7 @@ export default function AdminSettingsPage() {
           <ul className="text-sm text-slate-700 space-y-2">
             <li>• The system automatically detects when custom prompts are used for non-job/career purposes</li>
             <li>• Users attempting to generate essays, stories, or other non-career content will see this message</li>
-            <li>• This protection is <strong>invisible to users</strong> - they won't see the security rules in their prompts</li>
+            <li>• This protection is <strong>invisible to users</strong> - they won&apos;t see the security rules in their prompts</li>
             <li>• The message is <strong>configurable</strong> so you can adjust the tone and wording as needed</li>
             <li>• Detection happens instantly and prevents misuse while maintaining a friendly user experience</li>
           </ul>
