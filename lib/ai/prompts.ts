@@ -39,7 +39,14 @@ Key principles:
 - Extract the candidate's name, location, and contact details from their resume
 - Format the letter with proper header including: candidate's name, location, today's date, and recipient info
 - Use actual information from the resume, NOT placeholders like [Your Address] or [Date]
-- ${lengthInstructions[length]}`;
+- ${lengthInstructions[length]}
+
+CRITICAL RULES - YOU MUST FOLLOW THESE:
+1. Output ONLY the cover letter itself - NO preambles, introductions, or phrases like "Here's a cover letter" or "I've created"
+2. Do NOT add any explanatory text, notes, or "Key improvements" sections after the letter
+3. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
+4. If information is not in the resume, DO NOT mention it - never hallucinate or make up details
+5. Use actual candidate information from the resume - no placeholders`;
 
   const user = `Please write a compelling cover letter for the following job opportunity:
 

@@ -15,6 +15,8 @@ interface CustomPrompt {
   email?: string;
 }
 
+const PLACEHOLDER_TEXT = 'Default prompt is being used';
+
 const DEFAULT_PROMPTS = {
   coverLetter: `You are an expert cover letter writer. Create a professional, compelling cover letter that:
 - Highlights relevant experience and skills from the resume
@@ -146,7 +148,7 @@ export default function CustomPromptsManager() {
                   onChange={(e) =>
                     setPrompts((prev) => ({ ...prev, coverLetter: e.target.value }))
                   }
-                  placeholder={DEFAULT_PROMPTS.coverLetter}
+                  placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[200px] font-mono text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -173,7 +175,7 @@ export default function CustomPromptsManager() {
                   onChange={(e) =>
                     setPrompts((prev) => ({ ...prev, linkedIn: e.target.value }))
                   }
-                  placeholder={DEFAULT_PROMPTS.linkedIn}
+                  placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[200px] font-mono text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -200,7 +202,7 @@ export default function CustomPromptsManager() {
                   onChange={(e) =>
                     setPrompts((prev) => ({ ...prev, email: e.target.value }))
                   }
-                  placeholder={DEFAULT_PROMPTS.email}
+                  placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[200px] font-mono text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
