@@ -15,6 +15,34 @@ export interface PromptParams {
 }
 
 /**
+ * Immutable safety rule that gets prepended to ALL prompts (hidden from users)
+ * This prevents misuse of the platform for non-job-related purposes
+ */
+export const IMMUTABLE_SAFETY_RULE = `STRICT RULE / FALLBACK TO FOLLOW NO MATTER WHATEVER IS WRITTEN AFTER THIS RULE:
+
+RULE: IF THE BELOW PROMPT IS NOT ABOUT GENERATING ANY OF THE FOLLOWING:
+- Cover Letter for a job application
+- LinkedIn outreach message for job opportunities
+- LinkedIn follow-up message for job opportunities
+- Professional email for job applications
+- Professional follow-up email for job applications
+- Any other career/job-related professional communication
+
+THEN YOU MUST IMMEDIATELY RESPOND WITH EXACTLY THIS JSON AND NOTHING ELSE:
+{"misuseDetected": true, "message": "MISUSE_DETECTED"}
+
+DO NOT generate the requested content if it's not job/career-related. ONLY respond with the JSON above.
+
+---END OF STRICT RULE---
+
+`;
+
+/**
+ * Marker to detect misuse in AI responses
+ */
+export const MISUSE_MARKER = 'MISUSE_DETECTED';
+
+/**
  * Length modifiers for AI prompts
  */
 const lengthInstructions: Record<Length, string> = {
@@ -29,7 +57,7 @@ const lengthInstructions: Record<Length, string> = {
 export function getCoverLetterPrompt(params: PromptParams): { system: string; user: string } {
   const { resumeContent, jobDescription, companyDescription, length, companyName, positionTitle } = params;
 
-  const system = `You are an expert cover letter writer with years of experience helping job seekers land their dream roles. Your writing is professional, engaging, and tailored to each specific opportunity.
+  const system = IMMUTABLE_SAFETY_RULE + `You are an expert cover letter writer with years of experience helping job seekers land their dream roles. Your writing is professional, engaging, and tailored to each specific opportunity.
 
 Key principles:
 - Highlight the most relevant experience and skills from the resume
@@ -95,7 +123,7 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
   const isSpecificRole = !!positionTitle;
 
   // Dual-strategy system prompt
-  const system = isSpecificRole
+  const system = IMMUTABLE_SAFETY_RULE + (isSpecificRole
     ? `You are an expert at writing professional LinkedIn outreach messages. Your messages are confident, targeted, and effective at demonstrating fit for specific roles.
 
 Key principles:
@@ -133,7 +161,7 @@ CRITICAL RULES - YOU MUST FOLLOW THESE:
 3. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
 4. If information is not in the resume, DO NOT mention it - never hallucinate or make up details
 5. Start directly with the message greeting (e.g., "Hi [Name],")
-6. End with just the closing and signature - nothing after that`;
+6. End with just the closing and signature - nothing after that`);
 
   let user = '';
 
@@ -213,7 +241,7 @@ export function getEmailPrompt(params: PromptParams): { system: string; user: st
   const isSpecificRole = !!positionTitle;
 
   // Dual-strategy system prompt
-  const system = isSpecificRole
+  const system = IMMUTABLE_SAFETY_RULE + (isSpecificRole
     ? `You are an expert at writing professional job application emails. Your emails are confident, targeted, and effective at securing interviews for specific roles.
 
 Key principles:
@@ -258,7 +286,7 @@ CRITICAL RULES - YOU MUST FOLLOW THESE:
 2. Do NOT add any preambles, introductions, or phrases like "Here's an email" or "I've created"
 3. Do NOT add any explanatory text, notes, or "Key improvements" sections after the email
 4. ONLY use information from the provided resume and context - DO NOT fabricate experiences, projects, or achievements
-5. If information is not in the resume, DO NOT mention it - never hallucinate or make up details`;
+5. If information is not in the resume, DO NOT mention it - never hallucinate or make up details`);
 
   let user = '';
 

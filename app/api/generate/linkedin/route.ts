@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { decrypt } from '@/lib/encryption';
 import { generateContent, getProviderFromModel } from '@/lib/ai/providers';
 import { getLinkedInPrompt } from '@/lib/ai/prompts';
+import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length, LinkedInMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 
@@ -186,6 +187,18 @@ export async function POST(req: NextRequest) {
       maxTokens: 500,
       temperature: 0.7,
     });
+
+    // Check for misuse
+    if (detectMisuse(generatedContent)) {
+      const misuseMessage = await getMisuseMessage();
+      return NextResponse.json({
+        success: true,
+        content: misuseMessage,
+        id: null,
+        messageId: null,
+        saved: false,
+      });
+    }
 
     // Save to database only if requested
     let linkedInMessageId = null;
