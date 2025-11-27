@@ -283,7 +283,7 @@ export default function AdminSettingsPage() {
                     {/* Max Activities */}
                     <div className="space-y-2">
                       <Label htmlFor={`max-${limit.userType}`} className="text-sm font-medium text-slate-900">
-                        Maximum Activities
+                        Maximum Monthly Activities
                       </Label>
                       <div className="flex items-center gap-4">
                         <Input
@@ -298,11 +298,11 @@ export default function AdminSettingsPage() {
                         <span className="text-sm text-slate-600">
                           {limit.userType === 'ADMIN'
                             ? 'Unlimited activities'
-                            : `${limit.maxActivities === 0 ? 'Unlimited' : limit.maxActivities} activities allowed`}
+                            : `${limit.maxActivities === 0 ? 'Unlimited' : limit.maxActivities} activities per month`}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500">
-                        Set to 0 for unlimited activities. This counts cover letters, LinkedIn messages, and emails.
+                        Set to 0 for unlimited. Resets every 30 days. Counts cover letters, LinkedIn messages, and emails (excluding follow-ups by default).
                       </p>
                     </div>
 

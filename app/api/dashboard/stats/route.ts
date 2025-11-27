@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
 import { logger } from '@/lib/logger';
+import { getMonthlyActivityCount, getDaysUntilReset } from '@/lib/activity-tracker';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -21,10 +22,13 @@ export async function GET(req: NextRequest) {
     // Ensure user exists in database
     await ensureUserExists(user);
 
-    // Get user data including userType
+    // Get user data including userType and reset date
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { userType: true },
+      select: { 
+        userType: true,
+        monthlyResetDate: true,
+      },
     });
 
     if (!dbUser) {
@@ -38,6 +42,10 @@ export async function GET(req: NextRequest) {
 
     const maxActivities = usageLimitSettings?.maxActivities || 100;
     const includeFollowups = usageLimitSettings?.includeFollowups || false;
+
+    // Get monthly activity count from history
+    const monthlyCount = await getMonthlyActivityCount(user.id);
+    const daysUntilReset = getDaysUntilReset(dbUser.monthlyResetDate);
 
     // Get counts for each type (excluding followups if configured)
     const [coverLetterCount, linkedInCount, emailCount, recentActivity] = await Promise.all([
@@ -189,14 +197,19 @@ export async function GET(req: NextRequest) {
       (coverLetterCount * 0.5 + linkedInCount * 0.25 + emailCount * 0.33) * 10
     ) / 10;
 
-    // Usage percentage based on user's limit
-    const usagePercentage = Math.min(Math.round((totalGenerated / maxActivities) * 100), 100);
+    // Usage percentage based on monthly activity count and user's limit
+    const usagePercentage = maxActivities > 0 
+      ? Math.min(Math.round((monthlyCount / maxActivities) * 100), 100)
+      : 0;
 
     return NextResponse.json({
       totalCoverLetters: coverLetterCount,
       totalLinkedInMessages: linkedInCount,
       totalEmails: emailCount,
-      totalGenerated,
+      totalGenerated: coverLetterCount + linkedInCount + emailCount,
+      monthlyCount,
+      monthlyLimit: maxActivities,
+      daysUntilReset,
       hoursSaved,
       usagePercentage,
       maxActivities,

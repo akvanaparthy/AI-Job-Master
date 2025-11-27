@@ -647,7 +647,11 @@ export default function DashboardPage() {
                     </>
                   ) : (
                     <>
-                      <AnimatedNumber value={totalGenerated} /> items used of {stats?.maxActivities || 0}
+                      <AnimatedNumber value={stats?.monthlyCount || 0} /> of {stats?.monthlyLimit || 0} this month
+                      <br />
+                      <span className="text-xs text-slate-500">
+                        Resets in {stats?.daysUntilReset || 0} days
+                      </span>
                     </>
                   )}
                 </p>

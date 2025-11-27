@@ -9,6 +9,7 @@ import { Length, EmailMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
+import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -67,6 +68,24 @@ export async function POST(req: NextRequest) {
       status,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
+
+    // Check monthly activity limit (only for NEW messages, not follow-ups)
+    if (messageType === 'NEW') {
+      const activityCheck = await canCreateActivity(user.id);
+      if (!activityCheck.allowed) {
+        const daysLeft = getDaysUntilReset(activityCheck.resetDate);
+        return NextResponse.json(
+          {
+            error: `Monthly activity limit reached (${activityCheck.currentCount}/${activityCheck.limit}). Resets in ${daysLeft} days.`,
+            limitReached: true,
+            currentCount: activityCheck.currentCount,
+            limit: activityCheck.limit,
+            daysUntilReset: daysLeft,
+          },
+          { status: 429 }
+        );
+      }
+    }
 
     // Validate required fields
     if (!recipientEmail || !companyName || !llmModel || !messageType) {
@@ -260,6 +279,18 @@ export async function POST(req: NextRequest) {
         },
       });
       emailMessageId = emailMessage.id;
+
+      // Track activity in history (only for NEW messages)
+      if (messageType === 'NEW') {
+        await trackActivity({
+          userId: user.id,
+          activityType: 'EMAIL_MESSAGE',
+          companyName: companyName || 'Unknown Company',
+          positionTitle,
+          recipient: recipientEmail,
+          llmModel,
+        });
+      }
     }
 
     return NextResponse.json({

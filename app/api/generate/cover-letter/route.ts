@@ -8,6 +8,7 @@ import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
+import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -44,6 +45,22 @@ export async function POST(req: NextRequest) {
             'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
           },
         }
+      );
+    }
+
+    // Check monthly activity limit
+    const activityCheck = await canCreateActivity(user.id);
+    if (!activityCheck.allowed) {
+      const daysLeft = getDaysUntilReset(activityCheck.resetDate);
+      return NextResponse.json(
+        {
+          error: `Monthly activity limit reached (${activityCheck.currentCount}/${activityCheck.limit}). Resets in ${daysLeft} days.`,
+          limitReached: true,
+          currentCount: activityCheck.currentCount,
+          limit: activityCheck.limit,
+          daysUntilReset: daysLeft,
+        },
+        { status: 429 }
       );
     }
 
@@ -181,6 +198,15 @@ export async function POST(req: NextRequest) {
         },
       });
       coverLetterId = coverLetter.id;
+
+      // Track activity in history
+      await trackActivity({
+        userId: user.id,
+        activityType: 'COVER_LETTER',
+        companyName: companyName || 'Unknown Company',
+        positionTitle,
+        llmModel,
+      });
     }
 
     return NextResponse.json({

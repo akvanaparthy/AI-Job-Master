@@ -5,21 +5,21 @@ const prisma = new PrismaClient();
 async function seedUsageLimits() {
   console.log('Seeding usage limits...');
 
-  // Default limits for each user type
+  // Default monthly limits for each user type
   const defaultLimits = [
     {
       userType: UserType.FREE,
-      maxActivities: 100,
+      maxActivities: 100, // 100 activities per month
       includeFollowups: false,
     },
     {
       userType: UserType.PLUS,
-      maxActivities: 500,
+      maxActivities: 500, // 500 activities per month
       includeFollowups: false,
     },
     {
       userType: UserType.ADMIN,
-      maxActivities: 999999, // Unlimited for admins
+      maxActivities: 0, // 0 = Unlimited for admins
       includeFollowups: false,
     },
   ];
@@ -30,7 +30,8 @@ async function seedUsageLimits() {
       update: {}, // Don't update if exists
       create: limit,
     });
-    console.log(`✅ ${limit.userType}: ${result.maxActivities} activities`);
+    const displayLimit = result.maxActivities === 0 ? 'Unlimited' : `${result.maxActivities}/month`;
+    console.log(`✅ ${limit.userType}: ${displayLimit}`);
   }
 
   console.log('✅ Usage limits seeded successfully!');

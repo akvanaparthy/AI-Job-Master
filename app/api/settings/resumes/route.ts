@@ -58,14 +58,22 @@ export async function POST(req: NextRequest) {
     // Ensure user exists in database
     await ensureUserExists(user);
 
+    // Get user type to determine resume limit
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { userType: true },
+    });
+
+    const maxResumes = dbUser?.userType === 'PLUS' ? 8 : dbUser?.userType === 'ADMIN' ? 999 : 3;
+
     // Check current resume count
     const resumeCount = await prisma.resume.count({
       where: { userId: user.id },
     });
 
-    if (resumeCount >= 3) {
+    if (resumeCount >= maxResumes) {
       return NextResponse.json(
-        { error: 'Maximum of 3 resumes allowed' },
+        { error: `Maximum of ${maxResumes} resumes allowed for ${dbUser?.userType} users` },
         { status: 400 }
       );
     }

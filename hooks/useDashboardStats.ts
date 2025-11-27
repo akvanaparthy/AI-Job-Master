@@ -4,6 +4,10 @@ export interface DashboardStats {
   totalCoverLetters: number;
   totalLinkedInMessages: number;
   totalEmails: number;
+  totalGenerated: number;
+  monthlyCount: number;
+  monthlyLimit: number;
+  daysUntilReset: number;
   hoursSaved: number;
   usagePercentage: number;
   maxActivities: number;

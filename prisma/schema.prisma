@@ -27,12 +27,14 @@ model User {
   userType             UserType          @default(FREE)
   isAdmin              Boolean           @default(false)
   followupReminderDays Int               @default(7)
+  monthlyResetDate     DateTime          @default(now())
   coverLetters         CoverLetter[]
   customPrompts        CustomPrompt[]
   emailMessages        EmailMessage[]
   linkedinMessages     LinkedInMessage[]
   notifications        Notification[]
   resumes              Resume[]
+  activityHistory      ActivityHistory[]
 
   @@map("users")
 }
@@ -196,6 +198,30 @@ model Notification {
   @@index([userId, isRead])
   @@index([userId, createdAt])
   @@map("notifications")
+}
+
+model ActivityHistory {
+  id             String              @id @default(uuid())
+  userId         String
+  activityType   ActivityType
+  companyName    String
+  positionTitle  String?
+  recipient      String?
+  status         ApplicationStatus?
+  llmModel       String?
+  isDeleted      Boolean             @default(false)
+  createdAt      DateTime            @default(now())
+  user           User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, activityType])
+  @@map("activity_history")
+}
+
+enum ActivityType {
+  COVER_LETTER
+  LINKEDIN_MESSAGE
+  EMAIL_MESSAGE
 }
 
 enum NotificationType {

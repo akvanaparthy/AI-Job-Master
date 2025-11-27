@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Mail, MessageSquare, History, Settings, User, LayoutDashboard, KeyRound, LogOut, ChevronDown, Shield, Crown, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FileText, Mail, MessageSquare, History, Settings, User, LayoutDashboard, KeyRound, LogOut, ChevronDown, Shield, Crown, Menu, X, ChevronLeft, ChevronRight, FolderKanban, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -23,7 +23,8 @@ const navigation = [
   { name: 'Cover Letter', href: '/dashboard/cover-letter', icon: FileText },
   { name: 'LinkedIn', href: '/dashboard/linkedin', icon: MessageSquare },
   { name: 'Email', href: '/dashboard/email', icon: Mail },
-  { name: 'History', href: '/dashboard/history', icon: History },
+  { name: 'Manage', href: '/dashboard/manage', icon: FolderKanban },
+  { name: 'Activity History', href: '/dashboard/activity-history', icon: Clock },
 ];
 
 export default function DashboardLayout({
