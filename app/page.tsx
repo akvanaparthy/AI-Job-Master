@@ -23,12 +23,22 @@ import {
 
 export default function Home() {
   const [userCount, setUserCount] = useState('10,000+');
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     fetch('/api/public/stats')
       .then(res => res.json())
       .then(data => setUserCount(data.displayCount))
       .catch(() => setUserCount('10,000+'));
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#e5d9f2] via-[#f0eaf9] to-[#cfe2f3] relative overflow-hidden">
@@ -38,56 +48,131 @@ export default function Home() {
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-blue-200 rounded-full blur-[100px]" />
       </div>
 
-      {/* Navigation */}
-      <nav className="relative z-50 pt-6 pb-4 px-6">
-        <div className="max-w-7xl mx-auto">
+      {/* Navigation - Liquid Glass Design */}
+      <motion.nav
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-700 ease-out ${
+          scrolled ? 'pt-3 pb-2' : 'pt-6 pb-4'
+        }`}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <div className={`mx-auto px-6 transition-all duration-700 ${
+          scrolled ? 'max-w-5xl px-8' : 'max-w-7xl px-6'
+        }`}>
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/90 backdrop-blur-sm rounded-[32px] px-8 py-4 shadow-lg"
+            className={`relative overflow-hidden rounded-[32px] transition-all duration-700 ${
+              scrolled ? 'shadow-lg' : 'shadow-md bg-white/85'
+            }`}
+            style={{
+              background: scrolled
+                ? 'linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(243,232,255,0.55) 25%, rgba(219,234,254,0.5) 50%, rgba(255,255,255,0.45) 100%)'
+                : undefined,
+              backdropFilter: scrolled ? 'blur(16px) saturate(160%)' : 'blur(10px) saturate(120%)',
+              WebkitBackdropFilter: scrolled ? 'blur(16px) saturate(160%)' : 'blur(10px) saturate(120%)',
+            }}
           >
-            <div className="flex items-center justify-between">
+            {/* Liquid gradient overlay */}
+            <div className={`absolute inset-0 transition-opacity duration-700 ${
+              scrolled ? 'opacity-20' : 'opacity-[0.08]'
+            }`}>
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: 'radial-gradient(circle at 20% 50%, rgba(168,85,247,0.3) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(59,130,246,0.3) 0%, transparent 50%)',
+                  animation: 'liquid-flow 8s ease-in-out infinite',
+                }}
+              />
+            </div>
+
+            {/* Subtle border */}
+            <div
+              className="absolute inset-0 rounded-[32px] opacity-30"
+              style={{
+                background: 'linear-gradient(135deg, rgba(168,85,247,0.1) 0%, rgba(59,130,246,0.1) 100%)',
+                padding: '1px',
+                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'xor',
+                maskComposite: 'exclude',
+              }}
+            />
+
+            <div className={`relative flex items-center justify-between transition-all duration-700 ${
+              scrolled ? 'px-6 py-2.5' : 'px-8 py-4'
+            }`}>
               {/* Logo - Left side */}
-              <div className="flex items-center gap-2">
-                <div className="bg-slate-900 rounded-xl px-3 py-1.5">
-                  <Briefcase className="w-5 h-5 text-white" />
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl flex items-center justify-center shadow-lg px-3 py-1.5">
+                  <Briefcase className="text-white w-5 h-5" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-[17px] font-bold text-slate-900 leading-tight">AI Job</span>
-                  <span className="text-[17px] font-bold text-slate-900 leading-tight">Master</span>
+                  <span className="font-bold text-slate-900 leading-tight text-[17px]">AI Job</span>
+                  <span className="font-bold text-slate-900 leading-tight text-[17px]">Master</span>
                 </div>
               </div>
 
               {/* Nav Links - Center */}
               <div className="hidden md:flex items-center gap-12">
-                <a href="#features" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                  Features
-                </a>
-                <a href="#how-it-works" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                  How It Works
-                </a>
-                <a href="#about" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                  About
-                </a>
-                <a href="#pricing" className="text-[15px] font-medium text-slate-800 hover:text-slate-900 transition-colors">
-                  Pricing
-                </a>
+                {['Features', 'How It Works', 'About', 'Pricing'].map((item, index) => (
+                  <motion.a
+                    key={item}
+                    href={`#${item.toLowerCase().replace(' ', '-')}`}
+                    className="font-medium text-slate-800 hover:text-slate-900 transition-all duration-300 relative group whitespace-nowrap text-[15px]"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    {item}
+                    <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-600 group-hover:w-full transition-all duration-300" />
+                  </motion.a>
+                ))}
               </div>
 
-              {/* CTA Button - Right side */}
-              <Link
-                href="/auth/signup"
-                className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-[15px] font-semibold px-8 py-3.5 rounded-[20px] shadow-lg transition-all duration-200"
-              >
-                Get Started
-              </Link>
+              {/* CTA Button - Right side with gradient outline on hover */}
+              <div className="relative group flex-shrink-0">
+                {/* Animated gradient outline */}
+                <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 animate-gradient-shift" />
+                <Link
+                  href="/auth/signup"
+                  className="relative inline-block bg-slate-900 text-white font-semibold rounded-[20px] shadow-lg transition-all duration-300 hover:shadow-xl text-[15px] px-8 py-3.5"
+                >
+                  Get Started
+                </Link>
+              </div>
             </div>
           </motion.div>
         </div>
-      </nav>
+
+        {/* Add CSS keyframes for animations */}
+        <style jsx>{`
+          @keyframes liquid-flow {
+            0%, 100% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+          }
+
+          @keyframes gradient-shift {
+            0% {
+              background-position: 0% 50%;
+            }
+            50% {
+              background-position: 100% 50%;
+            }
+            100% {
+              background-position: 0% 50%;
+            }
+          }
+
+          .animate-gradient-shift {
+            background-size: 200% 200%;
+            animation: gradient-shift 3s ease infinite;
+          }
+        `}</style>
+      </motion.nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 min-h-[calc(100vh-100px)] flex items-center px-6 pb-32">
+      <section className="relative z-10 min-h-screen flex items-center px-6 pb-32 pt-32">
         <div className="max-w-5xl mx-auto text-center w-full">
           {/* Social Proof with Avatars */}
           <motion.div
@@ -156,12 +241,16 @@ export default function Home() {
             transition={{ delay: 0.6 }}
             className="mb-20"
           >
-            <Link
-              href="/auth/signup"
-              className="inline-block bg-slate-900 hover:bg-slate-800 text-white text-[16px] font-semibold px-10 py-4 rounded-[22px] shadow-2xl transition-all duration-200"
-            >
-              Start For Free
-            </Link>
+            <div className="relative group inline-block">
+              {/* Animated gradient outline - tighter */}
+              <div className="absolute -inset-[1.5px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[23px] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500 animate-gradient-shift" />
+              <Link
+                href="/auth/signup"
+                className="relative inline-block bg-slate-900 text-white text-[16px] font-semibold px-10 py-4 rounded-[22px] shadow-2xl transition-all duration-300 hover:shadow-3xl"
+              >
+                Start For Free
+              </Link>
+            </div>
           </motion.div>
 
           {/* Stats Cards - Tilted like in reference */}
@@ -564,7 +653,7 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-12">
             <Link
               href="/auth/signup"
-              className="inline-block bg-white text-purple-600 hover:bg-slate-50 text-lg font-bold px-12 py-4 rounded-[22px] shadow-2xl transition-all"
+              className="inline-block bg-white text-purple-600 text-lg font-bold px-12 py-4 rounded-[22px] shadow-2xl transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)]"
             >
               Start Free Today
             </Link>
