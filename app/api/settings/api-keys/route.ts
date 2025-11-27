@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { encrypt, getAvailableModels } from '@/lib/encryption';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   try {

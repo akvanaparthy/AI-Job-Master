@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
   try {

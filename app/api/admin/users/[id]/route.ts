@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { UserType } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // PATCH - Update user type (Admin only)
 export async function PATCH(

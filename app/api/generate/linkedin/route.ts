@@ -8,6 +8,7 @@ import { Length, LinkedInMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {

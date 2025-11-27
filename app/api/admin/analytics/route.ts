@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 
 // Mark this route as dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET - Get platform analytics (Admin only)
 export async function GET(req: NextRequest) {

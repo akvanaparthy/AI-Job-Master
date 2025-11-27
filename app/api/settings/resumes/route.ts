@@ -6,6 +6,7 @@ import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET - Fetch all resumes for the user
 export async function GET(req: NextRequest) {

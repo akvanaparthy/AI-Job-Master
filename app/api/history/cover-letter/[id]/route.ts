@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET - Fetch a single cover letter
 export async function GET(

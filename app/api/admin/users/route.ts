@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 // GET - List all users (Admin only)
 export async function GET(req: NextRequest) {

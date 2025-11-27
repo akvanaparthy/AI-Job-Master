@@ -7,6 +7,7 @@ import { getCoverLetterPrompt } from '@/lib/ai/prompts';
 import { Length } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
   try {
