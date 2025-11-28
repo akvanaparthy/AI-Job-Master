@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut, Clock, Activity, ArrowUpRight, Key } from 'lucide-react';
+import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut, Clock, Activity, ArrowUpRight, Key, Database } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
 import { logger } from '@/lib/logger';
+import { useToast } from '@/hooks/use-toast';
 
 // Animated number component
 function AnimatedNumber({ value }: { value: number }) {
@@ -59,11 +60,13 @@ interface RecentUser {
 
 export default function AdminDashboard() {
   const router = useRouter();
+  const { toast } = useToast();
   const [stats, setStats] = useState<Stats | null>(null);
   const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [userEmail, setUserEmail] = useState<string>('');
+  const [backfilling, setBackfilling] = useState(false);
   const supabase = createClient();
 
   const loadStats = useCallback(async () => {
@@ -92,6 +95,42 @@ export default function AdminDashboard() {
       logger.error('Failed to load recent users', error);
     }
   }, []);
+
+  const handleBackfillActivity = async () => {
+    if (!confirm('This will backfill the activity history with all existing cover letters, LinkedIn messages, and email messages. Continue?')) {
+      return;
+    }
+
+    setBackfilling(true);
+    try {
+      const response = await fetch('/api/admin/backfill-activity', {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to backfill activity history');
+      }
+
+      const data = await response.json();
+      toast({
+        title: 'Success',
+        description: data.message || `Backfilled ${data.backfilledCount} records`,
+      });
+
+      // Reload stats
+      await loadStats();
+    } catch (error: any) {
+      logger.error('Backfill error', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to backfill activity history',
+        variant: 'destructive',
+      });
+    } finally {
+      setBackfilling(false);
+    }
+  };
 
   useEffect(() => {
     Promise.all([loadStats(), loadRecentUsers()]).finally(() => setLoading(false));
@@ -410,6 +449,22 @@ export default function AdminDashboard() {
                       <div>
                         <div className="font-bold text-white text-sm">Shared API Keys</div>
                         <div className="text-xs text-purple-100">PLUS user keys</div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={handleBackfillActivity}
+                    disabled={backfilling}
+                    className="w-full group bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-4 shadow-lg shadow-amber-500/30 hover:shadow-xl hover:shadow-amber-500/40 transition-all duration-300 text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Database className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div>
+                        <div className="font-bold text-white text-sm">
+                          {backfilling ? 'Backfilling...' : 'Backfill Activity History'}
+                        </div>
+                        <div className="text-xs text-amber-100">Sync existing data</div>
                       </div>
                     </div>
                   </button>

@@ -92,24 +92,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if current password matches by attempting reauthentication
-    // Create a new Supabase client for verification without affecting current session
-    const { createClient: createAuthClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    
-    const authClient = createAuthClient(supabaseUrl, supabaseAnonKey);
-    
-    const { error: signInError } = await authClient.auth.signInWithPassword({
-      email: user.email!,
-      password: currentPassword,
-    });
+    // Supabase requires reauthentication for password changes for security
+    // We need to verify the current password by attempting sign in
+    // Note: This creates a temporary session that we immediately discard
+    try {
+      // Import createClient for server-side auth
+      const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+      
+      // Create a temporary client for verification
+      const tempClient = createSupabaseClient(supabaseUrl, supabaseAnonKey);
+      
+      // Verify current password
+      const { data: authData, error: signInError } = await tempClient.auth.signInWithPassword({
+        email: user.email!,
+        password: currentPassword,
+      });
 
-    if (signInError) {
-      logger.error('Current password verification failed', signInError);
+      if (signInError) {
+        logger.error('Current password verification failed', signInError);
+        return NextResponse.json(
+          { error: 'Current password is incorrect' },
+          { status: 400 }
+        );
+      }
+
+      // Sign out the temporary session immediately
+      if (authData.session) {
+        await tempClient.auth.signOut();
+      }
+    } catch (verifyError) {
+      logger.error('Password verification error', verifyError);
       return NextResponse.json(
-        { error: 'Current password is incorrect' },
-        { status: 400 }
+        { error: 'Failed to verify current password' },
+        { status: 500 }
       );
     }
 
