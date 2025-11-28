@@ -117,17 +117,17 @@ export default function PasswordManager() {
   };
 
   return (
-    <Card>
-      <CardHeader className="px-4 sm:px-6 py-3 sm:py-4 dark:bg-gray-800">
-        <CardTitle className="text-base sm:text-lg flex items-center gap-2 dark:text-gray-100">
+    <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
+      <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2 text-slate-900 dark:text-gray-100">
           <Lock className="h-4 w-4 sm:h-5 sm:w-5" />
           Change Password
         </CardTitle>
-        <CardDescription className="text-sm dark:text-gray-400">
+        <CardDescription className="text-sm text-slate-600 dark:text-gray-400">
           Update your account password. Use a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 sm:space-y-5 p-4 sm:p-6 dark:bg-gray-800">
+      <CardContent className="space-y-4 sm:space-y-5 p-4 sm:p-6">
         <div className="space-y-2">
           <Label htmlFor="current-password" className="text-sm font-medium text-slate-900 dark:text-gray-100">
             Current Password

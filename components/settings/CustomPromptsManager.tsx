@@ -116,10 +116,10 @@ export default function CustomPromptsManager() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
         <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
-          <CardTitle className="text-base sm:text-lg">Custom Prompts</CardTitle>
-          <CardDescription className="text-sm">
+          <CardTitle className="text-base sm:text-lg text-slate-900 dark:text-gray-100">Custom Prompts</CardTitle>
+          <CardDescription className="text-sm text-slate-600 dark:text-gray-400">
             Customize the AI prompts for each type of content generation. Leave blank to use default prompts.
           </CardDescription>
         </CardHeader>

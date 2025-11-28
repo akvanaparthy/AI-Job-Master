@@ -11,8 +11,16 @@ export function DarkModeToggle() {
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem('darkMode');
+    const shouldBeDark = saved === 'true';
+    
     if (saved !== null) {
-      setIsDarkMode(saved === 'true');
+      setIsDarkMode(shouldBeDark);
+      // Apply to DOM immediately on mount
+      if (shouldBeDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   }, []);
 

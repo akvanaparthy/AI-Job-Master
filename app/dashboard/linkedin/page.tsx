@@ -825,8 +825,8 @@ export default function LinkedInPage() {
                       transition={{ delay: 0.35 }}
                       className="text-center"
                     >
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
-                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
+                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-slate-600 dark:text-gray-400" strokeWidth={1.5} />
                       </div>
                       <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-gray-100 mb-2">Ready to Connect</h3>
                       <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">

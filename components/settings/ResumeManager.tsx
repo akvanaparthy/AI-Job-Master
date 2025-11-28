@@ -242,10 +242,10 @@ export default function ResumeManager() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Upload Section */}
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
         <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
-          <CardTitle className="text-base sm:text-lg">Upload Resume</CardTitle>
-          <CardDescription className="text-sm">
+          <CardTitle className="text-base sm:text-lg text-slate-900 dark:text-gray-100">Upload Resume</CardTitle>
+          <CardDescription className="text-sm text-slate-600 dark:text-gray-400">
             Upload up to 3 resumes. Supported formats: PDF, DOCX (max 3MB)
           </CardDescription>
         </CardHeader>
@@ -312,10 +312,10 @@ export default function ResumeManager() {
       </Card>
 
       {/* Resumes List */}
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
         <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
-          <CardTitle className="text-base sm:text-lg">Your Resumes ({resumes.length}/3)</CardTitle>
-          <CardDescription className="text-sm">
+          <CardTitle className="text-base sm:text-lg text-slate-900 dark:text-gray-100">Your Resumes ({resumes.length}/3)</CardTitle>
+          <CardDescription className="text-sm text-slate-600 dark:text-gray-400">
             Manage your stored resumes. Set one as default to use it automatically.
           </CardDescription>
         </CardHeader>
