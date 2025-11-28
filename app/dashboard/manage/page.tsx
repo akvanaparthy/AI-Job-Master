@@ -371,7 +371,7 @@ export default function HistoryPage() {
             </div>
           </div>
 
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-slate-100 dark:divide-gray-700">
             {loading ? (
               <div className="flex items-center justify-center p-8 sm:p-12">
                 <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-slate-400" />

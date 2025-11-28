@@ -725,7 +725,7 @@ export default function EmailPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <Card className="bg-white border-slate-200/60 shadow-sm h-full overflow-hidden">
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm h-full overflow-hidden">
             {generatedSubject && generatedBody ? (
               <>
                 <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 border-b border-emerald-100/50 px-4 sm:px-6 py-3 sm:py-4">

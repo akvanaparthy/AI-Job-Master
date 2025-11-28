@@ -169,10 +169,10 @@ export default function DashboardPage() {
                   <div className="p-4 sm:p-5 md:p-6 h-full flex flex-col">
                     <div className="flex items-start justify-between mb-4 md:mb-5 lg:mb-6">
                       <div className="flex-1">
-                        <h3 className="text-sm md:text-base font-semibold text-slate-900 dark:text-gray-100 mb-0.5 line-clamp-1">
+                        <h3 className="text-sm md:text-base font-semibold text-slate-900 mb-0.5 line-clamp-1">
                           {action.title}
                         </h3>
-                        <p className="text-xs md:text-sm text-slate-600 dark:text-gray-400 line-clamp-1">{action.description}</p>
+                        <p className="text-xs md:text-sm text-slate-600 line-clamp-1">{action.description}</p>
                       </div>
                       <div className={`w-9 h-9 sm:w-11 sm:h-11 rounded-[12px] sm:rounded-[14px] ${action.iconBg} flex items-center justify-center shadow-md opacity-90 group-hover:opacity-100 transition-opacity flex-shrink-0`}>
                         <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" strokeWidth={2.5} />
