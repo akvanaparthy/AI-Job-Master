@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     if (dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN') {
       const shared = await getAvailableSharedModels();
       sharedModels = shared.map(sm => ({
-        value: sm.model,
+        value: `shared:${sm.model}`, // Prefix with 'shared:' to distinguish from user's own keys
         label: getModelDisplayNameWithProvider(sm.model),
         provider: sm.provider,
         isShared: true,

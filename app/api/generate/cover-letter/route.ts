@@ -101,21 +101,30 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Determine provider and get API key (user's own or shared)
-    const provider = getProviderFromModel(llmModel);
+    // Check if user selected a shared/sponsored model (prefixed with 'shared:')
+    const isSharedModelSelected = llmModel.startsWith('shared:');
+    const actualModel = isSharedModelSelected ? llmModel.replace('shared:', '') : llmModel;
+    
+    // Determine provider from the actual model name
+    const provider = getProviderFromModel(actualModel);
     let apiKey: string | null = null;
     let usingSharedKey = false;
 
-    // Check if model is available as shared for PLUS users
-    if ((dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN') && await isSharedModel(llmModel)) {
-      const sharedKey = await getSharedApiKey(llmModel);
+    // If user explicitly selected shared model, use shared key
+    if (isSharedModelSelected && (dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN')) {
+      const sharedKey = await getSharedApiKey(actualModel);
       if (sharedKey) {
         apiKey = sharedKey;
         usingSharedKey = true;
+      } else {
+        return NextResponse.json(
+          { error: 'Selected shared model is not available' },
+          { status: 400 }
+        );
       }
     }
 
-    // If no shared key, use user's own key
+    // If not using shared key, use user's own key
     if (!apiKey) {
       switch (provider) {
         case 'openai':
@@ -178,7 +187,7 @@ export async function POST(req: NextRequest) {
     const generatedContent = await generateContent({
       provider,
       apiKey,
-      model: llmModel,
+      model: actualModel, // Use actual model name without prefix
       systemPrompt: system,
       userPrompt,
       maxTokens: 2000,
@@ -209,7 +218,7 @@ export async function POST(req: NextRequest) {
           companyDescription,
           content: generatedContent,
           length: length as Length,
-          llmModel,
+          llmModel: actualModel, // Store actual model name
         },
       });
       coverLetterId = coverLetter.id;
@@ -220,7 +229,7 @@ export async function POST(req: NextRequest) {
         activityType: 'COVER_LETTER',
         companyName: companyName || 'Unknown Company',
         positionTitle,
-        llmModel,
+        llmModel: actualModel, // Store actual model name
       });
     }
 

@@ -144,17 +144,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Determine provider and API key (check shared keys first for PLUS/ADMIN users)
-    const provider = getProviderFromModel(llmModel);
+    // Check if user selected a shared/sponsored model (prefixed with 'shared:')
+    const isSharedModelSelected = llmModel.startsWith('shared:');
+    const actualModel = isSharedModelSelected ? llmModel.replace('shared:', '') : llmModel;
+    
+    // Determine provider from the actual model name
+    const provider = getProviderFromModel(actualModel);
     let apiKey: string | undefined;
     let usingSharedKey = false;
 
-    // For PLUS/ADMIN users, check if model is available as a shared key
-    if ((dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN') && await isSharedModel(llmModel)) {
-      const sharedKey = await getSharedApiKey(llmModel);
+    // If user explicitly selected shared model, use shared key
+    if (isSharedModelSelected && (dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN')) {
+      const sharedKey = await getSharedApiKey(actualModel);
       if (sharedKey) {
         apiKey = sharedKey;
         usingSharedKey = true;
+      } else {
+        return NextResponse.json(
+          { error: 'Selected shared model is not available' },
+          { status: 400 }
+        );
       }
     }
 
@@ -248,7 +257,7 @@ export async function POST(req: NextRequest) {
     const generatedContent = await generateContent({
       provider,
       apiKey,
-      model: llmModel,
+      model: actualModel, // Use actual model name without prefix
       systemPrompt: system,
       userPrompt,
       maxTokens: 500,
@@ -292,7 +301,7 @@ export async function POST(req: NextRequest) {
           companyDescription,
           content: generatedContent,
           length: length as Length,
-          llmModel,
+          llmModel: actualModel, // Store actual model name
           status: status || 'SENT',
           parentMessageId: parentMessageId || null,
         },
@@ -307,7 +316,7 @@ export async function POST(req: NextRequest) {
           companyName: companyName || 'Unknown Company',
           positionTitle,
           recipient: recipientName,
-          llmModel,
+          llmModel: actualModel, // Store actual model name
         });
       }
     }
