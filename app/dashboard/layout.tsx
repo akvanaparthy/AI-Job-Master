@@ -223,11 +223,11 @@ export default function DashboardLayout({
             </div>
             <div className="space-y-1">
               <Link
-                href="/settings"
+                href="/dashboard/settings"
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
-                  pathname === '/settings'
+                  pathname === '/dashboard/settings'
                     ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
                     : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
                   isSidebarCollapsed && "justify-center"

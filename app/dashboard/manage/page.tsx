@@ -276,7 +276,7 @@ export default function HistoryPage() {
               <HistoryIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">History</h1>
+              <h1 className="text-2xl sm:text-3xl md:text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">Manage</h1>
               <p className="text-sm sm:text-base md:text-lg text-slate-500 dark:text-gray-400 leading-snug">
                 View and manage all your generated applications
               </p>
@@ -399,7 +399,7 @@ export default function HistoryPage() {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 sm:p-6 hover:bg-slate-50/50 transition-colors"
+                    className="p-4 sm:p-6 hover:bg-slate-50/50 dark:hover:bg-gray-700/30 transition-colors"
                   >
                     <div className="flex items-start gap-3 sm:gap-4">
                       <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg ${config.bgColor} border ${config.borderColor} flex items-center justify-center flex-shrink-0`}>
@@ -409,10 +409,10 @@ export default function HistoryPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4 mb-2">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-sm sm:text-base font-semibold text-slate-900 truncate">
+                            <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-gray-100 truncate">
                               {item.position}
                             </h3>
-                            <p className="text-xs sm:text-sm text-slate-600 truncate">
+                            <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 truncate">
                               {item.company}
                             </p>
                           </div>

@@ -704,7 +704,7 @@ export default function LinkedInPage() {
               <Button
                 onClick={handleGenerate}
                 disabled={loading || !companyName || !hasAnyApiKey || !llmModel}
-                className="w-full h-11 sm:h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+                className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? (
                   <>
@@ -729,17 +729,17 @@ export default function LinkedInPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.25 }}
         >
-          <Card className="bg-white border-slate-200/60 shadow-sm h-full overflow-hidden">
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm h-full overflow-hidden">
             {generatedMessage ? (
               <>
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 border-b border-emerald-100/50 px-4 sm:px-6 py-3 sm:py-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 dark:from-emerald-900/20 dark:to-teal-900/20 border-b border-emerald-100/50 dark:border-emerald-800/50 px-4 sm:px-6 py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                     <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                        <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                         Your LinkedIn Message
                       </h2>
-                      <p className="text-sm text-slate-600 mt-0.5">
+                      <p className="text-sm text-slate-600 dark:text-gray-400 mt-0.5">
                         {savedId ? 'Saved to history' : 'Review and save if needed'}
                       </p>
                     </div>
@@ -795,7 +795,7 @@ export default function LinkedInPage() {
                   <Textarea
                     value={generatedMessage}
                     onChange={(e) => setGeneratedMessage(e.target.value)}
-                    className="min-h-[500px] sm:min-h-[600px] lg:min-h-[680px] bg-white border-slate-200 rounded-lg resize-none leading-relaxed text-sm sm:text-base"
+                    className="min-h-[500px] sm:min-h-[600px] lg:min-h-[680px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none leading-relaxed text-sm sm:text-base"
                   />
                 </div>
               </>
@@ -804,16 +804,16 @@ export default function LinkedInPage() {
                 {/* Previous Message Card - Only shown in follow-up mode when message is loaded */}
                 {previousMessageContent && messageType === 'FOLLOW_UP' ? (
                   <div className="h-full flex flex-col">
-                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 border-b border-amber-100/50 px-4 sm:px-6 py-3 sm:py-4">
-                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                        <RefreshCw className="w-5 h-5 text-amber-600" />
+                    <div className="bg-gradient-to-br from-amber-50 to-yellow-50/80 dark:from-amber-900/20 dark:to-yellow-900/20 border-b border-amber-100/50 dark:border-amber-800/50 px-4 sm:px-6 py-3 sm:py-4">
+                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                        <RefreshCw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
                         Previous Message
                       </h2>
-                      <p className="text-xs sm:text-sm text-slate-600 mt-0.5">This is the message you sent previously</p>
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">This is the message you sent previously</p>
                     </div>
                     <div className="flex-1 p-4 sm:p-6 overflow-y-auto">
-                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4">
-                        <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{previousMessageContent}</p>
+                      <div className="bg-slate-50 dark:bg-gray-900/50 border border-slate-200 dark:border-gray-700 rounded-lg p-3 sm:p-4">
+                        <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{previousMessageContent}</p>
                       </div>
                     </div>
                   </div>
@@ -825,11 +825,11 @@ export default function LinkedInPage() {
                       transition={{ delay: 0.35 }}
                       className="text-center"
                     >
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
-                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600" strokeWidth={1.5} />
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
+                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-blue-600 dark:text-blue-400" strokeWidth={1.5} />
                       </div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Ready to Connect</h3>
-                      <p className="text-sm sm:text-base text-slate-600 max-w-sm mx-auto leading-relaxed">
+                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-gray-100 mb-2">Ready to Connect</h3>
+                      <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
                         Fill in the required fields and click Generate Message to create your personalized LinkedIn outreach
                       </p>
                       {savedMessageId && (

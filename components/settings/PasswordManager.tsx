@@ -118,18 +118,18 @@ export default function PasswordManager() {
 
   return (
     <Card>
-      <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
-        <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+      <CardHeader className="px-4 sm:px-6 py-3 sm:py-4 dark:bg-gray-800">
+        <CardTitle className="text-base sm:text-lg flex items-center gap-2 dark:text-gray-100">
           <Lock className="h-4 w-4 sm:h-5 sm:w-5" />
           Change Password
         </CardTitle>
-        <CardDescription className="text-sm">
+        <CardDescription className="text-sm dark:text-gray-400">
           Update your account password. Use a strong password with at least 8 characters, including uppercase, lowercase, numbers, and special characters.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4 sm:space-y-5 p-4 sm:p-6">
+      <CardContent className="space-y-4 sm:space-y-5 p-4 sm:p-6 dark:bg-gray-800">
         <div className="space-y-2">
-          <Label htmlFor="current-password" className="text-sm font-medium text-slate-900">
+          <Label htmlFor="current-password" className="text-sm font-medium text-slate-900 dark:text-gray-100">
             Current Password
           </Label>
           <div className="relative">
@@ -140,12 +140,12 @@ export default function PasswordManager() {
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="Enter current password"
               disabled={saving}
-              className="pr-10 h-10 sm:h-11 bg-white"
+              className="pr-10 h-10 sm:h-11 bg-white dark:bg-gray-800 dark:border-gray-600"
             />
             <button
               type="button"
               onClick={() => setShowCurrent(!showCurrent)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200"
               tabIndex={-1}
             >
               {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -154,7 +154,7 @@ export default function PasswordManager() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="new-password" className="text-sm font-medium text-slate-900">
+          <Label htmlFor="new-password" className="text-sm font-medium text-slate-900 dark:text-gray-100">
             New Password
           </Label>
           <div className="relative">
@@ -165,24 +165,24 @@ export default function PasswordManager() {
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter new password"
               disabled={saving}
-              className="pr-10 h-10 sm:h-11 bg-white"
+              className="pr-10 h-10 sm:h-11 bg-white dark:bg-gray-800 dark:border-gray-600"
             />
             <button
               type="button"
               onClick={() => setShowNew(!showNew)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200"
               tabIndex={-1}
             >
               {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-gray-400">
             Must include: 8+ characters, uppercase, lowercase, number, special character
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="confirm-password" className="text-sm font-medium text-slate-900">
+          <Label htmlFor="confirm-password" className="text-sm font-medium text-slate-900 dark:text-gray-100">
             Confirm New Password
           </Label>
           <div className="relative">
@@ -193,12 +193,12 @@ export default function PasswordManager() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Confirm new password"
               disabled={saving}
-              className="pr-10 h-10 sm:h-11 bg-white"
+              className="pr-10 h-10 sm:h-11 bg-white dark:bg-gray-800 dark:border-gray-600"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-gray-400 hover:text-slate-700 dark:hover:text-gray-200"
               tabIndex={-1}
             >
               {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -209,7 +209,7 @@ export default function PasswordManager() {
         <Button
           onClick={handleChangePassword}
           disabled={saving}
-          className="w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white h-10 sm:h-11"
+          className="w-full sm:w-auto bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white h-10 sm:h-11"
         >
           {saving ? (
             <>
@@ -221,8 +221,8 @@ export default function PasswordManager() {
           )}
         </Button>
 
-        <div className="pt-4 border-t border-slate-100">
-          <p className="text-xs text-slate-500">
+        <div className="pt-4 border-t border-slate-100 dark:border-gray-700">
+          <p className="text-xs text-slate-500 dark:text-gray-400">
             <strong>Security Tips:</strong>
             <br />
             • Never share your password with anyone

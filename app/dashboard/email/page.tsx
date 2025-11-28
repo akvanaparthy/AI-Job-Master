@@ -348,8 +348,8 @@ export default function EmailPage() {
             <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-slate-900 leading-tight">Professional Emails</h1>
-            <p className="text-sm sm:text-base lg:text-lg text-slate-500">
+            <h1 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">Professional Emails</h1>
+            <p className="text-sm sm:text-base lg:text-lg text-slate-500 dark:text-gray-400">
               Craft compelling job application emails that get responses from recruiters
             </p>
           </div>
@@ -364,16 +364,16 @@ export default function EmailPage() {
         className="mb-4 sm:mb-6"
       >
         <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)}>
-          <TabsList className="bg-white border border-slate-200 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
+          <TabsList className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
             <TabsTrigger
               value="NEW"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
               New Email
             </TabsTrigger>
             <TabsTrigger
               value="FOLLOW_UP"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-slate-700 data-[state=active]:to-gray-800 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
               <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
               Follow-up
@@ -391,19 +391,19 @@ export default function EmailPage() {
           className="space-y-4 sm:space-y-6"
         >
           {/* Configuration Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600" />
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 dark:from-gray-900/50 dark:to-gray-800/50 border-b border-slate-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-slate-600 dark:text-gray-400" />
                 Configuration
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Set your preferences</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Set your preferences</p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Resume</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Resume</Label>
                 <Select value={selectedResumeId} onValueChange={setSelectedResumeId} disabled={loadingResumes}>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors">
                     <SelectValue placeholder={loadingResumes ? "Loading..." : "Choose a resume"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -434,9 +434,9 @@ export default function EmailPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">AI Model</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">AI Model</Label>
                 <Select value={llmModel} onValueChange={setLlmModel} disabled={loadingModels || !hasAnyApiKey}>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors">
                     <SelectValue placeholder={
                       loadingModels
                         ? "Loading models..."
@@ -487,9 +487,9 @@ export default function EmailPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Email Length</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Email Length</Label>
                 <Select value={length} onValueChange={(value: any) => setLength(value)}>
-                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                  <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -508,13 +508,13 @@ export default function EmailPage() {
 
           {/* Search for Previous Messages - Only shown in follow-up mode */}
           {messageType === 'FOLLOW_UP' && (
-            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50/80 border-b border-purple-100/50 px-4 sm:px-6 py-3 sm:py-4">
-                <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+            <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-50 to-indigo-50/80 dark:from-purple-900/20 dark:to-indigo-900/20 border-b border-purple-100/50 dark:border-purple-800/50 px-4 sm:px-6 py-3 sm:py-4">
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                  <Search className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
                   Search Previous Emails
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Find and load a previous email to follow up on</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Find and load a previous email to follow up on</p>
               </div>
               <div className="p-4 sm:p-6 space-y-4">
                 <div className="flex gap-2">
@@ -523,7 +523,7 @@ export default function EmailPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                    className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                   />
                   <Button
                     onClick={handleSearch}
@@ -540,14 +540,14 @@ export default function EmailPage() {
                       <div
                         key={msg.id}
                         onClick={() => loadMessageDetails(msg.id)}
-                        className="p-3 bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-200 rounded-lg cursor-pointer transition-all"
+                        className="p-3 bg-slate-50 dark:bg-gray-900/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 border border-slate-200 dark:border-gray-700 hover:border-purple-200 dark:hover:border-purple-700 rounded-lg cursor-pointer transition-all"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-900 truncate">
+                            <p className="text-sm font-medium text-slate-900 dark:text-gray-100 truncate">
                               {msg.companyName} {msg.positionTitle && `- ${msg.positionTitle}`}
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
                               {msg.recipientName && `To: ${msg.recipientName} • `}
                               {new Date(msg.createdAt).toLocaleDateString()}
                             </p>
@@ -572,72 +572,72 @@ export default function EmailPage() {
 
 
           {/* Email Details Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">Email Details</h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-slate-50 to-gray-100/80 dark:from-gray-900/50 dark:to-gray-800/50 border-b border-slate-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">Email Details</h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">
                 {messageType === 'NEW' ? 'Enter recipient and position information' : 'Following up on your previous email'}
               </p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="space-y-2">
-                <Label className="text-xs sm:text-sm font-medium text-slate-900">
-                  Recipient Email <span className="text-slate-600">*</span>
+                <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">
+                  Recipient Email <span className="text-slate-600 dark:text-gray-400">*</span>
                 </Label>
                 <Input
                   type="email"
                   placeholder="hiring@company.com"
                   value={recipientEmail}
                   onChange={(e) => setRecipientEmail(e.target.value)}
-                  className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs sm:text-sm font-medium text-slate-900">Recipient Name</Label>
+                <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Recipient Name</Label>
                 <Input
                   placeholder="Jane Smith"
                   value={recipientName}
                   onChange={(e) => setRecipientName(e.target.value)}
-                  className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-medium text-slate-900">
+                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">
                     Position
                   </Label>
                   <Input
                     placeholder="e.g., Senior Software Engineer (or leave blank for general inquiry)"
                     value={positionTitle}
                     onChange={(e) => setPositionTitle(e.target.value)}
-                    className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                    className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-medium text-slate-900">
-                    Company <span className="text-slate-600">*</span>
+                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">
+                    Company <span className="text-slate-600 dark:text-gray-400">*</span>
                   </Label>
                   <Input
                     placeholder="Tech Corp"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                    className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                   />
                 </div>
               </div>
 
               {!positionTitle && (
                 <div className="space-y-2">
-                  <Label className="text-xs sm:text-sm font-medium text-slate-900">Areas of Interest</Label>
+                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Areas of Interest</Label>
                   <Input
                     placeholder="e.g., Backend Development, Cloud Infrastructure, AI/ML"
                     value={areasOfInterest}
                     onChange={(e) => setAreasOfInterest(e.target.value)}
-                    className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                    className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                   />
-                  <p className="text-xs text-slate-500">Specify areas you&apos;re interested in to help tailor the message</p>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">Specify areas you&apos;re interested in to help tailor the message</p>
                 </div>
               )}
 
@@ -652,19 +652,19 @@ export default function EmailPage() {
                   >
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-xs sm:text-sm font-medium text-slate-900">Job Description</Label>
+                        <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Job Description</Label>
                         <Textarea
                           placeholder="Paste the job description here..."
-                          className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                          className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs sm:text-sm font-medium text-slate-900">Company Info</Label>
+                        <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Company Info</Label>
                         <Textarea
                           placeholder="What interests you about this company?"
-                          className="min-h-[60px] sm:min-h-[80px] text-sm sm:text-base bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                          className="min-h-[60px] sm:min-h-[80px] text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
                         />
@@ -842,15 +842,15 @@ export default function EmailPage() {
                       transition={{ delay: 0.35 }}
                       className="text-center"
                     >
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
-                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-slate-600" strokeWidth={1.5} />
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 rounded-[20px] bg-gradient-to-br from-slate-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
+                        <Mail className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 text-slate-600 dark:text-gray-400" strokeWidth={1.5} />
                       </div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Ready to Send</h3>
-                      <p className="text-sm sm:text-base text-slate-600 max-w-sm mx-auto leading-relaxed">
+                      <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-gray-100 mb-2">Ready to Send</h3>
+                      <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
                         Fill in the required fields and click Generate Email to create your professional job application email
                       </p>
                       {savedMessageId && (
-                        <p className="text-xs text-slate-500 mt-4 font-mono">
+                        <p className="text-xs text-slate-500 dark:text-gray-400 mt-4 font-mono">
                           Last saved: {savedMessageId}
                         </p>
                       )}

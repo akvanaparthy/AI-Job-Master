@@ -575,10 +575,10 @@ export default function DashboardPage() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.35 }}
           >
-            <Card className="bg-white border-slate-200/60">
+            <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
               <div className="p-5 md:p-6 lg:p-7">
-                <h3 className="text-base md:text-lg font-semibold text-slate-900 mb-1">Your usage</h3>
-                <p className="text-xs md:text-sm text-slate-500 mb-5 md:mb-6 lg:mb-7">
+                <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-gray-100 mb-1">Your usage</h3>
+                <p className="text-xs md:text-sm text-slate-500 dark:text-gray-400 mb-5 md:mb-6 lg:mb-7">
                   Current plan: {loading ? (
                     <span className="inline-block w-12 h-4 bg-slate-200 rounded animate-pulse"></span>
                   ) : (
