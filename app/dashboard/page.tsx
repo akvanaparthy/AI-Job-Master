@@ -684,7 +684,7 @@ export default function DashboardPage() {
                 <h3 className="text-sm md:text-base font-semibold text-slate-900 mb-2 md:mb-2.5">Pro tip</h3>
                 <p className="text-xs md:text-sm lg:text-[15px] text-slate-700 leading-relaxed">
                   Upload your resume in{' '}
-                  <Link href="/settings" className="text-blue-600 font-medium hover:underline">
+                  <Link href="/dashboard/settings" className="text-blue-600 font-medium hover:underline">
                     Settings
                   </Link>{' '}
                   to generate more personalized content tailored to your experience.

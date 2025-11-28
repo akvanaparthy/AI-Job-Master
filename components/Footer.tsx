@@ -127,7 +127,7 @@ export function Footer({ variant = 'full', isDark = false }: FooterProps) {
                 </Link>
               </li>
               <li>
-                <Link href="/settings" className={`text-xs sm:text-sm ${textSecondary} ${hoverLinkClass}`}>
+                <Link href="/dashboard/settings" className={`text-xs sm:text-sm ${textSecondary} ${hoverLinkClass}`}>
                   Settings
                 </Link>
               </li>

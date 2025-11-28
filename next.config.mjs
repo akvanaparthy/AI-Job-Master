@@ -13,6 +13,8 @@ const nextConfig = {
       },
     ],
   },
+  // Optimize font loading
+  optimizeFonts: true,
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.ignoreWarnings = [

@@ -408,7 +408,7 @@ export default function LinkedInPage() {
                     {resumes.length === 0 && (
                       <div className="px-2 py-4 sm:py-6 text-center">
                         <p className="text-xs sm:text-sm text-slate-600 mb-3">No resumes uploaded yet</p>
-                        <Link href="/settings?tab=resumes">
+                        <Link href="/dashboard/settings?tab=resumes">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Upload Resume in Settings
                           </button>
@@ -416,7 +416,7 @@ export default function LinkedInPage() {
                       </div>
                     )}
                     {resumes.length > 0 && resumes.length < 3 && (
-                      <Link href="/settings?tab=resumes" className="block">
+                      <Link href="/dashboard/settings?tab=resumes" className="block">
                         <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
                           + Add Another Resume ({resumes.length}/3)
                         </div>
@@ -453,7 +453,7 @@ export default function LinkedInPage() {
                             </div>
                           </SelectItem>
                         ))}
-                        <Link href="/settings?tab=api-keys" className="block">
+                        <Link href="/dashboard/settings?tab=api-keys" className="block">
                           <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
                             + Manage API Keys
                           </div>
@@ -462,7 +462,7 @@ export default function LinkedInPage() {
                     ) : (
                       <div className="px-2 py-4 sm:py-6 text-center">
                         <p className="text-xs sm:text-sm text-slate-600 mb-3">No API keys configured</p>
-                        <Link href="/settings?tab=api-keys">
+                        <Link href="/dashboard/settings?tab=api-keys">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Add API Key in Settings
                           </button>

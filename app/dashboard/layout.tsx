@@ -314,7 +314,7 @@ export default function DashboardLayout({
               )}
               <DropdownMenuItem 
                 className="cursor-pointer"
-                onClick={() => router.push('/settings?tab=password')}
+                onClick={() => router.push('/dashboard/settings?tab=password')}
               >
                 <KeyRound className="w-4 h-4 mr-2" />
                 Change Password
