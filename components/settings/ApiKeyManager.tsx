@@ -192,7 +192,7 @@ export default function ApiKeyManager() {
           {/* OpenAI */}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="openai" className="text-sm sm:text-base">OpenAI API Key</Label>
+              <Label htmlFor="openai" className="text-sm sm:text-base text-slate-900 dark:text-gray-100">OpenAI API Key</Label>
               <div className="flex items-center gap-1 sm:gap-2">
                 {hasOpenaiKey && (
                   <>
@@ -221,7 +221,7 @@ export default function ApiKeyManager() {
               value={openaiKey}
               onChange={(e) => setOpenaiKey(e.target.value)}
               disabled={saving}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}
@@ -239,7 +239,7 @@ export default function ApiKeyManager() {
           {/* Anthropic */}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="anthropic" className="text-sm sm:text-base">Anthropic (Claude) API Key</Label>
+              <Label htmlFor="anthropic" className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Anthropic (Claude) API Key</Label>
               <div className="flex items-center gap-1 sm:gap-2">
                 {hasAnthropicKey && (
                   <>
@@ -268,7 +268,7 @@ export default function ApiKeyManager() {
               value={anthropicKey}
               onChange={(e) => setAnthropicKey(e.target.value)}
               disabled={saving}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}
@@ -286,7 +286,7 @@ export default function ApiKeyManager() {
           {/* Gemini */}
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="gemini" className="text-sm sm:text-base">Google Gemini API Key</Label>
+              <Label htmlFor="gemini" className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Google Gemini API Key</Label>
               <div className="flex items-center gap-1 sm:gap-2">
                 {hasGeminiKey && (
                   <>
@@ -315,7 +315,7 @@ export default function ApiKeyManager() {
               value={geminiKey}
               onChange={(e) => setGeminiKey(e.target.value)}
               disabled={saving}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
             />
             <p className="text-xs text-muted-foreground">
               Get your key from{' '}

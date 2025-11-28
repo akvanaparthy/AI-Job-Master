@@ -251,26 +251,26 @@ export default function ResumeManager() {
         </CardHeader>
         <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
           <div className="space-y-2">
-            <Label htmlFor="resume-title" className="text-sm sm:text-base">Resume Title</Label>
+            <Label htmlFor="resume-title" className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Resume Title</Label>
             <Input
               id="resume-title"
               placeholder="e.g., Software Engineer Resume"
               value={resumeTitle}
               onChange={(e) => setResumeTitle(e.target.value)}
               disabled={uploading}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="resume-file" className="text-sm sm:text-base">Resume File</Label>
+            <Label htmlFor="resume-file" className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Resume File</Label>
             <Input
               id="resume-file"
               type="file"
               accept=".pdf,.docx"
               onChange={handleFileChange}
               disabled={uploading || resumes.length >= 3}
-              className="h-10 sm:h-11 text-sm sm:text-base"
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
             />
             <p className="text-xs text-muted-foreground">
               Only PDF and DOCX files are allowed. Maximum file size: 3MB

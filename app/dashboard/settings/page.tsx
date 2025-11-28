@@ -143,7 +143,7 @@ function SettingsContent() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px]">Loading...</div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-[400px] text-slate-900 dark:text-gray-100">Loading...</div>}>
       <SettingsContent />
     </Suspense>
   );

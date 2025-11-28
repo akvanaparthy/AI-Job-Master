@@ -125,16 +125,16 @@ export default function CustomPromptsManager() {
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <Tabs defaultValue="coverLetter">
-            <TabsList className="grid w-full grid-cols-3 h-auto">
-              <TabsTrigger value="coverLetter" className="text-xs sm:text-sm py-2">Cover Letter</TabsTrigger>
-              <TabsTrigger value="linkedIn" className="text-xs sm:text-sm py-2">LinkedIn</TabsTrigger>
-              <TabsTrigger value="email" className="text-xs sm:text-sm py-2">Email</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3 h-auto bg-white/50 dark:bg-gray-800/50 border border-slate-200 dark:border-gray-700">
+              <TabsTrigger value="coverLetter" className="text-xs sm:text-sm py-2 data-[state=active]:bg-slate-900 dark:data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:text-gray-400">Cover Letter</TabsTrigger>
+              <TabsTrigger value="linkedIn" className="text-xs sm:text-sm py-2 data-[state=active]:bg-slate-900 dark:data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:text-gray-400">LinkedIn</TabsTrigger>
+              <TabsTrigger value="email" className="text-xs sm:text-sm py-2 data-[state=active]:bg-slate-900 dark:data-[state=active]:bg-blue-600 data-[state=active]:text-white dark:text-gray-400">Email</TabsTrigger>
             </TabsList>
 
             <TabsContent value="coverLetter" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <Label>Cover Letter System Prompt</Label>
+                  <Label className="text-slate-900 dark:text-gray-100">Cover Letter System Prompt</Label>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -150,7 +150,7 @@ export default function CustomPromptsManager() {
                     setPrompts((prev) => ({ ...prev, coverLetter: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
-                  className="min-h-[200px] font-mono text-sm"
+                  className="min-h-[200px] font-mono text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
                 />
                 <p className="text-xs text-muted-foreground">
                   This prompt guides how the AI generates cover letters. It will be used as the system prompt.
@@ -161,7 +161,7 @@ export default function CustomPromptsManager() {
             <TabsContent value="linkedIn" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                  <Label className="text-sm sm:text-base">LinkedIn System Prompt</Label>
+                  <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">LinkedIn System Prompt</Label>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -178,7 +178,7 @@ export default function CustomPromptsManager() {
                     setPrompts((prev) => ({ ...prev, linkedIn: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
-                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
+                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
                 />
                 <p className="text-xs text-muted-foreground">
                   This prompt guides how the AI generates LinkedIn messages. Keep it concise for shorter outputs.
@@ -189,7 +189,7 @@ export default function CustomPromptsManager() {
             <TabsContent value="email" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
-                  <Label className="text-sm sm:text-base">Email System Prompt</Label>
+                  <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Email System Prompt</Label>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -206,7 +206,7 @@ export default function CustomPromptsManager() {
                     setPrompts((prev) => ({ ...prev, email: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
-                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm"
+                  className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
                 />
                 <p className="text-xs text-muted-foreground">
                   This prompt guides how the AI generates email messages including subject lines.
