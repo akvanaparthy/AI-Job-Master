@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { getModelDisplayNameWithProvider } from '@/lib/utils/modelNames';
 import { logger } from '@/lib/logger';
+import { getAvailableSharedModels } from '@/lib/shared-keys';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -28,6 +29,7 @@ export async function GET(req: NextRequest) {
         openaiApiKey: true,
         anthropicApiKey: true,
         geminiApiKey: true,
+        userType: true,
       },
     });
 
@@ -43,23 +45,39 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    // Get shared models for PLUS users
+    let sharedModels: any[] = [];
+    if (dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN') {
+      const shared = await getAvailableSharedModels();
+      sharedModels = shared.map(sm => ({
+        value: sm.model,
+        label: getModelDisplayNameWithProvider(sm.model),
+        provider: sm.provider,
+        isShared: true,
+      }));
+    }
+
     // Combine all available models with provider information and user-friendly names
     const allModels = [
       ...dbUser.openaiModels.map(model => ({
         value: model,
         label: getModelDisplayNameWithProvider(model),
-        provider: 'openai'
+        provider: 'openai',
+        isShared: false,
       })),
       ...dbUser.anthropicModels.map(model => ({
         value: model,
         label: getModelDisplayNameWithProvider(model),
-        provider: 'anthropic'
+        provider: 'anthropic',
+        isShared: false,
       })),
       ...dbUser.geminiModels.map(model => ({
         value: model,
         label: getModelDisplayNameWithProvider(model),
-        provider: 'gemini'
+        provider: 'gemini',
+        isShared: false,
       })),
+      ...sharedModels,
     ];
 
     const hasAnyKey = !!(dbUser.openaiApiKey || dbUser.anthropicApiKey || dbUser.geminiApiKey);

@@ -10,6 +10,7 @@ import { generateMessageId } from '@/lib/utils/message-id';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
+import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -128,13 +129,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Get user's API keys
+    // Get user's API keys and userType
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
         openaiApiKey: true,
         anthropicApiKey: true,
         geminiApiKey: true,
+        userType: true,
       },
     });
 
@@ -142,40 +144,61 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Determine provider and decrypt API key
+    // Determine provider and API key (check shared keys first for PLUS/ADMIN users)
     const provider = getProviderFromModel(llmModel);
-    let apiKey: string;
+    let apiKey: string | undefined;
+    let usingSharedKey = false;
 
-    switch (provider) {
-      case 'openai':
-        if (!dbUser.openaiApiKey) {
-          return NextResponse.json(
-            { error: 'OpenAI API key not configured' },
-            { status: 400 }
-          );
-        }
-        apiKey = decrypt(dbUser.openaiApiKey);
-        break;
-      case 'anthropic':
-        if (!dbUser.anthropicApiKey) {
-          return NextResponse.json(
-            { error: 'Anthropic API key not configured' },
-            { status: 400 }
-          );
-        }
-        apiKey = decrypt(dbUser.anthropicApiKey);
-        break;
-      case 'gemini':
-        if (!dbUser.geminiApiKey) {
-          return NextResponse.json(
-            { error: 'Gemini API key not configured' },
-            { status: 400 }
-          );
-        }
-        apiKey = decrypt(dbUser.geminiApiKey);
-        break;
-      default:
-        return NextResponse.json({ error: 'Invalid model' }, { status: 400 });
+    // For PLUS/ADMIN users, check if model is available as a shared key
+    if ((dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN') && await isSharedModel(llmModel)) {
+      const sharedKey = await getSharedApiKey(llmModel);
+      if (sharedKey) {
+        apiKey = sharedKey;
+        usingSharedKey = true;
+      }
+    }
+
+    // If no shared key was used, fall back to user's own key
+    if (!usingSharedKey) {
+      switch (provider) {
+        case 'openai':
+          if (!dbUser.openaiApiKey) {
+            return NextResponse.json(
+              { error: 'OpenAI API key not configured' },
+              { status: 400 }
+            );
+          }
+          apiKey = decrypt(dbUser.openaiApiKey);
+          break;
+        case 'anthropic':
+          if (!dbUser.anthropicApiKey) {
+            return NextResponse.json(
+              { error: 'Anthropic API key not configured' },
+              { status: 400 }
+            );
+          }
+          apiKey = decrypt(dbUser.anthropicApiKey);
+          break;
+        case 'gemini':
+          if (!dbUser.geminiApiKey) {
+            return NextResponse.json(
+              { error: 'Gemini API key not configured' },
+              { status: 400 }
+            );
+          }
+          apiKey = decrypt(dbUser.geminiApiKey);
+          break;
+        default:
+          return NextResponse.json({ error: 'Invalid model' }, { status: 400 });
+      }
+    }
+
+    // Ensure we have an API key
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'API key not available for this model' },
+        { status: 400 }
+      );
     }
 
     // Get resume content if provided

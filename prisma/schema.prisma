@@ -218,6 +218,24 @@ model ActivityHistory {
   @@map("activity_history")
 }
 
+model SharedApiKey {
+  id          String               @id @default(uuid())
+  provider    AiProvider
+  apiKey      String
+  models      String[]             @default([])
+  isActive    Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+
+  @@map("shared_api_keys")
+}
+
+enum AiProvider {
+  OPENAI
+  ANTHROPIC
+  GEMINI
+}
+
 enum ActivityType {
   COVER_LETTER
   LINKEDIN_MESSAGE

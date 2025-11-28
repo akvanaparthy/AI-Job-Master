@@ -22,6 +22,7 @@ interface ModelOption {
   value: string;
   label: string;
   provider: string;
+  isShared?: boolean;
 }
 
 export default function CoverLetterPage() {
@@ -333,7 +334,14 @@ export default function CoverLetterPage() {
                       <>
                         {availableModels.map((model) => (
                           <SelectItem key={model.value} value={model.value} className="rounded-md text-sm">
-                            {model.label}
+                            <div className="flex items-center gap-2">
+                              <span>{model.label}</span>
+                              {model.isShared && (
+                                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded">
+                                  Plus
+                                </span>
+                              )}
+                            </div>
                           </SelectItem>
                         ))}
                         <Link href="/settings?tab=api-keys" className="block">

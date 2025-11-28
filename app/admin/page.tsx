@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut, Clock, Activity, ArrowUpRight } from 'lucide-react';
+import { Shield, Users, FileText, MessageSquare, TrendingUp, BarChart3, Search, Bell, MoreHorizontal, Home, Briefcase, UserCircle, Settings as SettingsIcon, Plus, ChevronRight, LogOut, Clock, Activity, ArrowUpRight, Key } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { motion, useSpring, useTransform } from 'framer-motion';
@@ -397,6 +397,19 @@ export default function AdminDashboard() {
                       <div>
                         <div className="font-bold text-white text-sm">Settings</div>
                         <div className="text-xs text-emerald-100">Configure limits</div>
+                      </div>
+                    </div>
+                  </button>
+
+                  <button
+                    onClick={() => router.push('/admin/shared-keys')}
+                    className="w-full group bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl p-4 shadow-lg shadow-purple-500/30 hover:shadow-xl hover:shadow-purple-500/40 transition-all duration-300 text-left"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Key className="w-6 h-6 text-white" strokeWidth={2.5} />
+                      <div>
+                        <div className="font-bold text-white text-sm">Shared API Keys</div>
+                        <div className="text-xs text-purple-100">PLUS user keys</div>
                       </div>
                     </div>
                   </button>
