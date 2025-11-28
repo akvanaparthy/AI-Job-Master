@@ -50,6 +50,7 @@ export default function ActivityHistoryPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState<Pagination>({
     page: 1,
     limit: 50,
@@ -61,8 +62,8 @@ export default function ActivityHistoryPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
+        page: currentPage.toString(),
+        limit: '50',
       });
 
       if (search) params.append('search', search);
@@ -83,7 +84,7 @@ export default function ActivityHistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [search, typeFilter, pagination.page, pagination.limit, toast]);
+  }, [search, typeFilter, currentPage, toast]);
 
   useEffect(() => {
     loadActivities();
@@ -130,12 +131,12 @@ export default function ActivityHistoryPage() {
 
   const handleSearch = (value: string) => {
     setSearch(value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setCurrentPage(1);
   };
 
   const handleTypeFilter = (value: string) => {
     setTypeFilter(value === 'ALL' ? '' : value);
-    setPagination(prev => ({ ...prev, page: 1 }));
+    setCurrentPage(1);
   };
 
   return (
@@ -285,7 +286,7 @@ export default function ActivityHistoryPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                        onClick={() => setCurrentPage(prev => prev - 1)}
                         disabled={pagination.page === 1}
                       >
                         <ChevronLeft className="w-4 h-4 mr-1" />
@@ -294,7 +295,7 @@ export default function ActivityHistoryPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                        onClick={() => setCurrentPage(prev => prev + 1)}
                         disabled={pagination.page === pagination.totalPages}
                       >
                         Next

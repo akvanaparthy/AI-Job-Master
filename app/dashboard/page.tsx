@@ -268,7 +268,7 @@ export default function DashboardPage() {
                 </h2>
                 <p className="text-xs md:text-sm text-slate-500">Track your recent generations</p>
               </div>
-              <Link href="/dashboard/history">
+              <Link href="/dashboard/activity-history">
                 <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
                   View all
                   <ArrowRight className="w-4 h-4 ml-1.5" />

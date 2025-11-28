@@ -28,10 +28,11 @@ export async function GET(req: NextRequest) {
     const where: any = { userId: user.id };
 
     if (search) {
+      const searchLower = search.toLowerCase();
       where.OR = [
-        { companyName: { contains: search, mode: 'insensitive' } },
-        { positionTitle: { contains: search, mode: 'insensitive' } },
-        { recipient: { contains: search, mode: 'insensitive' } },
+        { companyName: { contains: searchLower, mode: 'insensitive' } },
+        { positionTitle: { contains: searchLower, mode: 'insensitive' } },
+        { recipient: { contains: searchLower, mode: 'insensitive' } },
       ];
     }
 

@@ -92,8 +92,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify current password by attempting to sign in
-    const { error: signInError } = await supabase.auth.signInWithPassword({
+    // Check if current password matches by attempting reauthentication
+    // Create a new Supabase client for verification without affecting current session
+    const { createClient: createAuthClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    
+    const authClient = createAuthClient(supabaseUrl, supabaseAnonKey);
+    
+    const { error: signInError } = await authClient.auth.signInWithPassword({
       email: user.email!,
       password: currentPassword,
     });
@@ -106,7 +113,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Update password
+    // Update password using the original session
     const { error: updateError } = await supabase.auth.updateUser({
       password: newPassword,
     });
