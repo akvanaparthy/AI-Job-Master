@@ -258,8 +258,8 @@ export default function CoverLetterPage() {
             <FileText className="w-6 h-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Cover Letters</h1>
-            <p className="text-lg text-slate-500">
+            <h1 className="text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">Cover Letters</h1>
+            <p className="text-lg text-slate-500 dark:text-gray-400">
               Craft compelling, personalized cover letters that showcase your perfect fit
             </p>
           </div>
@@ -275,19 +275,19 @@ export default function CoverLetterPage() {
           className="space-y-4 sm:space-y-6"
         >
           {/* Configuration Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 border-b border-amber-100/50 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-amber-100/50 dark:border-amber-800/50 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 dark:text-amber-400" />
                 Configuration
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Set your preferences</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Set your preferences</p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Resume</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Resume</Label>
                 <Select value={selectedResumeId} onValueChange={setSelectedResumeId} disabled={loadingResumes}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue placeholder={loadingResumes ? "Loading..." : "Choose a resume"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -318,9 +318,9 @@ export default function CoverLetterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">AI Model</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">AI Model</Label>
                 <Select value={llmModel} onValueChange={setLlmModel} disabled={loadingModels || !hasAnyApiKey}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue placeholder={
                       loadingModels
                         ? "Loading models..."
@@ -371,9 +371,9 @@ export default function CoverLetterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Length</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Length</Label>
                 <Select value={length} onValueChange={(value: any) => setLength(value)}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -391,50 +391,50 @@ export default function CoverLetterPage() {
           </Card>
 
           {/* Job Details Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 border-b border-amber-100/50 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">Job Details</h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Tell us about the position</p>
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50/80 dark:from-amber-900/20 dark:to-orange-900/20 border-b border-amber-100/50 dark:border-amber-800/50 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">Job Details</h2>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Tell us about the position</p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Position</Label>
+                  <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Position</Label>
                   <Input
                     placeholder="Software Engineer"
                     value={positionTitle}
                     onChange={(e) => setPositionTitle(e.target.value)}
-                    className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                    className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Company</Label>
+                  <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Company</Label>
                   <Input
                     placeholder="Tech Corp"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                    className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">
-                  Job Description <span className="text-amber-600">*</span>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
+                  Job Description <span className="text-amber-600 dark:text-amber-400">*</span>
                 </Label>
                 <Textarea
                   placeholder="Paste the full job description here..."
-                  className="min-h-[150px] sm:min-h-[180px] bg-white border-slate-200 rounded-lg resize-none leading-relaxed hover:border-slate-300 transition-colors text-sm sm:text-base"
+                  className="min-h-[150px] sm:min-h-[180px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none leading-relaxed hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Company Info (Optional)</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Company Info (Optional)</Label>
                 <Textarea
                   placeholder="What interests you about this company?"
-                  className="min-h-[80px] sm:min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors text-sm sm:text-base"
+                  className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   value={companyDescription}
                   onChange={(e) => setCompanyDescription(e.target.value)}
                 />
@@ -443,7 +443,7 @@ export default function CoverLetterPage() {
               <Button
                 onClick={handleGenerate}
                 disabled={loading || !jobDescription || !hasAnyApiKey || !llmModel}
-                className="w-full h-11 sm:h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+                className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
               >
                 {loading ? (
                   <>
@@ -467,17 +467,17 @@ export default function CoverLetterPage() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="bg-white border-slate-200/60 shadow-sm h-full overflow-hidden">
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm h-full overflow-hidden">
             {generatedLetter ? (
               <>
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 border-b border-emerald-100/50 px-4 sm:px-6 py-3 sm:py-4">
+                <div className="bg-gradient-to-br from-emerald-50 to-teal-50/80 dark:from-emerald-900/20 dark:to-teal-900/20 border-b border-emerald-100/50 dark:border-emerald-800/50 px-4 sm:px-6 py-3 sm:py-4">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
                     <div>
-                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600" />
+                      <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 dark:text-emerald-400" />
                         Your Cover Letter
                       </h2>
-                      <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">
                         {savedId ? 'Saved to history' : 'Review and save to history if needed'}
                       </p>
                     </div>
@@ -529,7 +529,7 @@ export default function CoverLetterPage() {
                   <Textarea
                     value={generatedLetter}
                     onChange={(e) => setGeneratedLetter(e.target.value)}
-                    className="min-h-[500px] sm:min-h-[680px] bg-white border-slate-200 rounded-lg resize-none leading-relaxed font-serif text-sm sm:text-[15px]"
+                    className="min-h-[500px] sm:min-h-[680px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none leading-relaxed font-serif text-sm sm:text-[15px]"
                   />
                 </div>
               </>
@@ -541,11 +541,11 @@ export default function CoverLetterPage() {
                   transition={{ delay: 0.3 }}
                   className="text-center"
                 >
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
-                    <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-amber-600" strokeWidth={1.5} />
+                  <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-[16px] sm:rounded-[20px] bg-gradient-to-br from-amber-100 to-orange-100 dark:from-amber-900/40 dark:to-orange-900/40 flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-inner">
+                    <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-amber-600 dark:text-amber-400" strokeWidth={1.5} />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-slate-900 mb-2">Ready to Create</h3>
-                  <p className="text-sm sm:text-base text-slate-600 max-w-sm mx-auto leading-relaxed">
+                  <h3 className="text-lg sm:text-xl font-semibold text-slate-900 dark:text-gray-100 mb-2">Ready to Create</h3>
+                  <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 max-w-sm mx-auto leading-relaxed">
                     Fill in the job details and click Generate to craft your personalized cover letter
                   </p>
                 </motion.div>

@@ -276,8 +276,8 @@ export default function HistoryPage() {
               <HistoryIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-[42px] font-bold text-slate-900 leading-tight">History</h1>
-              <p className="text-sm sm:text-base md:text-lg text-slate-500 leading-snug">
+              <h1 className="text-2xl sm:text-3xl md:text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">History</h1>
+              <p className="text-sm sm:text-base md:text-lg text-slate-500 dark:text-gray-400 leading-snug">
                 View and manage all your generated applications
               </p>
             </div>
@@ -286,7 +286,7 @@ export default function HistoryPage() {
             onClick={handleExport}
             disabled={exporting || filteredHistory.length === 0}
             variant="outline"
-            className="h-10 sm:h-11 text-sm sm:text-base border-slate-200 hover:bg-slate-50 transition-colors w-full sm:w-auto"
+            className="h-10 sm:h-11 text-sm sm:text-base border-slate-200 dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-800 transition-colors w-full sm:w-auto"
           >
             {exporting ? (
               <Loader2 className="mr-2 h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin" />
@@ -305,27 +305,27 @@ export default function HistoryPage() {
         transition={{ delay: 0.1 }}
         className="mb-4 sm:mb-6"
       >
-        <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-br from-violet-50 to-purple-50/80 border-b border-violet-100/50 px-4 sm:px-6 py-3 sm:py-4">
-            <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-              <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600" />
+        <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-br from-violet-50 to-purple-50/80 dark:from-violet-900/20 dark:to-purple-900/20 border-b border-violet-100/50 dark:border-violet-800/50 px-4 sm:px-6 py-3 sm:py-4">
+            <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+              <Filter className="w-4 h-4 sm:w-5 sm:h-5 text-violet-600 dark:text-violet-400" />
               Filters
             </h2>
           </div>
           <div className="p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
               <div className="relative sm:col-span-2 md:col-span-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 dark:text-gray-500" />
                 <Input
                   placeholder="Search by company or position..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10 sm:h-11 pl-9 sm:pl-10 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors"
+                  className="h-10 sm:h-11 pl-9 sm:pl-10 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                 />
               </div>
 
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
@@ -337,7 +337,7 @@ export default function HistoryPage() {
               </Select>
 
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
                 <SelectContent className="rounded-lg">
@@ -359,10 +359,10 @@ export default function HistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-br from-slate-50 to-gray-50 border-b border-slate-200 px-4 sm:px-6 py-3 sm:py-4">
+        <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+          <div className="bg-gradient-to-br from-slate-50 to-gray-50 dark:from-gray-900/50 dark:to-gray-800/50 border-b border-slate-200 dark:border-gray-700 px-4 sm:px-6 py-3 sm:py-4">
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">
                 Generated Content
               </h2>
               <Badge variant="secondary" className="bg-violet-100 text-violet-700 hover:bg-violet-100 text-xs sm:text-sm">
@@ -381,8 +381,8 @@ export default function HistoryPage() {
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[14px] sm:rounded-[16px] bg-slate-100 flex items-center justify-center mb-3 sm:mb-4">
                   <HistoryIcon className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2">No History Found</h3>
-                <p className="text-sm sm:text-base text-slate-600 text-center max-w-sm px-4">
+                <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 mb-2">No History Found</h3>
+                <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 text-center max-w-sm px-4">
                   {searchQuery || typeFilter !== 'ALL' || statusFilter !== 'ALL'
                     ? 'Try adjusting your filters to see more results'
                     : 'Start generating cover letters, LinkedIn messages, or emails to build your history'}

@@ -26,16 +26,16 @@ export function Footer({ variant = 'full', isDark = false }: FooterProps) {
 
   const currentYear = new Date().getFullYear();
 
-  // Color classes based on context
+  // Color classes based on context - now with Tailwind dark mode support
   const bgClass = isDark
     ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-t border-slate-700'
-    : 'bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100 border-t border-slate-200';
+    : 'bg-gradient-to-br from-slate-50 via-slate-50 to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 border-t border-slate-200 dark:border-gray-700';
 
-  const textPrimary = isDark ? 'text-slate-100' : 'text-slate-900';
-  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-600';
+  const textPrimary = isDark ? 'text-slate-100' : 'text-slate-900 dark:text-gray-100';
+  const textSecondary = isDark ? 'text-slate-400' : 'text-slate-600 dark:text-gray-400';
   const hoverLinkClass = isDark
     ? 'hover:text-purple-400 transition-colors duration-300'
-    : 'hover:text-purple-600 transition-colors duration-300';
+    : 'hover:text-purple-600 dark:hover:text-purple-400 transition-colors duration-300';
 
   if (variant === 'compact') {
     return (
@@ -65,8 +65,8 @@ export function Footer({ variant = 'full', isDark = false }: FooterProps) {
     <footer className={`${bgClass} relative overflow-hidden`}>
       {/* Animated gradient background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${isDark ? 'bg-purple-600' : 'bg-purple-300'}`} />
-        <div className={`absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${isDark ? 'bg-blue-600' : 'bg-blue-300'}`} />
+        <div className={`absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${isDark ? 'bg-purple-600' : 'bg-purple-300 dark:bg-purple-600'}`} />
+        <div className={`absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl opacity-20 ${isDark ? 'bg-blue-600' : 'bg-blue-300 dark:bg-blue-600'}`} />
       </div>
 
       {/* Gradient line separator */}
@@ -148,24 +148,24 @@ export function Footer({ variant = 'full', isDark = false }: FooterProps) {
           <div>
             <h4 className={`font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${textPrimary}`}>Connect</h4>
             <div className="flex gap-2 sm:gap-3">
-              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300'} transition-colors duration-300`}>
-                <Linkedin className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`} />
+              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 dark:bg-gray-700 dark:hover:bg-gray-600'} transition-colors duration-300`}>
+                <Linkedin className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700 dark:text-gray-300'}`} />
               </a>
-              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300'} transition-colors duration-300`}>
-                <Twitter className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`} />
+              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 dark:bg-gray-700 dark:hover:bg-gray-600'} transition-colors duration-300`}>
+                <Twitter className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700 dark:text-gray-300'}`} />
               </a>
-              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300'} transition-colors duration-300`}>
-                <Github className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`} />
+              <a href="#" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 dark:bg-gray-700 dark:hover:bg-gray-600'} transition-colors duration-300`}>
+                <Github className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700 dark:text-gray-300'}`} />
               </a>
-              <a href="mailto:hello@aijobmaster.com" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300'} transition-colors duration-300`}>
-                <Mail className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700'}`} />
+              <a href="mailto:hello@aijobmaster.com" className={`p-2 rounded-lg ${isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-slate-200 hover:bg-slate-300 dark:bg-gray-700 dark:hover:bg-gray-600'} transition-colors duration-300`}>
+                <Mail className={`w-4 h-4 ${isDark ? 'text-slate-300' : 'text-slate-700 dark:text-gray-300'}`} />
               </a>
             </div>
           </div>
         </div>
 
         {/* Divider */}
-        <div className={`h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent ${isDark ? 'via-slate-600' : ''} mb-4 sm:mb-6`} />
+        <div className={`h-px bg-gradient-to-r from-transparent via-slate-300 dark:via-slate-600 to-transparent ${isDark ? 'via-slate-600' : ''} mb-4 sm:mb-6`} />
 
         {/* Bottom Section */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">

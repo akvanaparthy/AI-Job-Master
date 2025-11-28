@@ -343,8 +343,8 @@ export default function LinkedInPage() {
             <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-slate-900 leading-tight">LinkedIn Messages</h1>
-            <p className="text-sm sm:text-base lg:text-lg text-slate-500">
+            <h1 className="text-2xl sm:text-3xl lg:text-[42px] font-bold text-slate-900 dark:text-gray-100 leading-tight">LinkedIn Messages</h1>
+            <p className="text-sm sm:text-base lg:text-lg text-slate-500 dark:text-gray-400">
               Create personalized outreach that gets responses from hiring managers and recruiters
             </p>
           </div>
@@ -359,16 +359,16 @@ export default function LinkedInPage() {
         className="mb-4 sm:mb-6"
       >
         <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)}>
-          <TabsList className="bg-white border border-slate-200 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
+          <TabsList className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
             <TabsTrigger
               value="NEW"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
               New Message
             </TabsTrigger>
             <TabsTrigger
               value="FOLLOW_UP"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none"
+              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
               <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
               Follow-up
@@ -386,19 +386,19 @@ export default function LinkedInPage() {
           className="space-y-4 sm:space-y-6"
         >
           {/* Configuration Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 border-b border-blue-100/50 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
                 Configuration
               </h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Set your preferences</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Set your preferences</p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Resume</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Resume</Label>
                 <Select value={selectedResumeId} onValueChange={setSelectedResumeId} disabled={loadingResumes}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue placeholder={loadingResumes ? "Loading..." : "Choose a resume"} />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -427,9 +427,9 @@ export default function LinkedInPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">AI Model</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">AI Model</Label>
                 <Select value={llmModel} onValueChange={setLlmModel} disabled={loadingModels || !hasAnyApiKey}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue placeholder={
                       loadingModels
                         ? "Loading models..."
@@ -480,9 +480,9 @@ export default function LinkedInPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-900">Message Length</Label>
+                <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Message Length</Label>
                 <Select value={length} onValueChange={(value: any) => setLength(value)}>
-                  <SelectTrigger className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base">
+                  <SelectTrigger className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-lg">
@@ -502,13 +502,13 @@ export default function LinkedInPage() {
 
           {/* Search for Previous Messages - Only shown in follow-up mode */}
           {messageType === 'FOLLOW_UP' && (
-            <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-br from-purple-50 to-indigo-50/80 border-b border-purple-100/50 px-4 sm:px-6 py-3 sm:py-4">
-                <h2 className="text-base sm:text-lg font-semibold text-slate-900 flex items-center gap-2">
-                  <Search className="w-5 h-5 text-purple-600" />
+            <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-purple-50 to-indigo-50/80 dark:from-purple-900/20 dark:to-indigo-900/20 border-b border-purple-100/50 dark:border-purple-800/50 px-4 sm:px-6 py-3 sm:py-4">
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                  <Search className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                   Search Previous Messages
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">Find and load a previous message to follow up on</p>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Find and load a previous message to follow up on</p>
               </div>
               <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                 <div className="flex gap-2">
@@ -517,7 +517,7 @@ export default function LinkedInPage() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                    className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                    className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   />
                   <Button
                     onClick={handleSearch}
@@ -566,10 +566,10 @@ export default function LinkedInPage() {
 
 
           {/* Message Details Card */}
-          <Card className="bg-white border-slate-200/60 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 border-b border-blue-100/50 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900">Message Details</h2>
-              <p className="text-sm text-slate-600 mt-0.5">
+          <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">Message Details</h2>
+              <p className="text-sm text-slate-600 dark:text-gray-400 mt-0.5">
                 {messageType === 'NEW' ? 'Enter recipient and job information' : 'Following up on a previous message'}
               </p>
             </div>
@@ -585,21 +585,21 @@ export default function LinkedInPage() {
                   >
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">LinkedIn URL</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">LinkedIn URL</Label>
                         <Input
                           placeholder="https://linkedin.com/in/username"
                           value={linkedinUrl}
                           onChange={(e) => setLinkedinUrl(e.target.value)}
-                          className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                          className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">Recipient Name</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Recipient Name</Label>
                         <Input
                           placeholder="John Doe"
                           value={recipientName}
                           onChange={(e) => setRecipientName(e.target.value)}
-                          className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                          className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                         />
                       </div>
                     </div>
@@ -609,39 +609,39 @@ export default function LinkedInPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">
+                  <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
                     Position
                   </Label>
                     <Input
                       placeholder="e.g., Senior Software Engineer (or leave blank for general inquiry)"
                       value={positionTitle}
                       onChange={(e) => setPositionTitle(e.target.value)}
-                      className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                      className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                     />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">
-                    Company <span className="text-blue-600">*</span>
+                  <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
+                    Company <span className="text-blue-600 dark:text-blue-400">*</span>
                   </Label>
                   <Input
                     placeholder="Tech Corp"
                     value={companyName}
                     onChange={(e) => setCompanyName(e.target.value)}
-                    className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                    className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   />
                 </div>
               </div>
 
               {!positionTitle && (
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium text-slate-900">Areas of Interest</Label>
+                  <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Areas of Interest</Label>
                     <Input
                       placeholder="e.g., Backend Development, Cloud Infrastructure, AI/ML"
                       value={areasOfInterest}
                       onChange={(e) => setAreasOfInterest(e.target.value)}
-                      className="h-10 sm:h-11 bg-white border-slate-200 rounded-lg hover:border-slate-300 transition-colors text-sm sm:text-base"
+                      className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                     />
-                  <p className="text-xs text-slate-500">Specify areas you&apos;re interested in to help tailor the message</p>
+                  <p className="text-xs text-slate-500 dark:text-gray-400">Specify areas you&apos;re interested in to help tailor the message</p>
                 </div>
               )}
 

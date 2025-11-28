@@ -96,8 +96,8 @@ export function NotificationsBell() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors">
-          <Bell className="w-5 h-5 text-gray-700" />
+        <button className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
+          <Bell className="w-5 h-5 text-gray-700 dark:text-gray-300" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
           )}
@@ -120,7 +120,7 @@ export function NotificationsBell() {
         <DropdownMenuSeparator />
         <div className="max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="px-4 py-8 text-center text-sm text-gray-500">
+            <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
               No notifications
             </div>
           ) : (
@@ -129,7 +129,7 @@ export function NotificationsBell() {
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification)}
                 className={`px-4 py-3 cursor-pointer ${
-                  !notification.isRead ? 'bg-blue-50' : ''
+                  !notification.isRead ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 <div className="flex-1">
@@ -139,8 +139,8 @@ export function NotificationsBell() {
                       <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{notification.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{notification.message}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                     {new Date(notification.createdAt).toLocaleDateString()}
                   </p>
                 </div>

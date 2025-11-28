@@ -147,8 +147,8 @@ export default function ActivityHistoryPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Activity History</h1>
-        <p className="text-gray-600">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">Activity History</h1>
+        <p className="text-gray-600 dark:text-gray-400">
           Complete record of all your activities. Deleted items are marked but count toward your monthly limit.
         </p>
       </motion.div>
@@ -160,16 +160,16 @@ export default function ActivityHistoryPage() {
         transition={{ delay: 0.1 }}
         className="mb-6"
       >
-        <Card className="p-4">
+        <Card className="p-4 dark:bg-gray-800 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-4 h-4" />
                 <Input
                   placeholder="Search by company, position, or recipient..."
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 dark:bg-gray-800 dark:border-gray-600 dark:hover:border-gray-500"
                 />
               </div>
             </div>
@@ -197,9 +197,9 @@ export default function ActivityHistoryPage() {
         transition={{ delay: 0.2 }}
       >
         <Card>
-          <div className="p-6">
+          <div className="p-6 dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Activity Log ({pagination.totalCount} total)
               </h2>
             </div>
@@ -223,8 +223,8 @@ export default function ActivityHistoryPage() {
                     <div
                       key={activity.id}
                       className={`p-4 rounded-lg border ${
-                        activity.isDeleted ? 'bg-gray-50 opacity-60' : 'bg-white hover:bg-gray-50'
-                      } transition-colors`}
+                        activity.isDeleted ? 'bg-gray-50 dark:bg-gray-900/50 opacity-60' : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50'
+                      } transition-colors dark:border-gray-700`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex items-start gap-3 flex-1">
@@ -233,7 +233,7 @@ export default function ActivityHistoryPage() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="font-semibold text-gray-900 truncate">
+                              <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate">
                                 {activity.companyName}
                               </h3>
                               {activity.isDeleted && (
@@ -243,7 +243,7 @@ export default function ActivityHistoryPage() {
                                 </Badge>
                               )}
                             </div>
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
                               <Badge variant="outline" className={getActivityColor(activity.activityType)}>
                                 {getActivityLabel(activity.activityType)}
                               </Badge>
@@ -261,7 +261,7 @@ export default function ActivityHistoryPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 ml-4">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 ml-4">
                           <Calendar className="w-3 h-3" />
                           {new Date(activity.createdAt).toLocaleDateString('en-US', {
                             month: 'short',

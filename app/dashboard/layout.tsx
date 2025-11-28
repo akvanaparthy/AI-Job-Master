@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { NotificationsBell } from '@/components/NotificationsBell';
+import { DarkModeToggle } from '@/components/DarkModeToggle';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -123,7 +124,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
       {/* Overlay for mobile sidebar */}
       {isMobileSidebarOpen && (
         <div 
@@ -134,43 +135,43 @@ export default function DashboardLayout({
 
       {/* Sidebar - Collapsible on desktop, drawer on mobile */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 bg-[#f5f5f5] flex flex-col transition-all duration-300 ease-in-out z-50",
+        "fixed inset-y-0 left-0 bg-[#f5f5f5] dark:bg-gray-800 flex flex-col transition-all duration-300 ease-in-out z-50",
         isSidebarCollapsed ? "w-[80px]" : "w-[280px]",
         "lg:translate-x-0",
         isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3 px-6 pt-6 pb-8 hover:opacity-80 transition-opacity relative">
-          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center flex-shrink-0">
             <span className="text-white text-lg font-bold">AJ</span>
           </div>
           <span className={cn(
-            "text-xl font-bold text-gray-900 whitespace-nowrap transition-all duration-300 ease-in-out",
+            "text-xl font-bold text-gray-900 dark:text-gray-100 whitespace-nowrap transition-all duration-300 ease-in-out",
             isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
           )}>AI Job Master</span>
         </Link>
 
-        {/* Collapse button - Desktop only */}
-        <button
-          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          className="hidden lg:flex absolute -right-3 top-24 w-6 h-6 bg-white border border-gray-300 rounded-full items-center justify-center hover:bg-gray-50 hover:shadow-lg transition-all shadow-md z-[60]"
-        >
-          {isSidebarCollapsed ? (
-            <ChevronRight className="w-3.5 h-3.5 text-gray-700" strokeWidth={2.5} />
-          ) : (
-            <ChevronLeft className="w-3.5 h-3.5 text-gray-700" strokeWidth={2.5} />
-          )}
-        </button>
+          {/* Collapse button - Desktop only */}
+          <button
+            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+            className="hidden lg:flex absolute -right-3 top-24 w-6 h-6 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-600 hover:shadow-lg transition-all shadow-md z-[60]"
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight className="w-3.5 h-3.5 text-gray-700 dark:text-gray-300" strokeWidth={2.5} />
+            ) : (
+              <ChevronLeft className="w-3.5 h-3.5 text-gray-700 dark:text-gray-300" strokeWidth={2.5} />
+            )}
+          </button>
 
-        {/* Close button - Mobile only */}
-        <button
-          onClick={() => setIsMobileSidebarOpen(false)}
-          className="lg:hidden absolute right-4 top-4 p-2 hover:bg-white/40 rounded-lg transition-colors"
-        >
-          <X className="w-5 h-5 text-gray-600" />
-        </button>
+          {/* Close button - Mobile only */}
+          <button
+            onClick={() => setIsMobileSidebarOpen(false)}
+            className="lg:hidden absolute right-4 top-4 p-2 hover:bg-white/40 dark:hover:bg-gray-700/40 rounded-lg transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          </button>
 
-        {/* Navigation */}
+          {/* Navigation */}
         <nav className="flex-1 px-4 overflow-y-auto overflow-x-hidden">
           {/* Main Section */}
           <div className="mb-6">
@@ -178,7 +179,7 @@ export default function DashboardLayout({
               "px-3 mb-3 transition-all duration-300 ease-in-out",
               isSidebarCollapsed ? "opacity-0 h-0 mb-0 overflow-hidden" : "opacity-100 h-auto"
             )}>
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Tools</span>
+              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider whitespace-nowrap">Tools</span>
             </div>
             <div className="space-y-1">
               {navigation.map((item) => {
@@ -195,8 +196,8 @@ export default function DashboardLayout({
                     className={cn(
                       "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                       isActive
-                        ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                        : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                        ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+                        : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
                       isSidebarCollapsed && "justify-center"
                     )}
                     title={isSidebarCollapsed ? item.name : undefined}
@@ -218,7 +219,7 @@ export default function DashboardLayout({
               "px-3 mb-3 transition-all duration-300 ease-in-out",
               isSidebarCollapsed ? "opacity-0 h-0 mb-0 overflow-hidden" : "opacity-100 h-auto"
             )}>
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider whitespace-nowrap">Other</span>
+              <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider whitespace-nowrap">Other</span>
             </div>
             <div className="space-y-1">
               <Link
@@ -227,8 +228,8 @@ export default function DashboardLayout({
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                   pathname === '/settings'
-                    ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                    : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                    ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
                   isSidebarCollapsed && "justify-center"
                 )}
                 title={isSidebarCollapsed ? "Settings" : undefined}
@@ -246,8 +247,8 @@ export default function DashboardLayout({
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-xl text-[15px] font-normal transition-all",
                     pathname?.startsWith('/admin')
-                      ? "bg-white text-gray-900 shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-white/40",
+                      ? "bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-white/40 dark:hover:bg-gray-700/40",
                     isSidebarCollapsed && "justify-center"
                   )}
                   title={isSidebarCollapsed ? "Admin Dashboard" : undefined}
@@ -264,11 +265,11 @@ export default function DashboardLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-gray-300/50 mt-auto flex-shrink-0">
+        <div className="p-4 border-t border-gray-300/50 dark:border-gray-700/50 mt-auto flex-shrink-0">
           <DropdownMenu onOpenChange={setIsDropdownOpen}>
             <DropdownMenuTrigger asChild>
               <button className={cn(
-                "flex items-center rounded-xl hover:bg-white/40 transition-all w-full mb-3",
+                "flex items-center rounded-xl hover:bg-white/40 dark:hover:bg-gray-700/40 transition-all w-full mb-3",
                 isSidebarCollapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5"
               )}>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center flex-shrink-0 shadow-md">
@@ -278,7 +279,7 @@ export default function DashboardLayout({
                   "flex-1 min-w-0 text-left transition-all duration-300 ease-in-out",
                   isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
                 )}>
-                  <p className="text-[13px] font-semibold text-gray-900 truncate whitespace-nowrap">{userEmail || 'Loading...'}</p>
+                  <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate whitespace-nowrap">{userEmail || 'Loading...'}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600 flex-shrink-0" strokeWidth={2.5} />}
                     {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600 flex-shrink-0" strokeWidth={2.5} />}
@@ -330,7 +331,7 @@ export default function DashboardLayout({
             </DropdownMenuContent>
           </DropdownMenu>
           <button className={cn(
-            "px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-xl border border-gray-300 hover:bg-gray-50 transition-all duration-300 ease-in-out",
+            "px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 rounded-xl border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-all duration-300 ease-in-out",
             isSidebarCollapsed ? "opacity-0 h-0 p-0 overflow-hidden border-0" : "opacity-100 h-auto w-full"
           )}>
             Upgrade
@@ -344,33 +345,34 @@ export default function DashboardLayout({
         isSidebarCollapsed ? "lg:pl-[80px]" : "lg:pl-[280px]"
       )}>
         {/* Top header bar - Mobile navigation + notifications */}
-        <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+        <div className="sticky top-0 z-10 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 lg:px-8 py-3 sm:py-4 transition-colors duration-300">
           <div className="flex items-center justify-between">
             {/* Mobile menu button and logo */}
             <div className="flex items-center gap-3 lg:hidden">
               <button
                 onClick={() => setIsMobileSidebarOpen(true)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               >
-                <Menu className="w-5 h-5 text-gray-600" />
+                <Menu className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </button>
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-600 dark:bg-blue-500 flex items-center justify-center">
                   <span className="text-white text-sm sm:text-lg font-bold">AJ</span>
                 </div>
-                <span className="text-base sm:text-xl font-bold text-gray-900">AI Job Master</span>
+                <span className="text-base sm:text-xl font-bold text-gray-900 dark:text-gray-100">AI Job Master</span>
               </Link>
             </div>
             
-            {/* Notifications - always on right */}
-            <div className="lg:ml-auto">
+            {/* Dark Mode Toggle & Notifications - always on right */}
+            <div className="lg:ml-auto flex items-center gap-2">
+              <DarkModeToggle />
               <NotificationsBell />
             </div>
           </div>
         </div>
 
         {/* Mobile bottom navigation */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 transition-colors duration-300">
           <div className="grid grid-cols-5 gap-1 px-2 py-2">
             {navigation.map((item) => {
               const Icon = item.icon;
@@ -385,8 +387,8 @@ export default function DashboardLayout({
                   className={cn(
                     "flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-colors",
                     isActive
-                      ? "text-blue-600 bg-blue-50"
-                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30"
+                      : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                   )}
                 >
                   <Icon className="w-5 h-5" strokeWidth={1.5} />
@@ -397,13 +399,13 @@ export default function DashboardLayout({
           </div>
         </nav>
 
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-white pb-20 lg:pb-8">
-          {children}
-        </main>
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 bg-white dark:bg-gray-900 pb-20 lg:pb-8 transition-colors duration-300">
+        {children}
+      </main>
 
-        {/* Footer */}
-        <Footer variant="compact" isDark={false} />
-      </div>
+      {/* Footer */}
+      <Footer variant="compact" isDark={false} />
+    </div>
     </div>
   );
 }
