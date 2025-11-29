@@ -683,14 +683,14 @@ export default function EmailPage() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                 >
                   <div className="space-y-2">
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900">Extra Content</Label>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Extra Content</Label>
                     <Textarea
                       placeholder="Add any additional context or information to include in this follow-up email..."
-                      className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors"
+                      className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                       value={extraContent}
                       onChange={(e) => setExtraContent(e.target.value)}
                     />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-gray-400">
                       This extra context will be used by the AI to enhance your follow-up email with new angles or information
                     </p>
                   </div>
@@ -700,7 +700,7 @@ export default function EmailPage() {
               <Button
                 onClick={handleGenerate}
                 disabled={loading || !recipientEmail || !companyName || !hasAnyApiKey || !llmModel}
-                className="w-full h-11 sm:h-12 text-sm sm:text-base bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
+                className="w-full h-11 sm:h-12 text-sm sm:text-base bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {loading ? (
                   <>
