@@ -656,19 +656,19 @@ export default function LinkedInPage() {
                   >
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">Job Description</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Job Description</Label>
                         <Textarea
                           placeholder="Brief job description..."
-                          className="min-h-[80px] sm:min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors text-sm sm:text-base"
+                          className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900">Company Info</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Company Info</Label>
                         <Textarea
                           placeholder="What interests you about this company?"
-                          className="min-h-[60px] sm:min-h-[80px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors text-sm sm:text-base"
+                          className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
                         />
@@ -687,14 +687,14 @@ export default function LinkedInPage() {
                   transition={{ duration: 0.3, ease: 'easeInOut' }}
                 >
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium text-slate-900">Extra Content</Label>
+                    <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Extra Content</Label>
                     <Textarea
                       placeholder="Add any additional context or information to include in this follow-up message..."
-                      className="min-h-[80px] sm:min-h-[100px] bg-white border-slate-200 rounded-lg resize-none hover:border-slate-300 transition-colors text-sm sm:text-base"
+                      className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                       value={extraContent}
                       onChange={(e) => setExtraContent(e.target.value)}
                     />
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-gray-400">
                       This extra context will be used by the AI to enhance your follow-up message with new angles or information
                     </p>
                   </div>

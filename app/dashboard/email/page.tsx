@@ -789,20 +789,20 @@ export default function EmailPage() {
 
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
                   <div className="space-y-2">
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900">Subject Line</Label>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Subject Line</Label>
                     <Input
                       value={generatedSubject}
                       onChange={(e) => setGeneratedSubject(e.target.value)}
-                      className="h-10 sm:h-11 text-sm sm:text-base bg-white border-slate-200 rounded-lg font-medium"
+                      className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg font-medium"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900">Email Body</Label>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Email Body</Label>
                     <Textarea
                       value={generatedBody}
                       onChange={(e) => setGeneratedBody(e.target.value)}
-                      className="min-h-[400px] sm:min-h-[500px] lg:min-h-[580px] text-sm sm:text-base bg-white border-slate-200 rounded-lg resize-none leading-relaxed"
+                      className="min-h-[400px] sm:min-h-[500px] lg:min-h-[580px] text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none leading-relaxed"
                     />
                   </div>
                 </div>
@@ -821,15 +821,15 @@ export default function EmailPage() {
                     </div>
                     <div className="flex-1 p-4 sm:p-6 overflow-y-auto space-y-4">
                       <div className="space-y-2">
-                        <Label className="text-xs sm:text-sm font-medium text-slate-900">Subject</Label>
-                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 sm:p-3">
-                          <p className="text-xs sm:text-sm text-slate-700">{previousMessageSubject}</p>
+                        <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Subject</Label>
+                        <div className="bg-slate-50 dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg p-2 sm:p-3">
+                          <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300">{previousMessageSubject}</p>
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-xs sm:text-sm font-medium text-slate-900">Body</Label>
-                        <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 sm:p-4">
-                          <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap leading-relaxed">{previousMessageBody}</p>
+                        <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Body</Label>
+                        <div className="bg-slate-50 dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg p-3 sm:p-4">
+                          <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">{previousMessageBody}</p>
                         </div>
                       </div>
                     </div>

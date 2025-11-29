@@ -378,8 +378,8 @@ export default function HistoryPage() {
               </div>
             ) : filteredHistory.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-8 sm:p-12">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[14px] sm:rounded-[16px] bg-slate-100 flex items-center justify-center mb-3 sm:mb-4">
-                  <HistoryIcon className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[14px] sm:rounded-[16px] bg-slate-100 dark:bg-gray-700 flex items-center justify-center mb-3 sm:mb-4">
+                  <HistoryIcon className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400 dark:text-gray-500" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 mb-2">No History Found</h3>
                 <p className="text-sm sm:text-base text-slate-600 dark:text-gray-400 text-center max-w-sm px-4">
@@ -564,9 +564,9 @@ export default function HistoryPage() {
 
               {selectedItem.content && (
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Content</h3>
-                  <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
-                    <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-gray-100 mb-2">Content</h3>
+                  <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-gray-600">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap">
                       {selectedItem.content}
                     </p>
                   </div>
@@ -575,9 +575,9 @@ export default function HistoryPage() {
 
               {selectedItem.subject && (
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Subject</h3>
-                  <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
-                    <p className="text-xs sm:text-sm text-slate-700">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-gray-100 mb-2">Subject</h3>
+                  <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-gray-600">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300">
                       {selectedItem.subject}
                     </p>
                   </div>
@@ -586,9 +586,9 @@ export default function HistoryPage() {
 
               {selectedItem.body && (
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Body</h3>
-                  <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
-                    <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-gray-100 mb-2">Body</h3>
+                  <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-gray-600">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap">
                       {selectedItem.body}
                     </p>
                   </div>
@@ -597,17 +597,17 @@ export default function HistoryPage() {
 
               {selectedItem.message && (
                 <div>
-                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 mb-2">Message</h3>
-                  <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
-                    <p className="text-xs sm:text-sm text-slate-700 whitespace-pre-wrap">
+                  <h3 className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-gray-100 mb-2">Message</h3>
+                  <div className="bg-slate-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-slate-200 dark:border-gray-600">
+                    <p className="text-xs sm:text-sm text-slate-700 dark:text-gray-300 whitespace-pre-wrap">
                       {selectedItem.message}
                     </p>
                   </div>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-slate-200">
-                <div className="text-[10px] sm:text-xs text-slate-500">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-slate-200 dark:border-gray-700">
+                <div className="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
                   <span className="font-semibold">Created:</span> {selectedItem.createdAt && new Date(selectedItem.createdAt).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',
