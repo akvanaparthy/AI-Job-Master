@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       const shared = await getAvailableSharedModels();
       sharedModels = shared.map(sm => ({
         value: `shared:${sm.model}`, // Prefix with 'shared:' to distinguish from user's own keys
-        label: `${sm.displayName || sm.model} (Sponsored)`,
+        label: `${sm.displayName || sm.model}`,
         provider: sm.provider,
         isShared: true,
       }));
