@@ -26,7 +26,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
-import { Plus, Key, Trash2, Power, PowerOff, Crown, ChevronLeft } from 'lucide-react';
+import { Plus, Key, Trash2, Power, PowerOff, Crown, ChevronLeft, Edit } from 'lucide-react';
 
 interface SharedKey {
   id: string;
@@ -49,17 +49,20 @@ export default function SharedKeysPage() {
   const [keys, setKeys] = useState<SharedKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [availableModels, setAvailableModels] = useState<Record<string, ModelOption[]>>({
-    OPENAI: [],
-    ANTHROPIC: [],
-    GEMINI: [],
-  });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
   const [loadingModels, setLoadingModels] = useState(false);
+  const [editAvailableModels, setEditAvailableModels] = useState<ModelOption[]>([]);
+  const [loadingEditModels, setLoadingEditModels] = useState(false);
   
   // Form state
   const [provider, setProvider] = useState<string>('');
   const [apiKey, setApiKey] = useState('');
   const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  
+  // Edit state
+  const [editingKey, setEditingKey] = useState<SharedKey | null>(null);
+  const [editSelectedModels, setEditSelectedModels] = useState<string[]>([]);
 
   const loadKeys = useCallback(async () => {
     setLoading(true);
@@ -86,35 +89,65 @@ export default function SharedKeysPage() {
 
   useEffect(() => {
     loadKeys();
-    loadAvailableModels();
   }, [loadKeys]);
 
-  const loadAvailableModels = async () => {
-    setLoadingModels(true);
+  // Fetch models when provider or API key changes in Add dialog
+  useEffect(() => {
+    if (provider && apiKey && dialogOpen) {
+      fetchModelsForKey(provider, apiKey, false);
+    } else {
+      setAvailableModels([]);
+      setSelectedModels([]);
+    }
+  }, [provider, apiKey, dialogOpen]);
+
+  const fetchModelsForKey = async (providerValue: string, apiKeyValue: string, isEdit: boolean) => {
+    if (isEdit) {
+      setLoadingEditModels(true);
+    } else {
+      setLoadingModels(true);
+    }
+
     try {
-      const response = await fetch('/api/settings/available-models');
-      if (!response.ok) throw new Error('Failed to load models');
+      const response = await fetch('/api/admin/shared-keys/fetch-models', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: providerValue,
+          apiKey: apiKeyValue,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to fetch models');
+      }
 
       const data = await response.json();
       
-      // Group models by provider
-      const grouped: Record<string, ModelOption[]> = {
-        OPENAI: [],
-        ANTHROPIC: [],
-        GEMINI: [],
-      };
-
-      data.models.forEach((model: ModelOption) => {
-        if (grouped[model.provider]) {
-          grouped[model.provider].push(model);
-        }
-      });
-
-      setAvailableModels(grouped);
+      if (isEdit) {
+        setEditAvailableModels(data.models);
+      } else {
+        setAvailableModels(data.models);
+      }
     } catch (error: any) {
-      console.error('Failed to load available models:', error);
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to fetch models',
+        variant: 'destructive',
+      });
+      
+      if (isEdit) {
+        setEditAvailableModels([]);
+      } else {
+        setAvailableModels([]);
+      }
     } finally {
-      setLoadingModels(false);
+      if (isEdit) {
+        setLoadingEditModels(false);
+      } else {
+        setLoadingModels(false);
+      }
     }
   };
 
@@ -146,6 +179,7 @@ export default function SharedKeysPage() {
       setProvider('');
       setApiKey('');
       setSelectedModels([]);
+      setAvailableModels([]);
       loadKeys();
     } catch (error: any) {
       toast({
@@ -212,6 +246,69 @@ export default function SharedKeysPage() {
         ? prev.filter(m => m !== modelValue)
         : [...prev, modelValue]
     );
+  };
+
+  const toggleEditModelSelection = (modelValue: string) => {
+    setEditSelectedModels(prev =>
+      prev.includes(modelValue)
+        ? prev.filter(m => m !== modelValue)
+        : [...prev, modelValue]
+    );
+  };
+
+  const openEditDialog = async (key: SharedKey) => {
+    setEditingKey(key);
+    setEditSelectedModels(key.models);
+    setEditDialogOpen(true);
+    
+    // Fetch the full API key from the server to load models
+    try {
+      const response = await fetch(`/api/admin/shared-keys/decrypt?id=${key.id}`);
+      if (response.ok) {
+        const data = await response.json();
+        await fetchModelsForKey(key.provider, data.apiKey, true);
+      }
+    } catch (error) {
+      console.error('Failed to load models for editing:', error);
+    }
+  };
+
+  const handleEditModels = async () => {
+    if (!editingKey || editSelectedModels.length === 0) {
+      toast({
+        title: 'Error',
+        description: 'Please select at least one model',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/shared-keys/models', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: editingKey.id, models: editSelectedModels }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update models');
+
+      toast({
+        title: 'Success',
+        description: 'Models updated successfully',
+      });
+
+      setEditDialogOpen(false);
+      setEditingKey(null);
+      setEditSelectedModels([]);
+      setEditAvailableModels([]);
+      loadKeys();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update models',
+        variant: 'destructive',
+      });
+    }
   };
 
   const getProviderColor = (provider: string) => {
@@ -307,16 +404,16 @@ export default function SharedKeysPage() {
                       />
                     </div>
 
-                    {provider && (
+                    {provider && apiKey && (
                       <div>
                         <Label>Select Models ({selectedModels.length} selected)</Label>
                         {loadingModels ? (
                           <div className="flex items-center justify-center py-8 text-sm text-slate-500">
-                            Loading models...
+                            Loading models from API...
                           </div>
-                        ) : availableModels[provider]?.length > 0 ? (
-                          <div className="grid grid-cols-2 gap-2 mt-2 max-h-[300px] overflow-y-auto">
-                            {availableModels[provider].map((model) => (
+                        ) : availableModels.length > 0 ? (
+                          <div className="grid grid-cols-2 gap-2 mt-2 max-h-[300px] overflow-y-auto p-2 border rounded-lg">
+                            {availableModels.map((model) => (
                               <Button
                                 key={model.value}
                                 variant={selectedModels.includes(model.value) ? 'default' : 'outline'}
@@ -330,7 +427,7 @@ export default function SharedKeysPage() {
                           </div>
                         ) : (
                           <div className="text-sm text-slate-500 py-4 text-center border border-dashed rounded-lg">
-                            No models available for {provider}. Add API key in .env first.
+                            {apiKey ? 'Enter a valid API key to load models' : 'Enter API key above to load available models'}
                           </div>
                         )}
                       </div>
@@ -417,6 +514,15 @@ export default function SharedKeysPage() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => openEditDialog(key)}
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit Models
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => toggleKeyStatus(key.id, key.isActive)}
                         >
                           {key.isActive ? (
@@ -446,6 +552,69 @@ export default function SharedKeysPage() {
               ))
             )}
           </div>
+
+          {/* Edit Models Dialog */}
+          <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Edit Sponsored Models</DialogTitle>
+                <DialogDescription>
+                  Select which models from this API key should be available to PLUS users
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4 mt-4">
+                {editingKey && (
+                  <>
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+                      <Badge className={getProviderColor(editingKey.provider)}>
+                        {editingKey.provider}
+                      </Badge>
+                      <span className="text-sm text-slate-500 font-mono">
+                        {editingKey.apiKeyMasked}
+                      </span>
+                    </div>
+
+                    <div>
+                      <Label>Select Models ({editSelectedModels.length} selected)</Label>
+                      {loadingEditModels ? (
+                        <div className="flex items-center justify-center py-8 text-sm text-slate-500">
+                          Loading models from API...
+                        </div>
+                      ) : editAvailableModels.length > 0 ? (
+                        <div className="grid grid-cols-2 gap-2 mt-2 max-h-[300px] overflow-y-auto p-2 border rounded-lg">
+                          {editAvailableModels.map((model) => (
+                            <Button
+                              key={model.value}
+                              variant={editSelectedModels.includes(model.value) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => toggleEditModelSelection(model.value)}
+                              className="justify-start text-left h-auto py-2"
+                            >
+                              <span className="truncate">{model.label}</span>
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-sm text-slate-500 py-4 text-center border border-dashed rounded-lg">
+                          Loading models...
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleEditModels}>
+                    Save Changes
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </AdminLayout>
