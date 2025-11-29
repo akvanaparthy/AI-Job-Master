@@ -407,7 +407,7 @@ export default function LinkedInPage() {
                     ))}
                     {resumes.length === 0 && (
                       <div className="px-2 py-4 sm:py-6 text-center">
-                        <p className="text-xs sm:text-sm text-slate-600 mb-3">No resumes uploaded yet</p>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mb-3">No resumes uploaded yet</p>
                         <Link href="/dashboard/settings?tab=resumes">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Upload Resume in Settings
@@ -417,7 +417,7 @@ export default function LinkedInPage() {
                     )}
                     {resumes.length > 0 && resumes.length < 3 && (
                       <Link href="/dashboard/settings?tab=resumes" className="block">
-                        <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                        <div className="px-2 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-md border-t border-slate-100 dark:border-gray-700 mt-1">
                           + Add Another Resume ({resumes.length}/3)
                         </div>
                       </Link>
@@ -454,14 +454,14 @@ export default function LinkedInPage() {
                           </SelectItem>
                         ))}
                         <Link href="/dashboard/settings?tab=api-keys" className="block">
-                          <div className="px-2 py-2 text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                          <div className="px-2 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-md border-t border-slate-100 dark:border-gray-700 mt-1">
                             + Manage API Keys
                           </div>
                         </Link>
                       </>
                     ) : (
                       <div className="px-2 py-4 sm:py-6 text-center">
-                        <p className="text-xs sm:text-sm text-slate-600 mb-3">No API keys configured</p>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mb-3">No API keys configured</p>
                         <Link href="/dashboard/settings?tab=api-keys">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Add API Key in Settings
@@ -541,13 +541,13 @@ export default function LinkedInPage() {
                             <p className="text-sm font-medium text-slate-900 truncate">
                               {msg.companyName} {msg.positionTitle && `- ${msg.positionTitle}`}
                             </p>
-                            <p className="text-xs text-slate-500 mt-1">
+                            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
                               {msg.recipientName && `To: ${msg.recipientName} • `}
                               {new Date(msg.createdAt).toLocaleDateString()}
                             </p>
                           </div>
                           <div className="flex-shrink-0">
-                            <span className="text-xs px-2 py-1 bg-slate-200 text-slate-700 rounded">
+                            <span className="text-xs px-2 py-1 bg-slate-200 dark:bg-gray-600 text-slate-700 dark:text-gray-300 rounded">
                               {msg.status}
                             </span>
                           </div>
@@ -558,7 +558,7 @@ export default function LinkedInPage() {
                 )}
 
                 {searchQuery && searchResults.length === 0 && !searching && (
-                  <p className="text-sm text-slate-500 text-center py-4">No messages found</p>
+                  <p className="text-sm text-slate-500 dark:text-gray-400 text-center py-4">No messages found</p>
                 )}
               </div>
             </Card>
@@ -833,7 +833,7 @@ export default function LinkedInPage() {
                         Fill in the required fields and click Generate Message to create your personalized LinkedIn outreach
                       </p>
                       {savedMessageId && (
-                        <p className="text-xs text-slate-500 mt-4 font-mono">
+                        <p className="text-xs text-slate-500 dark:text-gray-400 mt-4 font-mono">
                           Last saved: {savedMessageId}
                         </p>
                       )}

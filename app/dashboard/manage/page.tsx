@@ -468,7 +468,7 @@ export default function HistoryPage() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleFollowUp(item)}
-                                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                                className="h-7 sm:h-8 px-2 sm:px-3 text-xs sm:text-sm border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300"
                               >
                                 <RefreshCw className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1.5" />
                                 <span className="hidden sm:inline">Follow-up</span>
@@ -531,8 +531,8 @@ export default function HistoryPage() {
             <div className="space-y-3 sm:space-y-4">
               {/* Status Update Section */}
               {selectedItem.status && (
-                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-50 rounded-lg border border-slate-200">
-                  <Label className="text-xs sm:text-sm font-medium text-slate-900">Status:</Label>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-50 dark:bg-gray-700 rounded-lg border border-slate-200 dark:border-gray-600">
+                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Status:</Label>
                   <Select
                     value={selectedItem.status}
                     onValueChange={(newStatus) => {
@@ -606,7 +606,7 @@ export default function HistoryPage() {
                 </div>
               )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-slate-200 dark:border-gray-700">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-slate-200 dark:border-gray-700">
                 <div className="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
                   <span className="font-semibold">Created:</span> {selectedItem.createdAt && new Date(selectedItem.createdAt).toLocaleDateString('en-US', {
                     month: 'long',
@@ -617,7 +617,7 @@ export default function HistoryPage() {
                   })}
                 </div>
                 {selectedItem.llmModel && (
-                  <div className="text-[10px] sm:text-xs text-slate-500">
+                  <div className="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
                     <span className="font-semibold">AI Model:</span> {getModelDisplayName(selectedItem.llmModel)}
                   </div>
                 )}

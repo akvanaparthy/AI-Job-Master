@@ -298,7 +298,7 @@ export default function CoverLetterPage() {
                     ))}
                     {resumes.length === 0 && (
                       <div className="px-2 py-4 sm:py-6 text-center">
-                        <p className="text-xs sm:text-sm text-slate-600 mb-3">No resumes uploaded yet</p>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mb-3">No resumes uploaded yet</p>
                         <Link href="/dashboard/settings?tab=resumes">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Upload Resume in Settings
@@ -308,7 +308,7 @@ export default function CoverLetterPage() {
                     )}
                     {resumes.length > 0 && resumes.length < 3 && (
                       <Link href="/dashboard/settings?tab=resumes" className="block">
-                        <div className="px-2 py-2 text-xs sm:text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                        <div className="px-2 py-2 text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-md border-t border-slate-100 dark:border-gray-700 mt-1">
                           + Add Another Resume ({resumes.length}/3)
                         </div>
                       </Link>
@@ -345,14 +345,14 @@ export default function CoverLetterPage() {
                           </SelectItem>
                         ))}
                         <Link href="/dashboard/settings?tab=api-keys" className="block">
-                          <div className="px-2 py-2 text-xs sm:text-sm text-blue-600 hover:bg-blue-50 cursor-pointer rounded-md border-t border-slate-100 mt-1">
+                          <div className="px-2 py-2 text-xs sm:text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 cursor-pointer rounded-md border-t border-slate-100 dark:border-gray-700 mt-1">
                             + Manage API Keys
                           </div>
                         </Link>
                       </>
                     ) : (
                       <div className="px-2 py-4 sm:py-6 text-center">
-                        <p className="text-xs sm:text-sm text-slate-600 mb-3">No API keys configured</p>
+                        <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mb-3">No API keys configured</p>
                         <Link href="/dashboard/settings?tab=api-keys">
                           <button className="w-full px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors">
                             Add API Key in Settings
