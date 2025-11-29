@@ -373,7 +373,7 @@ export default function DashboardLayout({
 
         {/* Mobile bottom navigation */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-50 transition-colors duration-300">
-          <div className="grid grid-cols-5 gap-1 px-2 py-2">
+          <div className="grid grid-cols-6 gap-0.5 px-1 py-2">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = item.href === '/dashboard'
@@ -385,14 +385,14 @@ export default function DashboardLayout({
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    "flex flex-col items-center justify-center gap-1 py-2 rounded-lg transition-colors",
+                    "flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-lg transition-colors",
                     isActive
                       ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30"
                       : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700"
                   )}
                 >
-                  <Icon className="w-5 h-5" strokeWidth={1.5} />
-                  <span className="text-[10px] font-medium">{item.name}</span>
+                  <Icon className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={1.5} />
+                  <span className="text-[9px] sm:text-[10px] font-medium text-center leading-tight">{item.name}</span>
                 </Link>
               );
             })}
