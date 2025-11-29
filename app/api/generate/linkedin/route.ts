@@ -11,6 +11,7 @@ import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
+import { checkUsageLimits, trackGeneration, trackGenerationHistory, trackActivity as trackActivityCount } from '@/lib/usage-tracking';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -70,22 +71,17 @@ export async function POST(req: NextRequest) {
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
-    // Check monthly activity limit (only for NEW messages, not follow-ups)
-    if (messageType === 'NEW') {
-      const activityCheck = await canCreateActivity(user.id);
-      if (!activityCheck.allowed) {
-        const daysLeft = getDaysUntilReset(activityCheck.resetDate);
-        return NextResponse.json(
-          {
-            error: `Monthly activity limit reached (${activityCheck.currentCount}/${activityCheck.limit}). Resets in ${daysLeft} days.`,
-            limitReached: true,
-            currentCount: activityCheck.currentCount,
-            limit: activityCheck.limit,
-            daysUntilReset: daysLeft,
-          },
-          { status: 429 }
-        );
-      }
+    // Check generation limits (new tracking system)
+    const isFollowup = messageType === 'FOLLOW_UP';
+    const generationCheck = await checkUsageLimits(user.id, isFollowup);
+    if (!generationCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: generationCheck.reason,
+          limitReached: true,
+        },
+        { status: 429 }
+      );
     }
 
     // Validate required fields
@@ -276,6 +272,22 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Track generation (increment counter)
+    const isFollowup = messageType === 'FOLLOW_UP';
+    await trackGeneration(user.id, isFollowup);
+
+    // Track in generation history (not saved yet)
+    await trackGenerationHistory(
+      user.id,
+      'LINKEDIN_MESSAGE',
+      companyName || 'Unknown Company',
+      positionTitle || null,
+      recipientName || null,
+      actualModel,
+      false, // Not saved yet
+      isFollowup
+    );
+
     // Save to database only if requested
     let linkedInMessageId = null;
     let messageId = null;
@@ -307,6 +319,10 @@ export async function POST(req: NextRequest) {
         },
       });
       linkedInMessageId = linkedInMessage.id;
+
+      // Track activity count (new system)
+      const isFollowup = messageType === 'FOLLOW_UP';
+      await trackActivityCount(user.id, isFollowup);
 
       // Track activity in history (only for NEW messages)
       if (messageType === 'NEW') {

@@ -18,6 +18,8 @@ interface UsageLimit {
   id: string;
   userType: 'FREE' | 'PLUS' | 'ADMIN';
   maxActivities: number;
+  maxGenerations: number;
+  maxFollowupGenerations: number;
   includeFollowups: boolean;
   createdAt: string;
   updatedAt: string;
@@ -80,13 +82,13 @@ export default function AdminSettingsPage() {
     loadMisuseMessage();
   }, [loadLimits, loadMisuseMessage]);
 
-  const updateLimit = async (userType: string, maxActivities: number, includeFollowups: boolean) => {
+  const updateLimit = async (userType: string, maxActivities: number, maxGenerations: number, maxFollowupGenerations: number, includeFollowups: boolean) => {
     setSaving(true);
     try {
       const response = await fetch('/api/admin/usage-limits', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userType, maxActivities, includeFollowups }),
+        body: JSON.stringify({ userType, maxActivities, maxGenerations, maxFollowupGenerations, includeFollowups }),
       });
 
       if (!response.ok) {
@@ -116,6 +118,24 @@ export default function AdminSettingsPage() {
     setLimits(limits.map(limit =>
       limit.userType === userType
         ? { ...limit, maxActivities: numValue }
+        : limit
+    ));
+  };
+
+  const handleMaxGenerationsChange = (userType: string, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setLimits(limits.map(limit =>
+      limit.userType === userType
+        ? { ...limit, maxGenerations: numValue }
+        : limit
+    ));
+  };
+
+  const handleMaxFollowupGenerationsChange = (userType: string, value: string) => {
+    const numValue = parseInt(value) || 0;
+    setLimits(limits.map(limit =>
+      limit.userType === userType
+        ? { ...limit, maxFollowupGenerations: numValue }
         : limit
     ));
   };
@@ -283,7 +303,7 @@ export default function AdminSettingsPage() {
                     {/* Max Activities */}
                     <div className="space-y-2">
                       <Label htmlFor={`max-${limit.userType}`} className="text-sm font-medium text-slate-900">
-                        Maximum Monthly Activities
+                        Maximum Monthly Activities (Saved Items)
                       </Label>
                       <div className="flex items-center gap-4">
                         <Input
@@ -298,11 +318,63 @@ export default function AdminSettingsPage() {
                         <span className="text-sm text-slate-600">
                           {limit.userType === 'ADMIN'
                             ? 'Unlimited activities'
-                            : `${limit.maxActivities === 0 ? 'Unlimited' : limit.maxActivities} activities per month`}
+                            : `${limit.maxActivities === 0 ? 'Unlimited' : limit.maxActivities} saved items per month`}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500">
-                        Set to 0 for unlimited. Resets every 30 days. Counts cover letters, LinkedIn messages, and emails (excluding follow-ups by default).
+                        Counts only when user clicks "Save to History". Excludes follow-ups by default.
+                      </p>
+                    </div>
+
+                    {/* Max Generations */}
+                    <div className="space-y-2">
+                      <Label htmlFor={`gen-${limit.userType}`} className="text-sm font-medium text-slate-900">
+                        Maximum Monthly Generations (All Generations)
+                      </Label>
+                      <div className="flex items-center gap-4">
+                        <Input
+                          id={`gen-${limit.userType}`}
+                          type="number"
+                          min="0"
+                          value={limit.maxGenerations}
+                          onChange={(e) => handleMaxGenerationsChange(limit.userType, e.target.value)}
+                          className="w-[200px] h-11 bg-white"
+                          disabled={limit.userType === 'ADMIN'}
+                        />
+                        <span className="text-sm text-slate-600">
+                          {limit.userType === 'ADMIN'
+                            ? 'Unlimited generations'
+                            : `${limit.maxGenerations === 0 ? 'Unlimited' : limit.maxGenerations} generations per month`}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Counts every successful generation (saved or not). Excludes follow-ups.
+                      </p>
+                    </div>
+
+                    {/* Max Followup Generations */}
+                    <div className="space-y-2">
+                      <Label htmlFor={`followup-gen-${limit.userType}`} className="text-sm font-medium text-slate-900">
+                        Maximum Monthly Follow-up Generations
+                      </Label>
+                      <div className="flex items-center gap-4">
+                        <Input
+                          id={`followup-gen-${limit.userType}`}
+                          type="number"
+                          min="0"
+                          value={limit.maxFollowupGenerations}
+                          onChange={(e) => handleMaxFollowupGenerationsChange(limit.userType, e.target.value)}
+                          className="w-[200px] h-11 bg-white"
+                          disabled={limit.userType === 'ADMIN'}
+                        />
+                        <span className="text-sm text-slate-600">
+                          {limit.userType === 'ADMIN'
+                            ? 'Unlimited follow-ups'
+                            : `${limit.maxFollowupGenerations === 0 ? 'Unlimited' : limit.maxFollowupGenerations} follow-up generations per month`}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500">
+                        Separate limit for follow-up messages only. Prevents abuse while keeping follow-ups free.
                       </p>
                     </div>
 
@@ -310,10 +382,10 @@ export default function AdminSettingsPage() {
                     <div className="flex items-center justify-between p-4 bg-white/50 rounded-lg border border-slate-200">
                       <div className="space-y-0.5">
                         <Label htmlFor={`followup-${limit.userType}`} className="text-sm font-medium text-slate-900">
-                          Include Follow-up Messages in Count
+                          Include Follow-up Messages in Activity Count
                         </Label>
                         <p className="text-xs text-slate-500">
-                          When enabled, follow-up messages count towards the activity limit
+                          When enabled, saved follow-up messages count towards activity limit (not recommended)
                         </p>
                       </div>
                       <Switch
@@ -327,7 +399,7 @@ export default function AdminSettingsPage() {
                     {/* Save Button */}
                     <div className="flex justify-end pt-4 border-t border-slate-200">
                       <Button
-                        onClick={() => updateLimit(limit.userType, limit.maxActivities, limit.includeFollowups)}
+                        onClick={() => updateLimit(limit.userType, limit.maxActivities, limit.maxGenerations, limit.maxFollowupGenerations, limit.includeFollowups)}
                         disabled={saving || limit.userType === 'ADMIN'}
                         className="bg-slate-900 hover:bg-slate-800 text-white"
                       >
@@ -365,10 +437,12 @@ export default function AdminSettingsPage() {
             About Usage Limits
           </h3>
           <ul className="text-sm text-slate-700 space-y-2">
-            <li>• <strong>Activities</strong> include cover letters, LinkedIn messages, and email messages</li>
-            <li>• <strong>Follow-up messages</strong> can optionally be excluded from the count</li>
+            <li>• <strong>Activities</strong> count only when user saves to history (follow-ups excluded by default)</li>
+            <li>• <strong>Generations</strong> count every time AI generates content successfully (excludes follow-ups)</li>
+            <li>• <strong>Follow-up Generations</strong> have their own separate limit to prevent abuse</li>
             <li>• <strong>Admin users</strong> always have unlimited access</li>
-            <li>• <strong>Setting to 0</strong> grants unlimited activities for that user type</li>
+            <li>• <strong>Setting to 0</strong> grants unlimited for that metric</li>
+            <li>• Limits reset monthly on the user&apos;s registration anniversary</li>
             <li>• Changes take effect immediately for all users of that type</li>
           </ul>
         </Card>

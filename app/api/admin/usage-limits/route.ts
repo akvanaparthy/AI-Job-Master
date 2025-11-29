@@ -66,9 +66,9 @@ export async function PUT(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { userType, maxActivities, includeFollowups } = body;
+    const { userType, maxActivities, maxGenerations, maxFollowupGenerations, includeFollowups } = body;
 
-    if (!userType || maxActivities === undefined) {
+    if (!userType || maxActivities === undefined || maxGenerations === undefined || maxFollowupGenerations === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -77,11 +77,15 @@ export async function PUT(req: NextRequest) {
       where: { userType },
       update: {
         maxActivities,
+        maxGenerations,
+        maxFollowupGenerations,
         includeFollowups: includeFollowups ?? false,
       },
       create: {
         userType,
         maxActivities,
+        maxGenerations,
+        maxFollowupGenerations,
         includeFollowups: includeFollowups ?? false,
       },
     });

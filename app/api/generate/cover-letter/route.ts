@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
+import { checkUsageLimits, trackGeneration, trackGenerationHistory, trackActivity as trackActivityCount } from '@/lib/usage-tracking';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -46,6 +47,18 @@ export async function POST(req: NextRequest) {
             'X-RateLimit-Reset': rateLimitResult.resetAt.toString(),
           },
         }
+      );
+    }
+
+    // Check generation limit (new tracking system)
+    const generationCheck = await checkUsageLimits(user.id, false);
+    if (!generationCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: generationCheck.reason,
+          limitReached: true,
+        },
+        { status: 429 }
       );
     }
 
@@ -205,6 +218,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Track generation (increment counter)
+    await trackGeneration(user.id, false);
+
+    // Track in generation history (not saved yet)
+    await trackGenerationHistory(
+      user.id,
+      'COVER_LETTER',
+      companyName || 'Unknown Company',
+      positionTitle,
+      null,
+      actualModel,
+      false, // Not saved yet
+      false  // Not a followup
+    );
+
     // Save to database only if requested
     let coverLetterId = null;
     if (saveToHistory) {
@@ -223,7 +251,10 @@ export async function POST(req: NextRequest) {
       });
       coverLetterId = coverLetter.id;
 
-      // Track activity in history
+      // Track activity count (new system)
+      await trackActivityCount(user.id, false);
+
+      // Track activity in history (old system, keeping for compatibility)
       await trackActivity({
         userId: user.id,
         activityType: 'COVER_LETTER',
