@@ -92,15 +92,6 @@ export default function SharedKeysPage() {
   }, [loadKeys]);
 
   // Fetch models when provider or API key changes in Add dialog
-  useEffect(() => {
-    if (provider && apiKey && dialogOpen) {
-      fetchModelsForKey(provider, apiKey, false);
-    } else {
-      setAvailableModels([]);
-      setSelectedModels([]);
-    }
-  }, [provider, apiKey, dialogOpen]);
-
   const fetchModelsForKey = async (providerValue: string, apiKeyValue: string, isEdit: boolean) => {
     if (isEdit) {
       setLoadingEditModels(true);
@@ -150,6 +141,16 @@ export default function SharedKeysPage() {
       }
     }
   };
+
+  useEffect(() => {
+    if (provider && apiKey && dialogOpen) {
+      fetchModelsForKey(provider, apiKey, false);
+    } else {
+      setAvailableModels([]);
+      setSelectedModels([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [provider, apiKey, dialogOpen]);
 
   const handleAddKey = async () => {
     if (!provider || !apiKey || selectedModels.length === 0) {

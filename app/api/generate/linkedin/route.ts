@@ -273,7 +273,6 @@ export async function POST(req: NextRequest) {
     }
 
     // Track generation (increment counter)
-    const isFollowup = messageType === 'FOLLOW_UP';
     await trackGeneration(user.id, isFollowup);
 
     // Track in generation history (not saved yet)
@@ -321,7 +320,6 @@ export async function POST(req: NextRequest) {
       linkedInMessageId = linkedInMessage.id;
 
       // Track activity count (new system)
-      const isFollowup = messageType === 'FOLLOW_UP';
       await trackActivityCount(user.id, isFollowup);
 
       // Track activity in history (only for NEW messages)

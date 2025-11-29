@@ -322,7 +322,7 @@ export default function AdminSettingsPage() {
                         </span>
                       </div>
                       <p className="text-xs text-slate-500">
-                        Counts only when user clicks "Save to History". Excludes follow-ups by default.
+                        Counts only when user clicks &quot;Save to History&quot;. Excludes follow-ups by default.
                       </p>
                     </div>
 
