@@ -22,6 +22,7 @@ interface ModelOption {
   value: string;
   label: string;
   provider: string;
+  isShared?: boolean;
 }
 
 export default function UserPreferencesManager() {
@@ -142,7 +143,17 @@ export default function UserPreferencesManager() {
                 ) : (
                   availableModels.map((model) => (
                     <SelectItem key={model.value} value={model.value}>
-                      {model.label}
+                      <div className="flex items-center gap-2">
+                        <span>{model.label}</span>
+                        {model.isShared && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-[11px] text-green-600 font-medium">(Free)</span>
+                            <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded">
+                              Plus
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </SelectItem>
                   ))
                 )}
