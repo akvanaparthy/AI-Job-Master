@@ -37,11 +37,11 @@ interface SharedKey {
   createdAt: string;
 }
 
-const AVAILABLE_MODELS = {
-  OPENAI: ['gpt-4', 'gpt-4-turbo', 'gpt-4o', 'gpt-3.5-turbo'],
-  ANTHROPIC: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-sonnet-20240229', 'claude-3-haiku-20240307'],
-  GEMINI: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro'],
-};
+interface ModelOption {
+  value: string;
+  label: string;
+  provider: string;
+}
 
 export default function SharedKeysPage() {
   const router = useRouter();
@@ -49,6 +49,12 @@ export default function SharedKeysPage() {
   const [keys, setKeys] = useState<SharedKey[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [availableModels, setAvailableModels] = useState<Record<string, ModelOption[]>>({
+    OPENAI: [],
+    ANTHROPIC: [],
+    GEMINI: [],
+  });
+  const [loadingModels, setLoadingModels] = useState(false);
   
   // Form state
   const [provider, setProvider] = useState<string>('');
@@ -80,7 +86,37 @@ export default function SharedKeysPage() {
 
   useEffect(() => {
     loadKeys();
+    loadAvailableModels();
   }, [loadKeys]);
+
+  const loadAvailableModels = async () => {
+    setLoadingModels(true);
+    try {
+      const response = await fetch('/api/settings/available-models');
+      if (!response.ok) throw new Error('Failed to load models');
+
+      const data = await response.json();
+      
+      // Group models by provider
+      const grouped: Record<string, ModelOption[]> = {
+        OPENAI: [],
+        ANTHROPIC: [],
+        GEMINI: [],
+      };
+
+      data.models.forEach((model: ModelOption) => {
+        if (grouped[model.provider]) {
+          grouped[model.provider].push(model);
+        }
+      });
+
+      setAvailableModels(grouped);
+    } catch (error: any) {
+      console.error('Failed to load available models:', error);
+    } finally {
+      setLoadingModels(false);
+    }
+  };
 
   const handleAddKey = async () => {
     if (!provider || !apiKey || selectedModels.length === 0) {
@@ -170,11 +206,11 @@ export default function SharedKeysPage() {
     }
   };
 
-  const toggleModelSelection = (model: string) => {
+  const toggleModelSelection = (modelValue: string) => {
     setSelectedModels(prev =>
-      prev.includes(model)
-        ? prev.filter(m => m !== model)
-        : [...prev, model]
+      prev.includes(modelValue)
+        ? prev.filter(m => m !== modelValue)
+        : [...prev, modelValue]
     );
   };
 
@@ -274,19 +310,29 @@ export default function SharedKeysPage() {
                     {provider && (
                       <div>
                         <Label>Select Models ({selectedModels.length} selected)</Label>
-                        <div className="grid grid-cols-2 gap-2 mt-2">
-                          {AVAILABLE_MODELS[provider as keyof typeof AVAILABLE_MODELS]?.map((model) => (
-                            <Button
-                              key={model}
-                              variant={selectedModels.includes(model) ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => toggleModelSelection(model)}
-                              className="justify-start"
-                            >
-                              {model}
-                            </Button>
-                          ))}
-                        </div>
+                        {loadingModels ? (
+                          <div className="flex items-center justify-center py-8 text-sm text-slate-500">
+                            Loading models...
+                          </div>
+                        ) : availableModels[provider]?.length > 0 ? (
+                          <div className="grid grid-cols-2 gap-2 mt-2 max-h-[300px] overflow-y-auto">
+                            {availableModels[provider].map((model) => (
+                              <Button
+                                key={model.value}
+                                variant={selectedModels.includes(model.value) ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => toggleModelSelection(model.value)}
+                                className="justify-start text-left h-auto py-2"
+                              >
+                                <span className="truncate">{model.label}</span>
+                              </Button>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-sm text-slate-500 py-4 text-center border border-dashed rounded-lg">
+                            No models available for {provider}. Add API key in .env first.
+                          </div>
+                        )}
                       </div>
                     )}
 

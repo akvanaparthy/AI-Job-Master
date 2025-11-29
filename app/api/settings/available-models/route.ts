@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
-import { getModelDisplayNameWithProvider } from '@/lib/utils/modelNames';
+import { getModelProvider } from '@/lib/utils/modelNames';
 import { logger } from '@/lib/logger';
 import { getAvailableSharedModels } from '@/lib/shared-keys';
+import { getAvailableModelsWithNames, decrypt } from '@/lib/encryption';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -51,34 +52,62 @@ export async function GET(req: NextRequest) {
       const shared = await getAvailableSharedModels();
       sharedModels = shared.map(sm => ({
         value: `shared:${sm.model}`, // Prefix with 'shared:' to distinguish from user's own keys
-        label: getModelDisplayNameWithProvider(sm.model),
+        label: `${sm.displayName || sm.model} (Sponsored)`,
         provider: sm.provider,
         isShared: true,
       }));
     }
 
-    // Combine all available models with provider information and user-friendly names
-    const allModels = [
-      ...dbUser.openaiModels.map(model => ({
-        value: model,
-        label: getModelDisplayNameWithProvider(model),
-        provider: 'openai',
-        isShared: false,
-      })),
-      ...dbUser.anthropicModels.map(model => ({
-        value: model,
-        label: getModelDisplayNameWithProvider(model),
-        provider: 'anthropic',
-        isShared: false,
-      })),
-      ...dbUser.geminiModels.map(model => ({
-        value: model,
-        label: getModelDisplayNameWithProvider(model),
-        provider: 'gemini',
-        isShared: false,
-      })),
-      ...sharedModels,
-    ];
+    // Fetch models with display names from APIs for each provider the user has keys for
+    const allModels: any[] = [];
+
+    if (dbUser.openaiApiKey) {
+      try {
+        const openaiKey = decrypt(dbUser.openaiApiKey);
+        const models = await getAvailableModelsWithNames(openaiKey, 'openai');
+        allModels.push(...models.map(m => ({
+          value: m.id,
+          label: `${m.displayName} (OpenAI)`,
+          provider: 'openai',
+          isShared: false,
+        })));
+      } catch (error) {
+        logger.error('Failed to fetch OpenAI models', error);
+      }
+    }
+
+    if (dbUser.anthropicApiKey) {
+      try {
+        const anthropicKey = decrypt(dbUser.anthropicApiKey);
+        const models = await getAvailableModelsWithNames(anthropicKey, 'anthropic');
+        allModels.push(...models.map(m => ({
+          value: m.id,
+          label: `${m.displayName} (Anthropic)`,
+          provider: 'anthropic',
+          isShared: false,
+        })));
+      } catch (error) {
+        logger.error('Failed to fetch Anthropic models', error);
+      }
+    }
+
+    if (dbUser.geminiApiKey) {
+      try {
+        const geminiKey = decrypt(dbUser.geminiApiKey);
+        const models = await getAvailableModelsWithNames(geminiKey, 'gemini');
+        allModels.push(...models.map(m => ({
+          value: m.id,
+          label: `${m.displayName} (Google)`,
+          provider: 'gemini',
+          isShared: false,
+        })));
+      } catch (error) {
+        logger.error('Failed to fetch Gemini models', error);
+      }
+    }
+
+    // Add shared models
+    allModels.push(...sharedModels);
 
     const hasAnyKey = !!(dbUser.openaiApiKey || dbUser.anthropicApiKey || dbUser.geminiApiKey);
 

@@ -108,3 +108,6 @@ next-env.d.ts
 
 # prisma
 /prisma/migrations
+
+# scripts folder (debug/test scripts)
+/scripts/

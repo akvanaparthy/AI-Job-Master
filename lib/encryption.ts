@@ -108,37 +108,122 @@ export async function validateApiKey(apiKey: string, provider: 'openai' | 'anthr
 }
 
 /**
- * Gets available models for a given API key
+ * Gets available models for a given API key with their display names
  */
-export async function getAvailableModels(apiKey: string, provider: 'openai' | 'anthropic' | 'gemini'): Promise<string[]> {
+export async function getAvailableModelsWithNames(
+  apiKey: string,
+  provider: 'openai' | 'anthropic' | 'gemini'
+): Promise<Array<{ id: string; displayName: string }>> {
+  // Import formatter utility once at the top for fallback
+  const { getModelDisplayName } = await import('./utils/modelNames');
+  
   try {
     switch (provider) {
       case 'openai':
         const { default: OpenAI } = await import('openai');
         const openai = new OpenAI({ apiKey });
         const models = await openai.models.list();
-        return models.data
-          .filter(m => m.id.includes('gpt'))
-          .map(m => m.id)
-          .sort();
+        // OpenAI doesn't provide display names, use our formatter as fallback
+        // Filter for main GPT models only (exclude specialized variants)
+        const mainModels = models.data.filter(m => {
+          const id = m.id;
+          // Include main model versions
+          if (id === 'gpt-3.5-turbo') return true;
+          if (id === 'gpt-4.1') return true;
+          if (id === 'gpt-4o') return true;
+          if (id === 'gpt-4o-mini') return true;
+          if (id === 'gpt-5') return true;
+          if (id === 'gpt-5-mini') return true;
+          if (id === 'gpt-5-nano') return true;
+          if (id === 'gpt-5-pro') return true;
+          if (id === 'gpt-5.1') return true;
+          return false;
+        });
+        
+        return mainModels
+          .map(m => ({
+            id: m.id,
+            displayName: getModelDisplayName(m.id),
+          }))
+          .sort((a, b) => a.id.localeCompare(b.id));
 
       case 'anthropic':
-        // Anthropic models are predefined
+        // Fetch available models from Anthropic API with native display names
+        try {
+          const response = await fetch('https://api.anthropic.com/v1/models', {
+            headers: {
+              'x-api-key': apiKey,
+              'anthropic-version': '2023-06-01',
+            },
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            return data.data.map((model: any) => ({
+              id: model.id,
+              displayName: model.display_name,
+            }));
+          }
+        } catch (error) {
+          logger.error('Failed to fetch Anthropic models from API', error);
+        }
+        
+        // Fallback with display names
         return [
-          'claude-3-5-sonnet-20241022',
-          'claude-3-5-haiku-20241022',
-          'claude-3-opus-20240229',
-          'claude-3-sonnet-20240229',
-          'claude-3-haiku-20240307',
+          { id: 'claude-opus-4-5-20251101', displayName: 'Claude Opus 4.5' },
+          { id: 'claude-haiku-4-5-20251001', displayName: 'Claude Haiku 4.5' },
+          { id: 'claude-sonnet-4-5-20250929', displayName: 'Claude Sonnet 4.5' },
+          { id: 'claude-opus-4-1-20250805', displayName: 'Claude Opus 4.1' },
+          { id: 'claude-opus-4-20250514', displayName: 'Claude Opus 4' },
+          { id: 'claude-sonnet-4-20250514', displayName: 'Claude Sonnet 4' },
+          { id: 'claude-3-7-sonnet-20250219', displayName: 'Claude Sonnet 3.7' },
+          { id: 'claude-3-5-haiku-20241022', displayName: 'Claude Haiku 3.5' },
+          { id: 'claude-3-haiku-20240307', displayName: 'Claude Haiku 3' },
         ];
 
       case 'gemini':
-        // Gemini models are predefined
+        // Fetch Gemini models with native display names
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`
+          );
+          
+          if (response.ok) {
+            const data = await response.json();
+            if (data.models) {
+              // Filter for main Gemini chat models only
+              const mainGeminiModels = [
+                'models/gemini-2.0-flash',
+                'models/gemini-2.0-flash-lite',
+                'models/gemini-2.5-flash',
+                'models/gemini-2.5-pro',
+                'models/gemini-3-pro-preview',
+              ];
+              
+              return data.models
+                .filter((m: any) => mainGeminiModels.includes(m.name))
+                .map((m: any) => ({
+                  id: m.name.replace('models/', ''),
+                  displayName: m.displayName,
+                }))
+                .sort((a: any, b: any) => a.id.localeCompare(b.id));
+            }
+          }
+        } catch (error) {
+          logger.error('Failed to fetch Gemini models from API', error);
+        }
+        
+        // Fallback with formatter
         return [
-          'gemini-1.5-pro',
-          'gemini-1.5-flash',
-          'gemini-pro',
-        ];
+          'gemini-2.0-flash',
+          'gemini-2.0-flash-lite',
+          'gemini-2.5-flash',
+          'gemini-2.5-pro',
+          'gemini-3-pro-preview',
+        ].map(id => ({
+          id,
+          displayName: getModelDisplayName(id),
+        }));
 
       default:
         return [];
@@ -147,4 +232,12 @@ export async function getAvailableModels(apiKey: string, provider: 'openai' | 'a
     logger.error(`Failed to get models for ${provider}`, error);
     return [];
   }
+}
+
+/**
+ * Gets available models for a given API key (returns IDs only for backwards compatibility)
+ */
+export async function getAvailableModels(apiKey: string, provider: 'openai' | 'anthropic' | 'gemini'): Promise<string[]> {
+  const modelsWithNames = await getAvailableModelsWithNames(apiKey, provider);
+  return modelsWithNames.map(m => m.id);
 }
