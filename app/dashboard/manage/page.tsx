@@ -441,7 +441,7 @@ export default function HistoryPage() {
                         </div>
 
                         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <p className="text-[10px] sm:text-xs text-slate-500">
+                          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-gray-400">
                             {new Date(item.createdAt).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric',
