@@ -1,9 +1,10 @@
 import { prisma } from '@/lib/db/prisma';
-import { decrypt } from '@/lib/encryption';
+import { decrypt, getAvailableModelsWithNames } from '@/lib/encryption';
 import { logger } from '@/lib/logger';
 
 export interface SharedModel {
   model: string;
+  displayName: string;
   provider: 'openai' | 'anthropic' | 'gemini';
   isShared: true;
   keyId: string;
@@ -65,17 +66,51 @@ export async function getAvailableSharedModels(): Promise<SharedModel[]> {
         id: true,
         provider: true,
         models: true,
+        apiKey: true,
       },
     });
 
-    return sharedKeys.flatMap(key =>
-      key.models.map(model => ({
-        model,
-        provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'gemini',
-        isShared: true as const,
-        keyId: key.id,
-      }))
-    );
+    const allSharedModels: SharedModel[] = [];
+
+    // Fetch display names for each provider's models
+    for (const key of sharedKeys) {
+      try {
+        const decryptedKey = decrypt(key.apiKey);
+        const provider = key.provider.toLowerCase() as 'openai' | 'anthropic' | 'gemini';
+        
+        // Get models with display names from the API
+        const modelsWithNames = await getAvailableModelsWithNames(decryptedKey, provider);
+        
+        // Filter to only include models that are in the shared key's model list
+        const sharedModelsForKey = key.models
+          .map(modelId => {
+            const modelInfo = modelsWithNames.find(m => m.id === modelId);
+            return modelInfo ? {
+              model: modelId,
+              displayName: modelInfo.displayName,
+              provider,
+              isShared: true as const,
+              keyId: key.id,
+            } : null;
+          })
+          .filter((m): m is SharedModel => m !== null);
+
+        allSharedModels.push(...sharedModelsForKey);
+      } catch (error) {
+        logger.error(`Failed to fetch display names for shared ${key.provider} models:`, error);
+        // Fallback: add models without display names
+        const fallbackModels = key.models.map(model => ({
+          model,
+          displayName: model, // Use model ID as display name
+          provider: key.provider.toLowerCase() as 'openai' | 'anthropic' | 'gemini',
+          isShared: true as const,
+          keyId: key.id,
+        }));
+        allSharedModels.push(...fallbackModels);
+      }
+    }
+
+    return allSharedModels;
   } catch (error) {
     logger.error('Get available shared models error:', error);
     return [];
