@@ -577,200 +577,119 @@ export default function DashboardPage() {
           >
             <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
               <div className="p-5 md:p-6 lg:p-7">
-                <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-gray-100 mb-1">Your usage</h3>
-                <p className="text-xs md:text-sm text-slate-500 dark:text-gray-400 mb-5 md:mb-6 lg:mb-7">
-                  Current plan: {loading ? (
-                    <span className="inline-block w-12 h-4 bg-slate-200 rounded animate-pulse"></span>
-                  ) : (
-                    stats?.userType === 'FREE' ? 'Free' : stats?.userType === 'PLUS' ? 'Plus' : 'Admin'
-                  )}
-                </p>
-
-                {/* Modern Usage Visualization */}
-                <div className="mb-8 md:mb-10 lg:mb-12">
-                  {/* Main Usage Display */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
-                    {/* Activities Card */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.1 }}
-                      className="group"
-                    >
-                      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full flex flex-col justify-between">
-                        <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-blue-200 to-transparent dark:from-blue-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-between mb-4 sm:mb-3">
-                            <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-xl sm:rounded-lg bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg flex-shrink-0">
-                              <svg className="w-6 h-6 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                              </svg>
-                            </div>
-                          </div>
-                          <p className="text-xs sm:text-xs font-medium text-slate-600 dark:text-gray-400 uppercase tracking-widest mb-2">Activities</p>
-                          <p className="text-4xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
-                            {loading ? '...' : <AnimatedNumber value={stats?.activityCount || 0} />}
-                          </p>
-                          <div className="mt-4 sm:mt-3 h-2 sm:h-1.5 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: '100%' }}
-                              transition={{ duration: 1, ease: 'easeOut' }}
-                              className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Generations Card */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.15 }}
-                      className="group"
-                    >
-                      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-purple-50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full flex flex-col justify-between">
-                        <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-purple-200 to-transparent dark:from-purple-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-between mb-4 sm:mb-3">
-                            <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-xl sm:rounded-lg bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg flex-shrink-0">
-                              <svg className="w-6 h-6 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 6H6.28l-.31-1.243A1 1 0 005 4H3z" />
-                              </svg>
-                            </div>
-                          </div>
-                          <p className="text-xs sm:text-xs font-medium text-slate-600 dark:text-gray-400 uppercase tracking-widest mb-2">Generations</p>
-                          <p className="text-4xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
-                            {loading ? '...' : <AnimatedNumber value={stats?.generationCount || 0} />}
-                          </p>
-                          <div className="mt-4 sm:mt-3 h-2 sm:h-1.5 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: '100%' }}
-                              transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
-                              className="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
-
-                    {/* Followup Generations Card */}
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.2 }}
-                      className="group"
-                    >
-                      <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-orange-50 to-amber-50/50 dark:from-orange-900/10 dark:to-amber-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full flex flex-col justify-between">
-                        <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-orange-200 to-transparent dark:from-orange-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
-                        <div className="relative z-10">
-                          <div className="flex items-center justify-between mb-4 sm:mb-3">
-                            <div className="w-12 h-12 sm:w-11 sm:h-11 rounded-xl sm:rounded-lg bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg flex-shrink-0">
-                              <svg className="w-6 h-6 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M15.5 1H4c-.82 0-1.5.68-1.5 1.5v12c0 .82.68 1.5 1.5 1.5h11c.82 0 1.5-.68 1.5-1.5V2.5c0-.82-.68-1.5-1.5-1.5zm0 12.5H4V2.5h11v11z" />
-                              </svg>
-                            </div>
-                          </div>
-                          <p className="text-xs sm:text-xs font-medium text-slate-600 dark:text-gray-400 uppercase tracking-widest mb-2">Followup Gen.</p>
-                          <p className="text-4xl sm:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
-                            {loading ? '...' : <AnimatedNumber value={stats?.followupGenerationCount || 0} />}
-                          </p>
-                          <div className="mt-4 sm:mt-3 h-2 sm:h-1.5 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                            <motion.div
-                              initial={{ width: 0 }}
-                              animate={{ width: '100%' }}
-                              transition={{ duration: 1.4, ease: 'easeOut', delay: 0.4 }}
-                              className="h-full bg-gradient-to-r from-orange-400 to-amber-500 rounded-full"
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-base md:text-lg font-semibold text-slate-900 dark:text-gray-100 mb-1">Your usage</h3>
+                    <p className="text-xs md:text-sm text-slate-500 dark:text-gray-400">
+                      Current plan: {loading ? (
+                        <span className="inline-block w-12 h-4 bg-slate-200 rounded animate-pulse"></span>
+                      ) : (
+                        <span className="font-medium text-slate-700 dark:text-gray-300">{stats?.userType === 'FREE' ? 'Free' : stats?.userType === 'PLUS' ? 'Plus' : 'Admin'}</span>
+                      )}
+                    </p>
                   </div>
+                </div>
 
-                  {/* Overall Usage Bar */}
+                {/* Metric Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+                  {/* Activities Card */}
                   <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25 }}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.1 }}
+                    className="group"
                   >
-                    <div className="rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-slate-50 to-slate-50/50 dark:from-gray-800 dark:to-gray-800/50 p-5 sm:p-6">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-3 mb-4 sm:mb-3">
-                        <p className="text-sm sm:text-base font-semibold text-slate-900 dark:text-gray-100">Monthly Usage</p>
-                        <p className="text-2xl sm:text-xl lg:text-2xl font-bold text-slate-900 dark:text-gray-100">
-                          {loading ? '...' : <>
-                            <AnimatedNumber value={stats?.usagePercentage || 0} />%
-                          </>}
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-blue-50 to-indigo-50/50 dark:from-blue-900/10 dark:to-indigo-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full">
+                      <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-blue-200 to-transparent dark:from-blue-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                          </svg>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Activities</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
+                          {loading ? '...' : <AnimatedNumber value={stats?.activityCount || 0} />}
                         </p>
+                        <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
                       </div>
-                      <div className="h-3 sm:h-2 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inset">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{ width: loading ? '100%' : `${Math.min(stats?.usagePercentage || 0, 100)}%` }}
-                          transition={{ duration: 1.5, ease: 'easeOut' }}
-                          className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 via-purple-500 to-pink-500 rounded-full shadow-lg"
-                        />
+                    </div>
+                  </motion.div>
+
+                  {/* Generations Card */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.15 }}
+                    className="group"
+                  >
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-purple-50 to-pink-50/50 dark:from-purple-900/10 dark:to-pink-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full">
+                      <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-purple-200 to-transparent dark:from-purple-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 6H6.28l-.31-1.243A1 1 0 005 4H3z" />
+                          </svg>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Generations</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
+                          {loading ? '...' : <AnimatedNumber value={stats?.generationCount || 0} />}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
                       </div>
-                      <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-3 sm:mt-4 leading-relaxed">
-                        <AnimatedNumber value={stats?.monthlyCount || 0} /> of {stats?.monthlyLimit || 0} items used • Resets in {stats?.daysUntilReset || 0} days
-                      </p>
+                    </div>
+                  </motion.div>
+
+                  {/* Followup Generations Card */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="group"
+                  >
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-orange-50 to-amber-50/50 dark:from-orange-900/10 dark:to-amber-900/10 p-5 sm:p-6 hover:border-slate-300 dark:hover:border-gray-600 transition-all duration-300 h-full">
+                      <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-orange-200 to-transparent dark:from-orange-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
+                      <div className="relative z-10">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
+                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M15.5 1H4c-.82 0-1.5.68-1.5 1.5v12c0 .82.68 1.5 1.5 1.5h11c.82 0 1.5-.68 1.5-1.5V2.5c0-.82-.68-1.5-1.5-1.5zm0 12.5H4V2.5h11v11z" />
+                          </svg>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Followup Generations</p>
+                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
+                          {loading ? '...' : <AnimatedNumber value={stats?.followupGenerationCount || 0} />}
+                        </p>
+                        <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
+                      </div>
                     </div>
                   </motion.div>
                 </div>
 
-                {/* Breakdown Legend */}
-                <div className="space-y-2.5 mb-4 px-2 hidden">
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-indigo-400"></div>
-                    <span className="text-slate-600 dark:text-gray-400 font-medium flex-1">Activities</span>
-                    <span className="font-bold text-slate-900 dark:text-gray-100">
-                      {loading ? '...' : <AnimatedNumber value={stats?.activityCount || 0} />}
-                    </span>
+                {/* Monthly Usage Info */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.25 }}
+                  className="rounded-2xl border border-slate-200/60 dark:border-gray-700 bg-gradient-to-br from-slate-50 to-slate-50/50 dark:from-gray-800 dark:to-gray-800/50 p-5 sm:p-6"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm font-semibold text-slate-900 dark:text-gray-100">Monthly Summary</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-gray-400">Resets in {loading ? '...' : <>{stats?.daysUntilReset || 0} days</>}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-purple-400 to-pink-500"></div>
-                    <span className="text-slate-600 dark:text-gray-400 font-medium flex-1">Generations</span>
-                    <span className="font-bold text-slate-900 dark:text-gray-100">
-                      {loading ? '...' : <AnimatedNumber value={stats?.generationCount || 0} />}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-xs">
-                    <div className="w-2 h-2 rounded-full bg-gradient-to-r from-orange-400 to-amber-500"></div>
-                    <span className="text-slate-600 dark:text-gray-400 font-medium flex-1">Followup Gen.</span>
-                    <span className="font-bold text-slate-900 dark:text-gray-100">
-                      {loading ? '...' : <AnimatedNumber value={stats?.followupGenerationCount || 0} />}
-                    </span>
-                  </div>
-                </div>
-
-                <p className="text-center text-sm text-slate-600 dark:text-gray-400 mb-6">
-                  {loading ? (
-                    <>
-                      <span className="inline-block w-3 h-3 bg-slate-300 dark:bg-gray-700 rounded animate-pulse"></span>
-                      {' items used of '}
-                      <span className="inline-block w-8 h-3 bg-slate-300 dark:bg-gray-700 rounded animate-pulse"></span>
-                    </>
-                  ) : (
-                    <>
-                      <AnimatedNumber value={stats?.monthlyCount || 0} /> of {stats?.monthlyLimit || 0} this month
-                      <br />
-                      <span className="text-xs text-slate-500 dark:text-gray-500">
-                        Resets in {stats?.daysUntilReset || 0} days
-                      </span>
-                    </>
-                  )}
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-2 md:gap-2.5">
-                  <Button variant="outline" size="sm" className="flex-1 text-xs md:text-sm h-9 md:h-10">
-                    Pricing plans
-                  </Button>
-                  <Button size="sm" className="flex-1 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-xs md:text-sm h-9 md:h-10">
-                    Upgrade
-                  </Button>
-                </div>
+                  <p className="text-sm text-slate-700 dark:text-gray-300">
+                    {loading ? (
+                      <>
+                        <span className="inline-block w-3 h-3 bg-slate-300 dark:bg-gray-700 rounded animate-pulse"></span>
+                        {' items used of '}
+                        <span className="inline-block w-8 h-3 bg-slate-300 dark:bg-gray-700 rounded animate-pulse"></span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="font-bold"><AnimatedNumber value={stats?.monthlyCount || 0} /></span> of <span className="font-bold">{stats?.monthlyLimit || 0}</span> items saved this month
+                      </>
+                    )}
+                  </p>
+                </motion.div>
               </div>
             </Card>
           </motion.div>
