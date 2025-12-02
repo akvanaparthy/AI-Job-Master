@@ -73,6 +73,64 @@ export default function DashboardPage() {
 
   const totalGenerated = (stats?.totalCoverLetters || 0) + (stats?.totalLinkedInMessages || 0) + (stats?.totalEmails || 0);
 
+  const FEATURE_TOOLS = [
+    {
+      title: 'Cover Letters',
+      description: 'Generate tailored cover letters that match job descriptions and highlight your qualifications',
+      href: '/dashboard/cover-letter',
+      icon: FileText,
+      gradient: 'from-amber-500 to-orange-500',
+      bgGradient: 'from-amber-50 to-orange-50/50',
+      darkBgGradient: 'dark:from-amber-900/20 dark:to-orange-900/20',
+      accentColor: 'text-amber-600 dark:text-amber-400',
+      borderColor: 'border-amber-200/50 dark:border-amber-800/50',
+    },
+    {
+      title: 'LinkedIn Messages',
+      description: 'Craft personalized connection requests and follow-ups that stand out in recruiters\' inboxes',
+      href: '/dashboard/linkedin',
+      icon: MessageSquare,
+      gradient: 'from-blue-500 to-indigo-500',
+      bgGradient: 'from-blue-50 to-indigo-50/50',
+      darkBgGradient: 'dark:from-blue-900/20 dark:to-indigo-900/20',
+      accentColor: 'text-blue-600 dark:text-blue-400',
+      borderColor: 'border-blue-200/50 dark:border-blue-800/50',
+    },
+    {
+      title: 'Email Outreach',
+      description: 'Create professional, compelling emails with subject lines optimized for engagement',
+      href: '/dashboard/email',
+      icon: Mail,
+      gradient: 'from-slate-500 to-gray-600',
+      bgGradient: 'from-slate-50 to-gray-50/50',
+      darkBgGradient: 'dark:from-slate-900/20 dark:to-gray-900/20',
+      accentColor: 'text-slate-600 dark:text-slate-400',
+      borderColor: 'border-slate-200/50 dark:border-slate-800/50',
+    },
+    {
+      title: 'Resume Manager',
+      description: 'Upload and manage your resume, then use it to personalize all your generations',
+      href: '/dashboard/settings',
+      icon: FileText,
+      gradient: 'from-green-500 to-emerald-500',
+      bgGradient: 'from-green-50 to-emerald-50/50',
+      darkBgGradient: 'dark:from-green-900/20 dark:to-emerald-900/20',
+      accentColor: 'text-green-600 dark:text-green-400',
+      borderColor: 'border-green-200/50 dark:border-green-800/50',
+    },
+    {
+      title: 'Activity History',
+      description: 'View all your generated content, track patterns, and manage your saved items',
+      href: '/dashboard/activity-history',
+      icon: Clock,
+      gradient: 'from-violet-500 to-purple-500',
+      bgGradient: 'from-violet-50 to-purple-50/50',
+      darkBgGradient: 'dark:from-violet-900/20 dark:to-purple-900/20',
+      accentColor: 'text-violet-600 dark:text-violet-400',
+      borderColor: 'border-violet-200/50 dark:border-violet-800/50',
+    },
+  ];
+
   // Handle follow-up button click
   const handleFollowup = (activity: any) => {
     const params = new URLSearchParams({
@@ -133,6 +191,174 @@ export default function DashboardPage() {
 
   return (
     <div className="max-w-[1400px] mx-auto">
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="mb-12 md:mb-16 relative"
+      >
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border border-slate-700/50">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 opacity-20">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-blue-500 to-transparent rounded-full blur-3xl -mr-40 -mt-40 animate-pulse" style={{ animationDuration: '4s' }} />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-purple-500 to-transparent rounded-full blur-3xl -ml-40 -mb-40 animate-pulse" style={{ animationDuration: '6s', animationDelay: '1s' }} />
+          </div>
+
+          <div className="relative z-10 px-6 sm:px-8 md:px-12 py-12 md:py-16 lg:py-20">
+            <div className="max-w-2xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1, duration: 0.5 }}
+              >
+                <div className="inline-flex items-center gap-2 mb-4 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 backdrop-blur-sm">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  <span className="text-sm font-medium text-blue-300">AI-Powered Job Search</span>
+                </div>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.5 }}
+                className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 md:mb-6 leading-tight"
+              >
+                Land Your Dream Job<br />
+                <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Faster Than Ever</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-lg text-slate-300 mb-6 md:mb-8 leading-relaxed max-w-xl"
+              >
+                Use AI to generate personalized cover letters, LinkedIn messages, and professional emails. Stand out to recruiters with content tailored to every opportunity.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25, duration: 0.5 }}
+                className="flex flex-wrap gap-3"
+              >
+                <Link href="/dashboard/cover-letter">
+                  <Button className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium h-11 px-6 shadow-lg">
+                    Get Started
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                </Link>
+                <Link href="/dashboard/activity-history">
+                  <Button variant="outline" className="border-slate-600 text-white hover:bg-slate-800 h-11 px-6">
+                    View Your Progress
+                  </Button>
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Stats Grid in Hero */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35, duration: 0.5 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 md:mt-16 pt-8 md:pt-12 border-t border-slate-700/50"
+            >
+              {[
+                { label: 'Generated', value: totalGenerated, icon: '✨' },
+                { label: 'Hours Saved', value: stats?.hoursSaved || 0, icon: '⏱️' },
+                { label: 'Activities', value: stats?.activityCount || 0, icon: '📊' },
+                { label: 'Success Rate', value: '94%', icon: '🎯' },
+              ].map((stat, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 + idx * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="text-2xl mb-2">{stat.icon}</div>
+                  <p className="text-2xl md:text-3xl font-bold text-white">
+                    {loading && stat.value === totalGenerated ? '...' : typeof stat.value === 'number' ? <AnimatedNumber value={stat.value} /> : stat.value}
+                  </p>
+                  <p className="text-sm text-slate-400 mt-1">{stat.label}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Features Grid */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.6 }}
+        className="mb-12 md:mb-16"
+      >
+        <div className="mb-8">
+          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-gray-100 mb-3">
+            Powerful Tools at Your Command
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-gray-400">
+            Everything you need to ace your job search in one place
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6 lg:gap-7">
+          {FEATURE_TOOLS.map((tool, index) => {
+            const Icon = tool.icon;
+            return (
+              <motion.div
+                key={tool.title}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 + index * 0.08 }}
+                whileHover={{ translateY: -8 }}
+              >
+                <Link href={tool.href} className="group h-full block">
+                  <Card className={`relative overflow-hidden border ${tool.borderColor} ${tool.bgGradient} ${tool.darkBgGradient} hover:border-opacity-100 dark:hover:border-opacity-100 shadow-md hover:shadow-xl transition-all duration-300 h-full`}>
+                    {/* Gradient overlay on hover */}
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-5 bg-gradient-to-br from-white to-transparent transition-opacity duration-300" />
+
+                    <div className="p-6 h-full flex flex-col">
+                      {/* Icon */}
+                      <motion.div
+                        className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${tool.gradient} flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-all duration-300`}
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                      >
+                        <Icon className="w-7 h-7 text-white" strokeWidth={2} />
+                      </motion.div>
+
+                      {/* Content */}
+                      <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-gray-100 mb-2 leading-tight">
+                        {tool.title}
+                      </h3>
+                      <p className="text-sm md:text-base text-slate-600 dark:text-gray-400 leading-relaxed flex-1">
+                        {tool.description}
+                      </p>
+
+                      {/* Footer */}
+                      <div className="mt-6 flex items-center justify-between">
+                        <span className={`text-sm font-semibold ${tool.accentColor}`}>
+                          Learn more
+                        </span>
+                        <motion.div
+                          className="w-8 h-8 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          whileHover={{ scale: 1.15 }}
+                        >
+                          <ArrowRight className="w-4 h-4 text-slate-900 dark:text-white" strokeWidth={2.5} />
+                        </motion.div>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </motion.div>
+
       {/* Welcome Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -140,10 +366,10 @@ export default function DashboardPage() {
         className="mb-8"
       >
         <h1 className="text-[42px] font-bold text-slate-900 dark:text-gray-100 mb-2 leading-tight">
-          Hello there,
+          Your Dashboard
         </h1>
         <p className="text-lg text-slate-500 dark:text-gray-400">
-          Accelerate your job search with AI-powered content generation.
+          Track your progress and manage your generated content
         </p>
       </motion.div>
 
