@@ -50,33 +50,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check generation limit (new tracking system)
-    const generationCheck = await checkUsageLimits(user.id, false);
-    if (!generationCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: generationCheck.reason,
-          limitReached: true,
-        },
-        { status: 429 }
-      );
-    }
-
-    // Check monthly activity limit
-    const activityCheck = await canCreateActivity(user.id);
-    if (!activityCheck.allowed) {
-      const daysLeft = getDaysUntilReset(activityCheck.resetDate);
-      return NextResponse.json(
-        {
-          error: `Monthly activity limit reached (${activityCheck.currentCount}/${activityCheck.limit}). Resets in ${daysLeft} days.`,
-          limitReached: true,
-          currentCount: activityCheck.currentCount,
-          limit: activityCheck.limit,
-          daysUntilReset: daysLeft,
-        },
-        { status: 429 }
-      );
-    }
+    // Note: Generation limit check moved below after determining if using shared key
+    // Users with their own API keys are NOT subject to generation limits
+    // However, activity limits always apply when saving
 
     // Parse request body
     const body = await req.json();
@@ -172,6 +148,37 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Check generation limit ONLY if using shared/sponsored key
+    // Users with their own API keys are NOT subject to generation limits
+    if (usingSharedKey) {
+      const generationCheck = await checkUsageLimits(user.id, false);
+      if (!generationCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: generationCheck.reason,
+            limitReached: true,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
+    // Check activity limit when saving (always applies)
+    const activityCheck = await canCreateActivity(user.id);
+    if (!activityCheck.allowed) {
+      const daysLeft = getDaysUntilReset(activityCheck.resetDate);
+      return NextResponse.json(
+        {
+          error: `Monthly activity limit reached (${activityCheck.currentCount}/${activityCheck.limit}). Resets in ${daysLeft} days.`,
+          limitReached: true,
+          currentCount: activityCheck.currentCount,
+          limit: activityCheck.limit,
+          daysUntilReset: daysLeft,
+        },
+        { status: 429 }
+      );
+    }
+
     // Get resume content if provided
     let resumeContent = '';
     if (resumeId) {
@@ -218,8 +225,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Track generation (increment counter)
-    await trackGeneration(user.id, false);
+    // Track generation (increment counter) - only if using shared key
+    await trackGeneration(user.id, false, usingSharedKey);
 
     // Track in generation history (not saved yet)
     await trackGenerationHistory(

@@ -71,19 +71,6 @@ export async function POST(req: NextRequest) {
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
 
-    // Check generation limits (new tracking system)
-    const isFollowup = messageType === 'FOLLOW_UP';
-    const generationCheck = await checkUsageLimits(user.id, isFollowup);
-    if (!generationCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: generationCheck.reason,
-          limitReached: true,
-        },
-        { status: 429 }
-      );
-    }
-
     // Validate required fields
     if (!companyName || !llmModel || !messageType) {
       return NextResponse.json(
@@ -91,6 +78,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Note: Generation limits check moved below after determining if using shared key
+    // Users with their own API keys are NOT subject to generation limits
+    const isFollowup = messageType === 'FOLLOW_UP';
 
     // Check 2-message limit per recipient
     if (linkedinUrl && messageType === 'FOLLOW_UP') {
@@ -206,6 +197,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Check generation limits ONLY if using shared/sponsored key
+    // Users with their own API keys are NOT subject to generation limits
+    if (usingSharedKey) {
+      const generationCheck = await checkUsageLimits(user.id, isFollowup);
+      if (!generationCheck.allowed) {
+        return NextResponse.json(
+          {
+            error: generationCheck.reason,
+            limitReached: true,
+          },
+          { status: 429 }
+        );
+      }
+    }
+
     // Get resume content if provided
     let resumeContent = '';
     if (resumeId) {
@@ -272,8 +278,8 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Track generation (increment counter)
-    await trackGeneration(user.id, isFollowup);
+    // Track generation (increment counter) - only if using shared key
+    await trackGeneration(user.id, isFollowup, usingSharedKey);
 
     // Track in generation history (not saved yet)
     await trackGenerationHistory(

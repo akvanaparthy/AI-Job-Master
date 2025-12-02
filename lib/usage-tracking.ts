@@ -79,9 +79,17 @@ export async function checkUsageLimits(
  */
 export async function trackGeneration(
   userId: string,
-  isFollowup: boolean = false
+  isFollowup: boolean = false,
+  usingSharedKey: boolean = false
 ): Promise<void> {
   try {
+    // Only count generations if using shared/sponsored keys
+    // If user is using their own API key, don't count towards limits
+    if (!usingSharedKey) {
+      logger.info(`User ${userId} used their own API key - generation not counted towards limits`);
+      return;
+    }
+
     if (isFollowup) {
       await prisma.user.update({
         where: { id: userId },
