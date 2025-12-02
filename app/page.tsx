@@ -667,52 +667,179 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section id="pricing" className="relative z-10 py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-600 overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-0 w-full h-full bg-white rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
-          <div className="absolute bottom-0 right-0 w-full h-full bg-white rounded-full blur-[150px] translate-x-1/2 translate-y-1/2" />
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="relative max-w-4xl mx-auto text-center"
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
-            Your Dream Job Awaits
-          </h2>
-          <p className="text-base sm:text-lg md:text-xl text-purple-100 mb-8 sm:mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4">
-            Stop wasting hours on repetitive work. Let AI handle the writing while you focus on what matters—landing interviews and getting hired.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 justify-center items-center mb-8 sm:mb-10 md:mb-12 px-4">
-            <Link
-              href="/auth/signup"
-              className="w-full sm:w-auto inline-block bg-white text-purple-600 text-base sm:text-lg font-bold px-8 sm:px-10 md:px-12 py-3 sm:py-3.5 md:py-4 rounded-2xl sm:rounded-[22px] shadow-2xl transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.4)] text-center"
-            >
-              Start Free Today
-            </Link>
-            <p className="text-purple-100 text-xs sm:text-sm font-medium text-center">
-              No credit card • Free forever • 2-minute setup
+      <section id="pricing" className="relative z-10 py-16 sm:py-20 md:py-24 lg:py-28 px-4 sm:px-6 bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12 sm:mb-16 md:mb-20"
+          >
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4 sm:mb-6 px-4">
+              Simple, <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">Transparent Pricing</span>
+            </h2>
+            <p className="text-base sm:text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed px-4">
+              Choose the plan that fits your job search. Scale up whenever you're ready.
             </p>
+          </motion.div>
+
+          {/* Pricing Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 lg:gap-10 max-w-4xl mx-auto mb-12 md:mb-16">
+            {/* Free Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="group"
+            >
+              <div className="relative h-full bg-white rounded-3xl border-2 border-slate-200 hover:border-slate-300 shadow-lg hover:shadow-xl transition-all duration-300 p-8 md:p-10 overflow-hidden">
+                {/* Gradient overlay */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-blue-100 to-transparent rounded-full blur-3xl opacity-0 group-hover:opacity-50 transition-opacity duration-300 -mr-20 -mt-20" />
+
+                <div className="relative z-10">
+                  {/* Plan Name */}
+                  <div className="mb-6">
+                    <h3 className="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Free</h3>
+                    <p className="text-slate-600">Perfect for getting started</p>
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-6 pb-6 border-b border-slate-200">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl md:text-6xl font-bold text-slate-900">$0</span>
+                      <span className="text-slate-600">/month</span>
+                    </div>
+                    <p className="text-sm text-slate-600 mt-2">Forever free with basic features</p>
+                  </div>
+
+                  {/* CTA */}
+                  <Link href="/auth/signup" className="w-full">
+                    <Button className="w-full mb-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold h-12 rounded-xl">
+                      Get Started Free
+                    </Button>
+                  </Link>
+
+                  {/* Features */}
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold text-slate-900 mb-4">What&apos;s Included:</p>
+                    {[
+                      { label: "100 activities/month", icon: "📝" },
+                      { label: "No AI model access (use your own API key)", icon: "🔑" },
+                      { label: "In-app reminders", icon: "🔔" },
+                      { label: "Activity tracking & history", icon: "📊" },
+                      { label: "Standard support", icon: "💬" },
+                    ].map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <span className="text-lg flex-shrink-0">{feature.icon}</span>
+                        <span className="text-sm text-slate-700">{feature.label}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Not Included */}
+                  <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
+                    <p className="text-xs font-semibold text-slate-500 uppercase">Not Included:</p>
+                    {[
+                      "Sponsored AI models (Claude, OpenAI, Gemini)",
+                      "Email reminders",
+                      "Resume modifier (coming soon)"
+                    ].map((feature, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <span className="text-slate-300">✕</span>
+                        <span className="text-sm text-slate-500">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Plus Plan */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="group"
+            >
+              <div className="relative h-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl border-2 border-purple-500/50 shadow-2xl hover:shadow-2xl transition-all duration-300 p-8 md:p-10 overflow-hidden ring-2 ring-purple-500/30">
+                {/* Gradient overlay */}
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-purple-500 to-transparent rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-300 -mr-20 -mt-20" />
+
+                {/* Badge */}
+                <div className="absolute top-6 right-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold">
+                  Most Popular
+                </div>
+
+                <div className="relative z-10">
+                  {/* Plan Name */}
+                  <div className="mb-6">
+                    <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Plus</h3>
+                    <p className="text-purple-200">For serious job seekers</p>
+                  </div>
+
+                  {/* Price */}
+                  <div className="mb-6 pb-6 border-b border-slate-700">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-5xl md:text-6xl font-bold text-white">$5</span>
+                      <span className="text-slate-400">/month</span>
+                    </div>
+                    <p className="text-sm text-slate-300 mt-2">Billed monthly • Cancel anytime</p>
+                  </div>
+
+                  {/* CTA */}
+                  <Link href="/auth/signup" className="w-full">
+                    <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold h-12 rounded-xl shadow-lg">
+                      Start 7-Day Trial
+                    </Button>
+                  </Link>
+
+                  {/* Features */}
+                  <div className="space-y-4">
+                    <p className="text-sm font-semibold text-white mb-4">Everything in Free, plus:</p>
+                    {[
+                      { label: "300 activities/month", icon: "📝", highlight: true },
+                      { label: "300 generations/month", icon: "✨", highlight: true },
+                      { label: "150 follow-up generations", icon: "↩️", highlight: true },
+                      { label: "Sponsored AI models (Claude, OpenAI)", icon: "🤖" },
+                      { label: "Coming soon: Gemini support", icon: "🔮" },
+                      { label: "Email reminders", icon: "📧" },
+                      { label: "Coming soon: Resume modifier by JD", icon: "📄" },
+                      { label: "Priority support", icon: "⭐" },
+                    ].map((feature, idx) => (
+                      <div key={idx} className={`flex items-start gap-3 ${feature.highlight ? 'bg-purple-500/10 p-3 rounded-lg border border-purple-500/20' : ''}`}>
+                        <span className="text-lg flex-shrink-0">{feature.icon}</span>
+                        <span className={`text-sm ${feature.highlight ? 'text-purple-200 font-medium' : 'text-slate-300'}`}>{feature.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-10 opacity-90 px-4">
-            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
-              <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
+          {/* Trust Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-10 px-4 py-8 md:py-12 border-t border-slate-200"
+          >
+            <div className="flex items-center gap-2 sm:gap-2.5 text-slate-700">
+              <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
               <span className="text-xs sm:text-sm font-medium">Secure & Encrypted</span>
             </div>
-            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
-              <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="flex items-center gap-2 sm:gap-2.5 text-slate-700">
+              <Users className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
               <span className="text-xs sm:text-sm font-medium">{userCount} Users</span>
             </div>
-            <div className="flex items-center gap-2 sm:gap-2.5 text-white">
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
+            <div className="flex items-center gap-2 sm:gap-2.5 text-slate-700">
+              <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-600" />
               <span className="text-xs sm:text-sm font-medium">Instant Results</span>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        </div>
       </section>
 
       {/* Footer */}
