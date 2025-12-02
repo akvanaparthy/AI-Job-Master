@@ -47,6 +47,16 @@ export async function GET(req: NextRequest) {
     const monthlyCount = await getMonthlyActivityCount(user.id);
     const daysUntilReset = getDaysUntilReset(dbUser.monthlyResetDate);
 
+    // Get usage counts from user record
+    const userCounts = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        generationCount: true,
+        followupGenerationCount: true,
+        activityCount: true,
+      },
+    });
+
     // Get counts for each type (excluding followups if configured)
     const [coverLetterCount, linkedInCount, emailCount, recentActivity] = await Promise.all([
       prisma.coverLetter.count({
@@ -215,6 +225,9 @@ export async function GET(req: NextRequest) {
       maxActivities,
       userType: dbUser.userType,
       recentActivity: allActivity,
+      generationCount: userCounts?.generationCount || 0,
+      followupGenerationCount: userCounts?.followupGenerationCount || 0,
+      activityCount: userCounts?.activityCount || 0,
     });
   } catch (error) {
     logger.error('Dashboard stats error', error);

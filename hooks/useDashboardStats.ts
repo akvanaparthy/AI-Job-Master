@@ -12,6 +12,9 @@ export interface DashboardStats {
   usagePercentage: number;
   maxActivities: number;
   userType: 'FREE' | 'PLUS' | 'ADMIN';
+  generationCount: number;
+  followupGenerationCount: number;
+  activityCount: number;
   recentActivity: Array<{
     id: string;
     type: 'Cover Letter' | 'LinkedIn' | 'Email';
