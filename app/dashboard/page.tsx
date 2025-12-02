@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, MessageSquare, Mail, ArrowRight, TrendingUp, Clock, ArrowUpRight, Reply, Trash2 } from 'lucide-react';
+import { FileText, MessageSquare, Mail, ArrowRight, TrendingUp, Clock, ArrowUpRight, Reply, Trash2, Sparkles, Send } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useToast } from '@/hooks/use-toast';
@@ -603,14 +603,22 @@ export default function DashboardPage() {
                       <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-blue-200 to-transparent dark:from-blue-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
                       <div className="relative z-10">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
-                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                          </svg>
+                          <TrendingUp className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
                         <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Activities</p>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
-                          {loading ? '...' : <AnimatedNumber value={stats?.activityCount || 0} />}
-                        </p>
+                        <div className="h-9 mb-2">
+                          <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
+                            {loading ? (
+                              <span className="inline-flex gap-0.5">
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                              </span>
+                            ) : (
+                              <AnimatedNumber value={stats?.activityCount || 0} />
+                            )}
+                          </p>
+                        </div>
                         <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
                       </div>
                     </div>
@@ -627,14 +635,22 @@ export default function DashboardPage() {
                       <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-purple-200 to-transparent dark:from-purple-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
                       <div className="relative z-10">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
-                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 6H6.28l-.31-1.243A1 1 0 005 4H3z" />
-                          </svg>
+                          <Sparkles className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
                         <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Generations</p>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
-                          {loading ? '...' : <AnimatedNumber value={stats?.generationCount || 0} />}
-                        </p>
+                        <div className="h-9 mb-2">
+                          <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
+                            {loading ? (
+                              <span className="inline-flex gap-0.5">
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                              </span>
+                            ) : (
+                              <AnimatedNumber value={stats?.generationCount || 0} />
+                            )}
+                          </p>
+                        </div>
                         <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
                       </div>
                     </div>
@@ -651,15 +667,98 @@ export default function DashboardPage() {
                       <div className="absolute top-0 right-0 w-24 h-24 sm:w-20 sm:h-20 bg-gradient-to-bl from-orange-200 to-transparent dark:from-orange-800/30 rounded-full -mr-6 -mt-6 sm:-mr-8 sm:-mt-8 opacity-40 group-hover:opacity-60 transition-opacity" />
                       <div className="relative z-10">
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
-                          <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M15.5 1H4c-.82 0-1.5.68-1.5 1.5v12c0 .82.68 1.5 1.5 1.5h11c.82 0 1.5-.68 1.5-1.5V2.5c0-.82-.68-1.5-1.5-1.5zm0 12.5H4V2.5h11v11z" />
-                          </svg>
+                          <Send className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
                         <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Followup Generations</p>
-                        <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight mb-2">
-                          {loading ? '...' : <AnimatedNumber value={stats?.followupGenerationCount || 0} />}
-                        </p>
+                        <div className="h-9 mb-2">
+                          <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
+                            {loading ? (
+                              <span className="inline-flex gap-0.5">
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                              </span>
+                            ) : (
+                              <AnimatedNumber value={stats?.followupGenerationCount || 0} />
+                            )}
+                          </p>
+                        </div>
                         <p className="text-xs text-slate-500 dark:text-gray-500">Unlimited for Admin</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+
+                {/* Usage Progress Bars */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+                  {/* Activities Usage Bar */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.25 }}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-slate-600 dark:text-gray-400">Usage</p>
+                        <p className="text-xs font-semibold text-slate-700 dark:text-gray-300">
+                          {loading ? '...' : <>Unlimited</>}
+                        </p>
+                      </div>
+                      <div className="h-2 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 1, ease: 'easeOut', delay: 0.3 }}
+                          className="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Generations Usage Bar */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-slate-600 dark:text-gray-400">Usage</p>
+                        <p className="text-xs font-semibold text-slate-700 dark:text-gray-300">
+                          {loading ? '...' : <>Unlimited</>}
+                        </p>
+                      </div>
+                      <div className="h-2 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.4 }}
+                          className="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Followup Generations Usage Bar */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.35 }}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium text-slate-600 dark:text-gray-400">Usage</p>
+                        <p className="text-xs font-semibold text-slate-700 dark:text-gray-300">
+                          {loading ? '...' : <>Unlimited</>}
+                        </p>
+                      </div>
+                      <div className="h-2 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: '100%' }}
+                          transition={{ duration: 1.4, ease: 'easeOut', delay: 0.5 }}
+                          className="h-full bg-gradient-to-r from-orange-400 to-amber-500 rounded-full"
+                        />
                       </div>
                     </div>
                   </motion.div>
