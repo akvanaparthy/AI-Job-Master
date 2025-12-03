@@ -26,6 +26,7 @@ model User {
   openaiModels         String[]          @default([])
   userType             UserType          @default(FREE)
   isAdmin              Boolean           @default(false)
+  subscriptionId       String?           // Coinbase Commerce charge ID
   followupReminderDays Int               @default(7)
   monthlyResetDate     DateTime          @default(now())
   generationCount      Int               @default(0)

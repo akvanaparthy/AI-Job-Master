@@ -783,9 +783,9 @@ export default function Home() {
                   </div>
 
                   {/* CTA */}
-                  <Link href="/auth/signup" className="w-full">
+                  <Link href="/auth/signup?plan=plus" className="w-full">
                     <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold h-12 rounded-xl shadow-lg">
-                      Start 7-Day Trial
+                      Get Started with Plus
                     </Button>
                   </Link>
 

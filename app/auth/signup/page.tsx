@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
@@ -15,32 +15,32 @@ import { Sparkles } from 'lucide-react';
 
 export default function SignupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const isPlusFlow = searchParams.get('plan') === 'plus';
 
-  const handleSignup = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const validatePassword = (): boolean => {
     if (password !== confirmPassword) {
       toast({
         title: 'Error',
         description: 'Passwords do not match',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
-    // Strong password validation
     if (password.length < 8) {
       toast({
         title: 'Error',
         description: 'Password must be at least 8 characters',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
     if (!/[A-Z]/.test(password)) {
@@ -49,7 +49,7 @@ export default function SignupPage() {
         description: 'Password must contain at least one uppercase letter',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
     if (!/[a-z]/.test(password)) {
@@ -58,7 +58,7 @@ export default function SignupPage() {
         description: 'Password must contain at least one lowercase letter',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
     if (!/[0-9]/.test(password)) {
@@ -67,7 +67,7 @@ export default function SignupPage() {
         description: 'Password must contain at least one number',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
 
     if (!/[^A-Za-z0-9]/.test(password)) {
@@ -76,12 +76,39 @@ export default function SignupPage() {
         description: 'Password must contain at least one special character',
         variant: 'destructive',
       });
-      return;
+      return false;
     }
+
+    return true;
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validatePassword()) return;
 
     setLoading(true);
 
     try {
+      // If PLUS flow, redirect to payment first
+      if (isPlusFlow) {
+        setProcessingPayment(true);
+        const response = await fetch('/api/payment/create-charge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to create payment charge');
+        }
+
+        const { url } = await response.json();
+        window.location.href = url; // Redirect to Coinbase hosted payment page
+        return;
+      }
+
+      // FREE flow - normal signup
       const supabase = createClient();
       const { error } = await supabase.auth.signUp({
         email,
@@ -98,17 +125,17 @@ export default function SignupPage() {
           variant: 'destructive',
         });
       } else {
-        // Redirect to verification prompt page with email
         router.push(`/auth/verify-email?email=${encodeURIComponent(email)}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: 'Error',
-        description: 'An unexpected error occurred',
+        description: error.message || 'An unexpected error occurred',
         variant: 'destructive',
       });
     } finally {
       setLoading(false);
+      setProcessingPayment(false);
     }
   };
 
@@ -137,7 +164,11 @@ export default function SignupPage() {
             <div className="p-8">
               <div className="mb-6">
                 <h2 className="text-2xl font-display font-bold text-slate-900 mb-2">Create Account</h2>
-                <p className="text-slate-600">Sign up to start using AI Job Master</p>
+                <p className="text-slate-600">
+                  {isPlusFlow
+                    ? 'Sign up and upgrade to Plus ($5/month)'
+                    : 'Sign up to start using AI Job Master'}
+                </p>
               </div>
 
               <form onSubmit={handleSignup} className="space-y-4">
@@ -187,9 +218,15 @@ export default function SignupPage() {
                 <Button
                   type="submit"
                   className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white font-medium rounded-[20px] transition-colors mt-6"
-                  disabled={loading}
+                  disabled={loading || processingPayment}
                 >
-                  {loading ? 'Creating account...' : 'Create Account'}
+                  {processingPayment
+                    ? 'Redirecting to payment...'
+                    : loading
+                    ? 'Creating account...'
+                    : isPlusFlow
+                    ? 'Continue to Payment'
+                    : 'Create Account'}
                 </Button>
               </form>
 
