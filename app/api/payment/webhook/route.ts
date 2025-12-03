@@ -30,6 +30,8 @@ export async function POST(request: NextRequest) {
     }
 
     const event = JSON.parse(payload);
+    console.log('Full webhook payload:', JSON.stringify(event, null, 2));
+
     const { type, data } = event;
 
     console.log('Webhook event received:', type);
