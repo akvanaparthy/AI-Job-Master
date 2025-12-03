@@ -32,27 +32,34 @@ export async function POST(request: NextRequest) {
     const event = JSON.parse(payload);
     const { type, data } = event;
 
+    console.log('Webhook event received:', type);
+    console.log('Event data:', JSON.stringify(data, null, 2));
+
     // Handle charge confirmed event
     if (type === 'charge:confirmed') {
-      const { email, plan } = data.metadata || {};
+      const chargeData = data.data || data; // Handle both response formats
+      const { email, plan } = chargeData.metadata || {};
+
+      console.log('Charge confirmed for email:', email, 'plan:', plan);
 
       if (email && plan === 'PLUS') {
         // Update user to PLUS tier
-        await prisma.user.update({
+        const updatedUser = await prisma.user.update({
           where: { email },
           data: {
             userType: 'PLUS',
-            subscriptionId: data.id,
+            subscriptionId: chargeData.id,
           },
         });
 
-        console.log(`User ${email} upgraded to PLUS`);
+        console.log(`User ${email} upgraded to PLUS, subscription ID: ${chargeData.id}`);
       }
     }
 
     // Handle charge failed event
     if (type === 'charge:failed') {
-      const { email } = data.metadata || {};
+      const chargeData = data.data || data;
+      const { email } = chargeData.metadata || {};
       console.log(`Payment failed for ${email}`);
     }
 

@@ -92,18 +92,30 @@ export function SignupForm() {
       // If PLUS flow, redirect to payment first
       if (isPlusFlow) {
         setProcessingPayment(true);
+        console.log('Starting PLUS payment flow for email:', email);
+
         const response = await fetch('/api/payment/create-charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
 
+        console.log('API response status:', response.status);
+
         if (!response.ok) {
-          throw new Error('Failed to create payment charge');
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to create payment charge');
         }
 
-        const { url } = await response.json();
-        window.location.href = url; // Redirect to Coinbase hosted payment page
+        const data = await response.json();
+        console.log('API response data:', data);
+
+        if (!data.url) {
+          throw new Error('No payment URL received from server');
+        }
+
+        console.log('Redirecting to Coinbase:', data.url);
+        window.location.href = data.url; // Redirect to Coinbase hosted payment page
         return;
       }
 
