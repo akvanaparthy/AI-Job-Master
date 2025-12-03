@@ -111,3 +111,6 @@ next-env.d.ts
 
 # scripts folder (debug/test scripts)
 /scripts/
+
+# documentation folder
+/documentation/
