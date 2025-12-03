@@ -130,10 +130,14 @@ export default function Home() {
               {/* CTA Button - Right side with gradient outline on hover */}
               <div className="relative group flex-shrink-0">
                 {/* Animated gradient outline */}
-                <div className="gradient-outline-rotate absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
+                <div className={`gradient-outline-rotate absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 opacity-0 group-hover:opacity-100 blur-sm transition-all duration-500 ${
+                  scrolled ? 'rounded-[22px] sm:rounded-[24px]' : 'rounded-[18px] sm:rounded-[22px]'
+                }`} />
                 <Link
                   href="/auth/signup"
-                  className="relative inline-block bg-slate-900 text-white font-semibold rounded-[16px] sm:rounded-[20px] shadow-lg transition-all duration-300 hover:shadow-xl text-[13px] sm:text-[15px] px-4 sm:px-8 py-2.5 sm:py-3.5"
+                  className={`relative inline-block bg-slate-900 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl text-[13px] sm:text-[15px] px-4 sm:px-8 py-2.5 sm:py-3.5 ${
+                    scrolled ? 'rounded-[20px] sm:rounded-[22px]' : 'rounded-[16px] sm:rounded-[20px]'
+                  }`}
                 >
                   <span className="hidden sm:inline">Get Started</span>
                   <span className="sm:hidden">Start</span>
