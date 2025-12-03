@@ -47,15 +47,27 @@ export async function GET(req: NextRequest) {
     const monthlyCount = await getMonthlyActivityCount(user.id);
     const daysUntilReset = getDaysUntilReset(dbUser.monthlyResetDate);
 
-    // Get usage counts from user record
-    const userCounts = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: {
-        generationCount: true,
-        followupGenerationCount: true,
-        activityCount: true,
-      },
-    });
+    // Get usage counts - calculate from actual database records for accuracy
+    const [generationCountDb, followupGenerationCountDb, activityCountDb] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: user.id },
+        select: { generationCount: true },
+      }),
+      prisma.user.findUnique({
+        where: { id: user.id },
+        select: { followupGenerationCount: true },
+      }),
+      // Calculate actual activity count from database records
+      prisma.$queryRaw<[{ count: bigint }]>`
+        SELECT CAST(COUNT(*) as BIGINT) as count FROM (
+          SELECT id FROM "CoverLetter" WHERE "userId" = ${user.id}
+          UNION ALL
+          SELECT id FROM "LinkedInMessage" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
+          UNION ALL
+          SELECT id FROM "EmailMessage" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
+        ) as activities
+      `,
+    ]);
 
     // Get counts for each type (excluding followups if configured)
     const [coverLetterCount, linkedInCount, emailCount, recentActivity] = await Promise.all([
@@ -225,9 +237,9 @@ export async function GET(req: NextRequest) {
       maxActivities,
       userType: dbUser.userType,
       recentActivity: allActivity,
-      generationCount: userCounts?.generationCount || 0,
-      followupGenerationCount: userCounts?.followupGenerationCount || 0,
-      activityCount: userCounts?.activityCount || 0,
+      generationCount: generationCountDb?.generationCount || 0,
+      followupGenerationCount: followupGenerationCountDb?.followupGenerationCount || 0,
+      activityCount: Number(activityCountDb[0]?.count || 0),
     });
   } catch (error) {
     logger.error('Dashboard stats error', error);

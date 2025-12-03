@@ -605,15 +605,31 @@ export default function DashboardPage() {
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
                           <TrendingUp className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Activities</p>
-                        <div className="h-9 mb-2">
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1 h-4">Activities</p>
+                        <div className="h-10 mb-2 flex items-center">
                           <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
                             {loading ? (
-                              <span className="inline-flex gap-0.5">
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                              </span>
+                              <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="inline-flex gap-1"
+                              >
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                              </motion.span>
                             ) : (
                               <AnimatedNumber value={stats?.activityCount || 0} />
                             )}
@@ -637,15 +653,31 @@ export default function DashboardPage() {
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
                           <Sparkles className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Generations</p>
-                        <div className="h-9 mb-2">
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1 h-4">Generations</p>
+                        <div className="h-10 mb-2 flex items-center">
                           <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
                             {loading ? (
-                              <span className="inline-flex gap-0.5">
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                              </span>
+                              <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="inline-flex gap-1"
+                              >
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                              </motion.span>
                             ) : (
                               <AnimatedNumber value={stats?.generationCount || 0} />
                             )}
@@ -669,15 +701,31 @@ export default function DashboardPage() {
                         <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-400 to-amber-500 flex items-center justify-center shadow-lg mb-3 flex-shrink-0">
                           <Send className="w-5 h-5 text-white" strokeWidth={2} />
                         </div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1">Followup Generations</p>
-                        <div className="h-9 mb-2">
+                        <p className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-1 h-4 line-clamp-1">Followup Gen.</p>
+                        <div className="h-10 mb-2 flex items-center">
                           <p className="text-3xl font-bold text-slate-900 dark:text-gray-100 leading-tight">
                             {loading ? (
-                              <span className="inline-flex gap-0.5">
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
-                                <span className="inline-block w-1.5 h-5 bg-slate-400 dark:bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
-                              </span>
+                              <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="inline-flex gap-1"
+                              >
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.1 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                                <motion.span
+                                  animate={{ y: [0, -6, 0] }}
+                                  transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut', delay: 0.2 }}
+                                  className="inline-block w-2 h-2 bg-slate-400 dark:bg-gray-500 rounded-full"
+                                />
+                              </motion.span>
                             ) : (
                               <AnimatedNumber value={stats?.followupGenerationCount || 0} />
                             )}
