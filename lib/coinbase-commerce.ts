@@ -1,15 +1,23 @@
-import { Client, Charge } from 'coinbase-commerce-node';
-
-// Initialize Coinbase Commerce client
-const client = new Client({
-  apiKey: process.env.COINBASE_KEY,
-});
+// Get or create Coinbase Commerce client
+function getClient() {
+  try {
+    const { Client } = require('coinbase-commerce-node');
+    return new Client({
+      apiKey: process.env.COINBASE_KEY || '',
+    });
+  } catch (error) {
+    console.error('Failed to initialize Coinbase client:', error);
+    return null;
+  }
+}
 
 export async function createPlusCharge(
   email: string,
   redirectUrl: string
 ): Promise<string> {
   try {
+    const { Charge } = require('coinbase-commerce-node');
+
     const chargeData = {
       name: 'AI Job Master Plus - Monthly Subscription',
       description: 'Plus plan subscription at $5/month',
@@ -57,6 +65,7 @@ export function verifyCoinbaseWebhookSignature(
 
 export async function getChargeById(chargeId: string): Promise<any> {
   try {
+    const { Charge } = require('coinbase-commerce-node');
     const charge = await Charge.retrieve(chargeId);
     return charge;
   } catch (error) {
