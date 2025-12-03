@@ -29,9 +29,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const event = JSON.parse(payload);
-    console.log('Full webhook payload:', JSON.stringify(event, null, 2));
+    const payload_obj = JSON.parse(payload);
+    console.log('Full webhook payload:', JSON.stringify(payload_obj, null, 2));
 
+    const event = payload_obj.event;
     const { type, data } = event;
 
     console.log('Webhook event received:', type);
@@ -39,8 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Handle charge confirmed event
     if (type === 'charge:confirmed') {
-      const chargeData = data.data || data; // Handle both response formats
-      const { email, plan } = chargeData.metadata || {};
+      const { email, plan } = data.metadata || {};
 
       console.log('Charge confirmed for email:', email, 'plan:', plan);
 
@@ -50,18 +50,17 @@ export async function POST(request: NextRequest) {
           where: { email },
           data: {
             userType: 'PLUS',
-            subscriptionId: chargeData.id,
+            subscriptionId: data.id,
           },
         });
 
-        console.log(`User ${email} upgraded to PLUS, subscription ID: ${chargeData.id}`);
+        console.log(`User ${email} upgraded to PLUS, subscription ID: ${data.id}`);
       }
     }
 
     // Handle charge failed event
     if (type === 'charge:failed') {
-      const chargeData = data.data || data;
-      const { email } = chargeData.metadata || {};
+      const { email } = data.metadata || {};
       console.log(`Payment failed for ${email}`);
     }
 
