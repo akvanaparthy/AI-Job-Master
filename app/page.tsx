@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Footer } from '@/components/Footer';
+import { createClient } from '@/lib/supabase/client';
 import {
   Briefcase,
   CheckCircle,
@@ -19,12 +21,45 @@ import {
   Zap,
   Clock,
   Brain,
-  Smile
+  Smile,
+  Check
 } from 'lucide-react';
 
 export default function Home() {
+  const router = useRouter();
   const [userCount, setUserCount] = useState('10,000+');
   const [scrolled, setScrolled] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userPlan, setUserPlan] = useState<'FREE' | 'PLUS' | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const supabase = createClient();
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          setIsLoggedIn(true);
+          // Fetch user plan from API
+          const response = await fetch('/api/user/profile');
+          if (response.ok) {
+            const userData = await response.json();
+            setUserPlan(userData.userType || 'FREE');
+          }
+        } else {
+          setIsLoggedIn(false);
+          setUserPlan(null);
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     fetch('/api/public/stats')
@@ -706,11 +741,22 @@ export default function Home() {
                   </div>
 
                   {/* CTA */}
-                  <Link href="/auth/signup" className="w-full">
-                    <Button className="w-full mb-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold h-12 rounded-xl">
-                      Get Started Free
-                    </Button>
-                  </Link>
+                  {isLoggedIn && userPlan === 'FREE' ? (
+                    <div className="w-full mb-6 flex items-center justify-center gap-2 h-12 rounded-xl bg-slate-200 text-slate-600 font-semibold cursor-not-allowed">
+                      <Check className="w-5 h-5" />
+                      Free plan activated
+                    </div>
+                  ) : isLoggedIn && userPlan === 'PLUS' ? (
+                    <div className="w-full mb-6 flex items-center justify-center gap-2 h-12 rounded-xl bg-slate-100 text-slate-400 font-semibold cursor-not-allowed">
+                      Free plan activated
+                    </div>
+                  ) : (
+                    <Link href="/auth/signup" className="w-full">
+                      <Button className="w-full mb-6 bg-slate-900 hover:bg-slate-800 text-white font-semibold h-12 rounded-xl">
+                        Get Started Free
+                      </Button>
+                    </Link>
+                  )}
 
                   {/* Features */}
                   <div className="space-y-4">
@@ -762,15 +808,26 @@ export default function Home() {
                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-purple-500 to-transparent rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-300 -mr-20 -mt-20" />
 
                 {/* Badge */}
-                <div className="absolute top-6 right-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold">
-                  Most Popular
-                </div>
+                {userPlan === 'PLUS' ? (
+                  <div className="absolute top-6 right-6 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold flex items-center gap-1">
+                    <Check className="w-4 h-4" />
+                    Your Plan
+                  </div>
+                ) : (
+                  <div className="absolute top-6 right-6 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-bold">
+                    Most Popular
+                  </div>
+                )}
 
                 <div className="relative z-10">
                   {/* Plan Name */}
                   <div className="mb-6">
                     <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Plus</h3>
-                    <p className="text-purple-200">For serious job seekers</p>
+                    <p className="text-purple-200">
+                      {userPlan === 'PLUS'
+                        ? 'Congratulations, you\'re already in Plus!'
+                        : 'For serious job seekers'}
+                    </p>
                   </div>
 
                   {/* Price */}
@@ -783,11 +840,24 @@ export default function Home() {
                   </div>
 
                   {/* CTA */}
-                  <Link href="/auth/signup?plan=plus" className="w-full">
-                    <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold h-12 rounded-xl shadow-lg">
-                      Get Started with Plus
-                    </Button>
-                  </Link>
+                  {userPlan === 'PLUS' ? (
+                    <div className="w-full mb-6 flex items-center justify-center gap-2 h-12 rounded-xl bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-emerald-200 font-semibold border border-green-500/30">
+                      <Check className="w-5 h-5" />
+                      Already active
+                    </div>
+                  ) : isLoggedIn && userPlan === 'FREE' ? (
+                    <Link href="/auth/signup?plan=plus" className="w-full">
+                      <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold h-12 rounded-xl shadow-lg">
+                        Upgrade to Plus
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/auth/signup?plan=plus" className="w-full">
+                      <Button className="w-full mb-6 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold h-12 rounded-xl shadow-lg">
+                        Get Started with Plus
+                      </Button>
+                    </Link>
+                  )}
 
                   {/* Features */}
                   <div className="space-y-4">
