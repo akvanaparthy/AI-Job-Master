@@ -60,11 +60,11 @@ export async function GET(req: NextRequest) {
       // Calculate actual activity count from database records
       prisma.$queryRaw<[{ count: bigint }]>`
         SELECT CAST(COUNT(*) as BIGINT) as count FROM (
-          SELECT id FROM "CoverLetter" WHERE "userId" = ${user.id}
+          SELECT id FROM "cover_letters" WHERE "userId" = ${user.id}
           UNION ALL
-          SELECT id FROM "LinkedInMessage" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
+          SELECT id FROM "linkedin_messages" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
           UNION ALL
-          SELECT id FROM "EmailMessage" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
+          SELECT id FROM "email_messages" WHERE "userId" = ${user.id} AND "messageType" = 'NEW'
         ) as activities
       `,
     ]);
