@@ -132,3 +132,9 @@
 .animate-pulse-glow {
   animation: pulse-glow 3s ease-in-out infinite;
 }
+
+/* Gradient outline animation for buttons and cards */
+.group:hover .gradient-outline-rotate {
+  background-size: 300% 300%;
+  animation: gradient-shift 2s ease infinite;
+}

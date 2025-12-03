@@ -130,7 +130,7 @@ export default function Home() {
               {/* CTA Button - Right side with gradient outline on hover */}
               <div className="relative group flex-shrink-0">
                 {/* Animated gradient outline */}
-                <div className="absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 animate-gradient-shift" />
+                <div className="gradient-outline-rotate absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[22px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500" />
                 <Link
                   href="/auth/signup"
                   className="relative inline-block bg-slate-900 text-white font-semibold rounded-[16px] sm:rounded-[20px] shadow-lg transition-all duration-300 hover:shadow-xl text-[13px] sm:text-[15px] px-4 sm:px-8 py-2.5 sm:py-3.5"
@@ -154,21 +154,9 @@ export default function Home() {
             }
           }
 
-          @keyframes gradient-shift {
-            0% {
-              background-position: 0% 50%;
-            }
-            50% {
-              background-position: 100% 50%;
-            }
-            100% {
-              background-position: 0% 50%;
-            }
-          }
-
           .animate-gradient-shift {
             background-size: 200% 200%;
-            animation: gradient-shift 3s ease infinite;
+            animation: liquid-flow 3s ease infinite;
           }
         `}</style>
       </motion.nav>
@@ -246,7 +234,7 @@ export default function Home() {
           >
             <div className="relative group inline-block">
               {/* Animated gradient outline - tighter */}
-              <div className="absolute -inset-[1.5px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[23px] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500 animate-gradient-shift" />
+              <div className="gradient-outline-rotate absolute -inset-[1.5px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[18px] sm:rounded-[23px] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500" />
               <Link
                 href="/auth/signup"
                 className="relative inline-block bg-slate-900 text-white text-sm sm:text-base md:text-[16px] font-semibold px-6 sm:px-8 md:px-10 py-3 sm:py-3.5 md:py-4 rounded-[16px] sm:rounded-[22px] shadow-2xl transition-all duration-300 hover:shadow-3xl"
@@ -741,9 +729,9 @@ export default function Home() {
                   <div className="mt-6 pt-6 border-t border-slate-200 space-y-3">
                     <p className="text-xs font-semibold text-slate-500 uppercase">Not Included:</p>
                     {[
-                      "Sponsored AI models (Claude, OpenAI, Gemini)",
+                      "Sponsored AI models",
                       "Email reminders",
-                      "Resume modifier (coming soon)"
+                      "Job Description Resume Maker"
                     ].map((feature, idx) => (
                       <div key={idx} className="flex items-start gap-3">
                         <span className="text-slate-300">✕</span>
@@ -761,8 +749,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="group"
+              className="group relative"
             >
+              {/* Animated gradient outline on hover */}
+              <div className="gradient-outline-rotate absolute -inset-[2px] bg-gradient-to-br from-purple-600 via-pink-500 to-blue-600 rounded-[24px] opacity-0 group-hover:opacity-100 blur-sm transition-opacity duration-500 pointer-events-none" />
               <div className="relative h-full bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl border-2 border-purple-500/50 shadow-2xl hover:shadow-2xl transition-all duration-300 p-8 md:p-10 overflow-hidden ring-2 ring-purple-500/30">
                 {/* Gradient overlay */}
                 <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-purple-500 to-transparent rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity duration-300 -mr-20 -mt-20" />
@@ -801,11 +791,10 @@ export default function Home() {
                     {[
                       { label: "300 activities/month", icon: "📝", highlight: true },
                       { label: "300 generations/month", icon: "✨", highlight: true },
-                      { label: "150 follow-up generations", icon: "↩️", highlight: true },
-                      { label: "Sponsored AI models (Claude, OpenAI)", icon: "🤖" },
-                      { label: "Coming soon: Gemini support", icon: "🔮" },
-                      { label: "Email reminders", icon: "📧" },
-                      { label: "Coming soon: Resume modifier by JD", icon: "📄" },
+                      { label: "150 follow-up generations/month", icon: "↩️", highlight: true },
+                      { label: "Sponsored AI models - Claude (OpenAI & Gemini soon)", icon: "🤖" },
+                      { label: "Email Reminders (soon)", icon: "📧" },
+                      { label: "Job Description Resume Maker (soon)", icon: "📄" },
                       { label: "Priority support", icon: "⭐" },
                     ].map((feature, idx) => (
                       <div key={idx} className={`flex items-start gap-3 ${feature.highlight ? 'bg-purple-500/10 p-3 rounded-lg border border-purple-500/20' : ''}`}>
