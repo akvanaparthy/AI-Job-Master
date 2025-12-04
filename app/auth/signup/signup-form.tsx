@@ -89,33 +89,50 @@ export function SignupForm() {
     setLoading(true);
 
     try {
-      // If PLUS flow, redirect to payment first
+      // If PLUS flow, create Supabase user first, then go to payment
       if (isPlusFlow) {
         setProcessingPayment(true);
         console.log('Starting PLUS payment flow for email:', email);
 
-        const response = await fetch('/api/payment/create-charge', {
+        // Step 1: Create Supabase auth user (sends verification email)
+        const supabase = createClient();
+        const { error: signupError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
+          },
+        });
+
+        if (signupError) {
+          throw new Error(signupError.message || 'Failed to create account');
+        }
+
+        console.log('Supabase user created, verification email sent');
+
+        // Step 2: Create Coinbase charge for payment
+        const chargeResponse = await fetch('/api/payment/create-charge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email }),
         });
 
-        console.log('API response status:', response.status);
+        console.log('Charge API response status:', chargeResponse.status);
 
-        if (!response.ok) {
-          const errorData = await response.json();
+        if (!chargeResponse.ok) {
+          const errorData = await chargeResponse.json();
           throw new Error(errorData.message || 'Failed to create payment charge');
         }
 
-        const data = await response.json();
-        console.log('API response data:', data);
+        const chargeData = await chargeResponse.json();
+        console.log('Charge created:', chargeData);
 
-        if (!data.url) {
+        if (!chargeData.url) {
           throw new Error('No payment URL received from server');
         }
 
-        console.log('Redirecting to Coinbase:', data.url);
-        window.location.href = data.url; // Redirect to Coinbase hosted payment page
+        console.log('Redirecting to Coinbase:', chargeData.url);
+        window.location.href = chargeData.url; // Redirect to Coinbase hosted payment page
         return;
       }
 

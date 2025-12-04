@@ -4,8 +4,15 @@ import { createPlusCharge } from '@/lib/coinbase-commerce';
 
 /**
  * Complete payment flow test endpoint
- * Creates user → Creates charge → Confirms payment → Sends verification email
+ * Creates user → Creates charge → Confirms payment
  * Only available when PAYMENT_TESTING=true
+ *
+ * NOTE: This endpoint skips Supabase user creation and email verification.
+ * In the real PLUS signup flow:
+ * 1. User signs up with email/password → Supabase sends verification email
+ * 2. User goes through payment
+ * 3. Webhook upgrades user to PLUS
+ * 4. User verifies email from inbox
  *
  * Usage: POST /api/payment/test-complete-flow
  * Body: { email: "test@example.com" }
