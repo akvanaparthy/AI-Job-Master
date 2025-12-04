@@ -30,6 +30,11 @@ export async function POST(request: NextRequest) {
     // Check if user exists
     const user = await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        userType: true,
+      },
     });
 
     if (!user) {
@@ -44,22 +49,44 @@ export async function POST(request: NextRequest) {
       const chargeId = `test-charge-${Date.now()}`;
 
       // Update user to PLUS tier (same as webhook does)
-      const updatedUser = await prisma.user.update({
-        where: { email },
-        data: {
-          userType: 'PLUS',
-          subscriptionId: chargeId,
-        },
-      });
+      try {
+        const updatedUser = await prisma.user.update({
+          where: { email },
+          data: {
+            userType: 'PLUS',
+            subscriptionId: chargeId,
+          },
+        });
 
-      console.log(`[TEST] User ${email} upgraded to PLUS, subscription ID: ${chargeId}`);
+        console.log(`[TEST] User ${email} upgraded to PLUS, subscription ID: ${chargeId}`);
 
-      return NextResponse.json({
-        success: true,
-        message: `User ${email} upgraded to PLUS tier`,
-        chargeId,
-        userType: updatedUser.userType,
-      });
+        return NextResponse.json({
+          success: true,
+          message: `User ${email} upgraded to PLUS tier`,
+          chargeId,
+          userType: updatedUser.userType,
+        });
+      } catch (updateError: any) {
+        // If subscriptionId column doesn't exist, try without it
+        if (updateError?.message?.includes('subscriptionId')) {
+          console.log(`[TEST] subscriptionId column missing, updating userType only`);
+          const updatedUser = await prisma.user.update({
+            where: { email },
+            data: {
+              userType: 'PLUS',
+            },
+          });
+
+          return NextResponse.json({
+            success: true,
+            message: `User ${email} upgraded to PLUS tier`,
+            chargeId,
+            userType: updatedUser.userType,
+            warning: 'subscriptionId column not in database - please run migration',
+          });
+        }
+        throw updateError;
+      }
     } else if (action === 'fail') {
       // Just log the failure (no database changes needed for failed payments)
       console.log(`[TEST] Payment failed for ${email}`);
