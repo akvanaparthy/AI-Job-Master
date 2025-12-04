@@ -51,11 +51,10 @@ export async function POST(request: NextRequest) {
             where: { email },
             data: {
               userType: 'PLUS',
-              subscriptionId: data.id,
             },
           });
 
-          console.log(`User ${email} upgraded to PLUS, subscription ID: ${data.id}`);
+          console.log(`User ${email} upgraded to PLUS, charge ID: ${data.id}`);
         } catch (error: any) {
           console.error(`Failed to update user ${email}:`, error?.message);
           // Don't throw - webhook should still return success so Coinbase doesn't retry

@@ -49,44 +49,21 @@ export async function POST(request: NextRequest) {
       const chargeId = `test-charge-${Date.now()}`;
 
       // Update user to PLUS tier (same as webhook does)
-      try {
-        const updatedUser = await prisma.user.update({
-          where: { email },
-          data: {
-            userType: 'PLUS',
-            subscriptionId: chargeId,
-          },
-        });
+      const updatedUser = await prisma.user.update({
+        where: { email },
+        data: {
+          userType: 'PLUS',
+        },
+      });
 
-        console.log(`[TEST] User ${email} upgraded to PLUS, subscription ID: ${chargeId}`);
+      console.log(`[TEST] User ${email} upgraded to PLUS, charge ID: ${chargeId}`);
 
-        return NextResponse.json({
-          success: true,
-          message: `User ${email} upgraded to PLUS tier`,
-          chargeId,
-          userType: updatedUser.userType,
-        });
-      } catch (updateError: any) {
-        // If subscriptionId column doesn't exist, try without it
-        if (updateError?.message?.includes('subscriptionId')) {
-          console.log(`[TEST] subscriptionId column missing, updating userType only`);
-          const updatedUser = await prisma.user.update({
-            where: { email },
-            data: {
-              userType: 'PLUS',
-            },
-          });
-
-          return NextResponse.json({
-            success: true,
-            message: `User ${email} upgraded to PLUS tier`,
-            chargeId,
-            userType: updatedUser.userType,
-            warning: 'subscriptionId column not in database - please run migration',
-          });
-        }
-        throw updateError;
-      }
+      return NextResponse.json({
+        success: true,
+        message: `User ${email} upgraded to PLUS tier`,
+        chargeId,
+        userType: updatedUser.userType,
+      });
     } else if (action === 'fail') {
       // Just log the failure (no database changes needed for failed payments)
       console.log(`[TEST] Payment failed for ${email}`);

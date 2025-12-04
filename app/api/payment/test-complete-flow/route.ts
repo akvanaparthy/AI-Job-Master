@@ -43,6 +43,11 @@ export async function POST(request: NextRequest) {
     // Step 1: Create or get user
     let user = await prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        userType: true,
+      },
     });
 
     if (!user) {
