@@ -45,23 +45,30 @@ export async function POST(request: NextRequest) {
       console.log('Charge confirmed for email:', email, 'plan:', plan);
 
       if (email && plan === 'PLUS') {
-        // Update user to PLUS tier
-        const updatedUser = await prisma.user.update({
-          where: { email },
-          data: {
-            userType: 'PLUS',
-            subscriptionId: data.id,
-          },
-        });
+        try {
+          // Update user to PLUS tier
+          const updatedUser = await prisma.user.update({
+            where: { email },
+            data: {
+              userType: 'PLUS',
+              subscriptionId: data.id,
+            },
+          });
 
-        console.log(`User ${email} upgraded to PLUS, subscription ID: ${data.id}`);
+          console.log(`User ${email} upgraded to PLUS, subscription ID: ${data.id}`);
+        } catch (error: any) {
+          console.error(`Failed to update user ${email}:`, error?.message);
+          // Don't throw - webhook should still return success so Coinbase doesn't retry
+        }
+      } else {
+        console.log('Skipping charge:confirmed - missing email or plan metadata');
       }
     }
 
     // Handle charge failed event
     if (type === 'charge:failed') {
       const { email } = data.metadata || {};
-      console.log(`Payment failed for ${email}`);
+      console.log(`Payment failed for ${email}`, email ? '- logging for future reference' : '- no email in metadata');
     }
 
     return NextResponse.json({ success: true });
