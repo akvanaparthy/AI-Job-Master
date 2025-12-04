@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
-import { verifyCoinbaseWebhookSignature } from '@/lib/coinbase-commerce';
 
 /**
  * Test endpoint to simulate a complete Coinbase payment flow
@@ -75,10 +74,14 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-  } catch (error) {
-    console.error('Test payment error:', error);
+  } catch (error: any) {
+    console.error('Test payment error:', error?.message || error);
+    console.error('Full error:', error);
     return NextResponse.json(
-      { error: 'Failed to process test payment' },
+      {
+        error: 'Failed to process test payment',
+        message: error?.message || 'Unknown error'
+      },
       { status: 500 }
     );
   }
