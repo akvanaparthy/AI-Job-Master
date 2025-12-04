@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
       where: { email },
       select: {
         userType: true,
-        subscriptionId: true,
       },
     });
 
@@ -34,7 +33,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       isPLUS,
       userType: user.userType,
-      subscriptionId: user.subscriptionId,
     });
   } catch (error) {
     console.error('Error checking PLUS status:', error);
