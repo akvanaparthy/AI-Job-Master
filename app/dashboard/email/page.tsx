@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { logger } from '@/lib/logger';
 import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
@@ -58,6 +59,7 @@ export default function EmailPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
+  const [requestReferral, setRequestReferral] = useState(false);
 
   useEffect(() => {
     loadResumes();
@@ -254,6 +256,7 @@ export default function EmailPage() {
           extraContent: extraContent || undefined,
           length,
           llmModel,
+          requestReferral,
           saveToHistory: false, // Don't auto-save
         }),
       });
@@ -299,6 +302,7 @@ export default function EmailPage() {
           extraContent: extraContent || undefined,
           length,
           llmModel,
+          requestReferral,
           status,
           saveToHistory: true, // Save to history
         }),
@@ -630,6 +634,16 @@ export default function EmailPage() {
                   />
                 </div>
               </div>
+
+              {messageType === 'NEW' && (
+                <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
+                  <div>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Request Referral</Label>
+                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Modify message to ask for a referral</p>
+                  </div>
+                  <Switch checked={requestReferral} onCheckedChange={setRequestReferral} />
+                </div>
+              )}
 
               {!positionTitle && (
                 <div className="space-y-2">

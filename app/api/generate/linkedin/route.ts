@@ -67,6 +67,7 @@ export async function POST(req: NextRequest) {
       extraContent,
       length,
       llmModel,
+      requestReferral,
       status,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
@@ -253,6 +254,7 @@ export async function POST(req: NextRequest) {
       previousMessage,
       extraContent,
       length: length as Length,
+      requestReferral,
     });
 
     // Generate message
@@ -320,6 +322,7 @@ export async function POST(req: NextRequest) {
           length: length as Length,
           llmModel: actualModel, // Store actual model name
           status: status || 'SENT',
+          requestReferral: requestReferral || false,
           parentMessageId: parentMessageId || null,
         },
       });

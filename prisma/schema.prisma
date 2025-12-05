@@ -113,6 +113,7 @@ model LinkedInMessage {
   length             Length              @default(MEDIUM)
   llmModel           String?
   status             ApplicationStatus   @default(SENT)
+  requestReferral    Boolean             @default(false)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   areasOfInterest    String?
@@ -146,6 +147,7 @@ model EmailMessage {
   length             Length            @default(MEDIUM)
   llmModel           String?
   status             ApplicationStatus @default(SENT)
+  requestReferral    Boolean           @default(false)
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   areasOfInterest    String?
