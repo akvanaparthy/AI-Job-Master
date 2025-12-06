@@ -214,9 +214,9 @@ export async function GET(req: NextRequest) {
     // Calculate total generated
     const totalGenerated = coverLetterCount + linkedInCount + emailCount;
 
-    // Calculate hours saved (estimate: 30 min per cover letter, 15 min per LinkedIn, 20 min per email)
+    // Calculate hours saved (20 min per activity)
     const hoursSaved = Math.round(
-      (coverLetterCount * 0.5 + linkedInCount * 0.25 + emailCount * 0.33) * 10
+      (totalGenerated * 0.33) * 10
     ) / 10;
 
     // Usage percentage based on monthly activity count and user's limit
