@@ -103,6 +103,7 @@ model LinkedInMessage {
   resumeId           String?
   linkedinUrl        String?
   recipientName      String?
+  recipientPosition  String?
   positionTitle      String?
   companyName        String
   content            String
@@ -136,6 +137,7 @@ model EmailMessage {
   resumeId           String?
   recipientEmail     String
   recipientName      String?
+  recipientPosition  String?
   positionTitle      String?
   companyName        String
   subject            String

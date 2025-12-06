@@ -6,6 +6,7 @@ export interface PromptParams {
   companyDescription?: string;
   length: Length;
   recipientName?: string;
+  recipientPosition?: string;
   positionTitle?: string;
   areasOfInterest?: string;
   companyName?: string;
@@ -112,6 +113,7 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
     companyDescription,
     length,
     recipientName,
+    recipientPosition,
     positionTitle,
     areasOfInterest,
     companyName,
@@ -176,7 +178,7 @@ PREVIOUS MESSAGE:
 ${previousMessage}
 
 CONTEXT:
-- Recipient: ${recipientName || 'Hiring Manager'}
+- Recipient: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 ${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
 ${extraContent ? `\nADDITIONAL CONTEXT FOR THIS FOLLOW-UP:\n${extraContent}\n\nIMPORTANT: Use the additional context above to enhance this follow-up message. This context provides new information or angles to incorporate into the message.` : ''}
@@ -190,7 +192,7 @@ Write a polite follow-up that:
     // Specific job title - confident/targeted approach
     user = `Please write a professional LinkedIn outreach message for the following opportunity:
 
-RECIPIENT: ${recipientName || 'Hiring Manager'}
+RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 POSITION: ${positionTitle} at ${companyName}
 
 ${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}\n` : ''}
@@ -203,7 +205,7 @@ Create a compelling message that demonstrates your strong fit for this specific 
     // General inquiry - exploratory/relationship-building approach
     user = `Please write a professional LinkedIn outreach message for a general opportunity inquiry:
 
-RECIPIENT: ${recipientName || 'Hiring Manager'}
+RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 COMPANY: ${companyName}
 ${areasOfInterest ? `AREAS OF INTEREST: ${areasOfInterest}` : 'LOOKING FOR: Open to various opportunities that match my background'}
 
@@ -233,6 +235,7 @@ export function getEmailPrompt(params: PromptParams): { system: string; user: st
     companyDescription,
     length,
     recipientName,
+    recipientPosition,
     positionTitle,
     areasOfInterest,
     companyName,
@@ -304,7 +307,7 @@ PREVIOUS EMAIL:
 ${previousMessage}
 
 CONTEXT:
-- Recipient: ${recipientName || 'Hiring Manager'}
+- Recipient: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 ${positionTitle ? `- Position: ${positionTitle} at ${companyName}` : `- Company: ${companyName}`}
 ${companyDescription ? `- Company Info: ${companyDescription}` : ''}
 ${extraContent ? `\nADDITIONAL CONTEXT FOR THIS FOLLOW-UP:\n${extraContent}\n\nIMPORTANT: Use the additional context above to enhance this follow-up email. This context provides new information or angles to incorporate into the email.` : ''}
@@ -318,7 +321,7 @@ Write a polite follow-up email that:
     // Specific job title - confident/targeted approach
     user = `Please write a professional job application email for the following opportunity:
 
-RECIPIENT: ${recipientName || 'Hiring Manager'}
+RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 POSITION: ${positionTitle} at ${companyName}
 
 ${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}\n` : ''}
@@ -331,7 +334,7 @@ Create a compelling email (with subject line) that demonstrates your strong fit 
     // General inquiry - exploratory/relationship-building approach
     user = `Please write a professional opportunity inquiry email:
 
-RECIPIENT: ${recipientName || 'Hiring Manager'}
+RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 COMPANY: ${companyName}
 ${areasOfInterest ? `AREAS OF INTEREST: ${areasOfInterest}` : 'LOOKING FOR: Open to various opportunities that match my background'}
 

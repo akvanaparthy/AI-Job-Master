@@ -58,6 +58,7 @@ export default function LinkedInPage() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
+  const [recipientPosition, setRecipientPosition] = useState('');
 
   useEffect(() => {
     loadResumes();
@@ -243,6 +244,7 @@ export default function LinkedInPage() {
           messageType,
           linkedinUrl: linkedinUrl || undefined,
           recipientName: recipientName || undefined,
+          recipientPosition: recipientPosition || undefined,
           positionTitle: positionTitle || undefined,
           areasOfInterest: areasOfInterest || undefined,
           companyName,
@@ -288,6 +290,7 @@ export default function LinkedInPage() {
           messageType,
           linkedinUrl: linkedinUrl || undefined,
           recipientName: recipientName || undefined,
+          recipientPosition: recipientPosition || undefined,
           positionTitle: positionTitle || undefined,
           areasOfInterest: areasOfInterest || undefined,
           companyName,
@@ -608,6 +611,16 @@ export default function LinkedInPage() {
                           onChange={(e) => setRecipientName(e.target.value)}
                           className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                         />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Recipient Position</Label>
+                        <Input
+                          placeholder="e.g., Hiring Manager, VP of Engineering"
+                          value={recipientPosition}
+                          onChange={(e) => setRecipientPosition(e.target.value)}
+                          className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                        />
+                        <p className="text-xs text-slate-500 dark:text-gray-400">Optional: Their job title or position at the company</p>
                       </div>
                     </div>
                   </motion.div>
