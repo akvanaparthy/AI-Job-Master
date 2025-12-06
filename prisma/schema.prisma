@@ -118,7 +118,7 @@ model LinkedInMessage {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   areasOfInterest    String?
-  messageId          String?             @unique
+  messageId          String?
   parentMessage      LinkedInMessage?    @relation("LinkedInFollowUp", fields: [parentMessageId], references: [id], onDelete: Cascade)
   followUpMessages   LinkedInMessage[]   @relation("LinkedInFollowUp")
   resume             Resume?             @relation(fields: [resumeId], references: [id])
@@ -153,7 +153,7 @@ model EmailMessage {
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
   areasOfInterest    String?
-  messageId          String?           @unique
+  messageId          String?
   parentMessage      EmailMessage?     @relation("EmailFollowUp", fields: [parentMessageId], references: [id], onDelete: Cascade)
   followUpMessages   EmailMessage[]    @relation("EmailFollowUp")
   resume             Resume?           @relation(fields: [resumeId], references: [id])

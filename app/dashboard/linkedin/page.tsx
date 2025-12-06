@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { ResizableTextarea } from '@/components/ui/resizable-textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -687,20 +688,24 @@ export default function LinkedInPage() {
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Job Description</Label>
-                        <Textarea
+                        <ResizableTextarea
                           placeholder="Brief job description..."
-                          className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                          className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base p-3"
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
+                          minHeight={80}
+                          maxHeight={600}
                         />
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Company Info</Label>
-                        <Textarea
+                        <ResizableTextarea
                           placeholder="What interests you about this company?"
-                          className="min-h-[60px] sm:min-h-[80px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                          className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base p-3"
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
+                          minHeight={60}
+                          maxHeight={600}
                         />
                       </div>
                     </div>
@@ -718,11 +723,13 @@ export default function LinkedInPage() {
                 >
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Extra Content</Label>
-                    <Textarea
+                    <ResizableTextarea
                       placeholder="Add any additional context or information to include in this follow-up message..."
-                      className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                      className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base p-3"
                       value={extraContent}
                       onChange={(e) => setExtraContent(e.target.value)}
+                      minHeight={80}
+                      maxHeight={600}
                     />
                     <p className="text-xs text-slate-500 dark:text-gray-400">
                       This extra context will be used by the AI to enhance your follow-up message with new angles or information

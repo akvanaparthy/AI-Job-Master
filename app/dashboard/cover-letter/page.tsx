@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { ResizableTextarea } from '@/components/ui/resizable-textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -425,21 +426,25 @@ export default function CoverLetterPage() {
                 <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
                   Job Description <span className="text-amber-600 dark:text-amber-400">*</span>
                 </Label>
-                <Textarea
+                <ResizableTextarea
                   placeholder="Paste the full job description here..."
-                  className="min-h-[150px] sm:min-h-[180px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none leading-relaxed hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                  className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-lg leading-relaxed hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base p-3"
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
+                  minHeight={150}
+                  maxHeight={600}
                 />
               </div>
 
               <div className="space-y-2">
                 <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Company Info (Optional)</Label>
-                <Textarea
+                <ResizableTextarea
                   placeholder="What interests you about this company?"
-                  className="min-h-[80px] sm:min-h-[100px] bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg resize-none hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                  className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base p-3"
                   value={companyDescription}
                   onChange={(e) => setCompanyDescription(e.target.value)}
+                  minHeight={80}
+                  maxHeight={600}
                 />
               </div>
 

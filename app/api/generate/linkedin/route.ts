@@ -327,6 +327,7 @@ export async function POST(req: NextRequest) {
           status: status || 'SENT',
           requestReferral: requestReferral || false,
           parentMessageId: parentMessageId || null,
+          messageId: messageId || null,
         },
       });
       linkedInMessageId = linkedInMessage.id;
