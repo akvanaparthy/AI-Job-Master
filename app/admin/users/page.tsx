@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminUsers } from '@/hooks/useAdminUsers';
 import { Shield, Search, ChevronLeft, ChevronRight, Trash2, Crown, Sparkles, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -33,49 +34,14 @@ interface User {
 export default function AdminUsersPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [userTypeFilter, setUserTypeFilter] = useState('ALL');
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
 
-  const loadUsers = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: '20',
-        ...(userTypeFilter !== 'ALL' && { userType: userTypeFilter }),
-        ...(search && { search }),
-      });
-
-      const response = await fetch(`/api/admin/users?${params}`);
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load users');
-
-      const data = await response.json();
-      setUsers(data.users);
-      setTotalPages(data.pagination.totalPages);
-      setTotalCount(data.pagination.totalCount);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load users',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [page, userTypeFilter, search, router, toast]);
-
-  useEffect(() => {
-    loadUsers();
-  }, [loadUsers]);
+  // Use React Query hook for admin users
+  const { users, pagination, isLoading, invalidateUsers } = useAdminUsers(page, userTypeFilter, search);
+  const totalPages = pagination?.totalPages || 1;
+  const totalCount = pagination?.totalCount || 0;
 
   const updateUserType = async (userId: string, newType: 'FREE' | 'PLUS' | 'ADMIN') => {
     try {
@@ -95,7 +61,7 @@ export default function AdminUsersPage() {
         description: 'User type updated successfully',
       });
 
-      loadUsers();
+      invalidateUsers();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -123,7 +89,7 @@ export default function AdminUsersPage() {
         description: 'User deleted successfully',
       });
 
-      loadUsers();
+      invalidateUsers();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -216,7 +182,7 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {loading ? (
+                {isLoading ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading users...</td>
                   </tr>
