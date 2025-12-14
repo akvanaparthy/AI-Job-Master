@@ -75,7 +75,7 @@ const COLORS = {
 
 export default function AdminAnalyticsPage() {
   const router = useRouter();
-  const { data, isLoading } = useAdminAnalytics();
+  const { data, isLoading, invalidateAnalytics } = useAdminAnalytics();
 
   if (isLoading) {
     return (

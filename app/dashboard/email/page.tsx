@@ -37,6 +37,15 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
+interface EmailSearchResult {
+  id: string;
+  companyName: string;
+  positionTitle?: string;
+  recipientName?: string;
+  createdAt: string;
+  status: string;
+}
+
 export default function EmailPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -62,7 +71,6 @@ export default function EmailPage() {
   const [previousMessageBody, setPreviousMessageBody] = useState('');
   const [extraContent, setExtraContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
@@ -71,7 +79,7 @@ export default function EmailPage() {
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
 
   // Use React Query for debounced search
-  const { data: searchResults = [] } = useQuery({
+  const { data: searchResults = [], isLoading: searchLoading } = useQuery<EmailSearchResult[]>({
     queryKey: ['email-search', debouncedSearchQuery],
     queryFn: async () => {
       if (!debouncedSearchQuery.trim()) return [];
@@ -186,7 +194,6 @@ export default function EmailPage() {
           setPreviousMessageSubject(msg.subject || '');
           setPreviousMessageBody(msg.body || '');
           setSearchQuery('');
-          setSearchResults([]);
           toast({
             title: 'Message Loaded',
             description: 'Previous email details loaded successfully',
@@ -507,15 +514,14 @@ export default function EmailPage() {
                     placeholder="Search by company, position, message ID..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors"
                   />
                   <Button
-                    onClick={handleSearch}
-                    disabled={searching || !searchQuery.trim()}
+                    onClick={() => setSearchQuery('')}
+                    disabled={!searchQuery.trim()}
                     className="h-10 sm:h-11 px-4 sm:px-6 text-sm sm:text-base bg-purple-600 hover:bg-purple-700 text-white rounded-lg"
                   >
-                    {searching ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : <Search className="h-3 w-3 sm:h-4 sm:w-4" />}
+                    <Search className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </div>
 
@@ -548,7 +554,7 @@ export default function EmailPage() {
                   </div>
                 )}
 
-                {searchQuery && searchResults.length === 0 && !searching && (
+                {searchQuery && searchResults.length === 0 && !searchLoading && (
                   <p className="text-sm text-slate-500 dark:text-gray-400 text-center py-4">No emails found</p>
                 )}
               </div>

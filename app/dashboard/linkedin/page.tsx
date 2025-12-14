@@ -37,6 +37,15 @@ function useDebouncedValue<T>(value: T, delay: number): T {
   return debouncedValue;
 }
 
+interface LinkedInSearchResult {
+  id: string;
+  companyName: string;
+  positionTitle?: string;
+  recipientName?: string;
+  createdAt: string;
+  status: string;
+}
+
 export default function LinkedInPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -60,7 +69,6 @@ export default function LinkedInPage() {
   const [previousMessageContent, setPreviousMessageContent] = useState('');
   const [extraContent, setExtraContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
@@ -69,7 +77,7 @@ export default function LinkedInPage() {
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
 
   // Use React Query for debounced search
-  const { data: searchResults = [] } = useQuery({
+  const { data: searchResults = [], isLoading: searchLoading } = useQuery<LinkedInSearchResult[]>({
     queryKey: ['linkedin-search', debouncedSearchQuery],
     queryFn: async () => {
       if (!debouncedSearchQuery.trim()) return [];
@@ -182,7 +190,6 @@ export default function LinkedInPage() {
           setParentMessageId(msg.id);
           setPreviousMessageContent(msg.content);
           setSearchQuery('');
-          setSearchResults([]);
           toast({
             title: 'Message Loaded',
             description: 'Previous message details loaded successfully',
@@ -500,15 +507,14 @@ export default function LinkedInPage() {
                     placeholder="Search by company, position, message ID..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                     className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
                   />
                   <Button
-                    onClick={handleSearch}
-                    disabled={searching || !searchQuery.trim()}
+                    onClick={() => setSearchQuery('')}
+                    disabled={!searchQuery.trim()}
                     className="h-10 sm:h-11 px-4 sm:px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm sm:text-base"
                   >
-                    {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                    <Search className="h-4 w-4" />
                   </Button>
                 </div>
 
@@ -541,7 +547,7 @@ export default function LinkedInPage() {
                   </div>
                 )}
 
-                {searchQuery && searchResults.length === 0 && !searching && (
+                {searchQuery && searchResults.length === 0 && !searchLoading && (
                   <p className="text-sm text-slate-500 dark:text-gray-400 text-center py-4">No messages found</p>
                 )}
               </div>
