@@ -44,6 +44,7 @@ export default function CoverLetterPage() {
   const [generatedLetter, setGeneratedLetter] = useState('');
   const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
   useEffect(() => {
     loadResumes();
@@ -51,6 +52,13 @@ export default function CoverLetterPage() {
     loadUserPreferences();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Generate idempotency key when content is generated
+  useEffect(() => {
+    if (generatedLetter) {
+      setIdempotencyKey(Date.now().toString());
+    }
+  }, [generatedLetter]);
 
   const loadResumes = async () => {
     try {
@@ -157,14 +165,18 @@ export default function CoverLetterPage() {
   };
 
   const handleSave = async () => {
-    if (!generatedLetter) return;
+    if (!generatedLetter || !idempotencyKey) return;
 
     setSaving(true);
     try {
-      const response = await fetch('/api/generate/cover-letter', {
+      const response = await fetch('/api/cover-letters/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
+        },
         body: JSON.stringify({
+          content: generatedLetter,
           resumeId: selectedResumeId || undefined,
           jobDescription,
           companyDescription: companyDescription || undefined,
@@ -172,7 +184,6 @@ export default function CoverLetterPage() {
           companyName: companyName || undefined,
           length,
           llmModel,
-          saveToHistory: true,
         }),
       });
 
@@ -432,7 +443,6 @@ export default function CoverLetterPage() {
                   value={jobDescription}
                   onChange={(e) => setJobDescription(e.target.value)}
                   minHeight={150}
-                  maxHeight={600}
                 />
               </div>
 
@@ -444,7 +454,6 @@ export default function CoverLetterPage() {
                   value={companyDescription}
                   onChange={(e) => setCompanyDescription(e.target.value)}
                   minHeight={80}
-                  maxHeight={600}
                 />
               </div>
 

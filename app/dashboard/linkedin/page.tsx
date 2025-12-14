@@ -60,6 +60,7 @@ export default function LinkedInPage() {
   const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
+  const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
   useEffect(() => {
     loadResumes();
@@ -117,6 +118,13 @@ export default function LinkedInPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Generate idempotency key when content is generated
+  useEffect(() => {
+    if (generatedMessage) {
+      setIdempotencyKey(Date.now().toString());
+    }
+  }, [generatedMessage]);
 
   const loadResumes = async () => {
     try {
@@ -280,15 +288,19 @@ export default function LinkedInPage() {
   };
 
   const handleSave = async () => {
-    if (!generatedMessage) return;
+    if (!generatedMessage || !idempotencyKey) return;
     setSaving(true);
     try {
-      const response = await fetch('/api/generate/linkedin', {
+      const response = await fetch('/api/linkedin-messages/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
+        },
         body: JSON.stringify({
-          resumeId: selectedResumeId || undefined,
+          content: generatedMessage,
           messageType,
+          resumeId: selectedResumeId || undefined,
           linkedinUrl: linkedinUrl || undefined,
           recipientName: recipientName || undefined,
           recipientPosition: recipientPosition || undefined,
@@ -298,12 +310,10 @@ export default function LinkedInPage() {
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           parentMessageId: parentMessageId || undefined,
-          extraContent: extraContent || undefined,
           length,
           llmModel,
           requestReferral,
           status,
-          saveToHistory: true, // Save to history
         }),
       });
       if (!response.ok) throw new Error('Failed to save message');
@@ -694,7 +704,6 @@ export default function LinkedInPage() {
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
                           minHeight={80}
-                          maxHeight={600}
                         />
                       </div>
                       <div className="space-y-2">
@@ -705,7 +714,6 @@ export default function LinkedInPage() {
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
                           minHeight={60}
-                          maxHeight={600}
                         />
                       </div>
                     </div>
@@ -729,7 +737,6 @@ export default function LinkedInPage() {
                       value={extraContent}
                       onChange={(e) => setExtraContent(e.target.value)}
                       minHeight={80}
-                      maxHeight={600}
                     />
                     <p className="text-xs text-slate-500 dark:text-gray-400">
                       This extra context will be used by the AI to enhance your follow-up message with new angles or information

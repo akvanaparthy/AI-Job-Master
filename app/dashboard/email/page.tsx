@@ -62,6 +62,7 @@ export default function EmailPage() {
   const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
+  const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
   useEffect(() => {
     loadResumes();
@@ -120,6 +121,13 @@ export default function EmailPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Generate idempotency key when content is generated
+  useEffect(() => {
+    if (generatedSubject && generatedBody) {
+      setIdempotencyKey(Date.now().toString());
+    }
+  }, [generatedSubject, generatedBody]);
 
   const loadResumes = async () => {
     try {
@@ -285,15 +293,20 @@ export default function EmailPage() {
   };
 
   const handleSave = async () => {
-    if (!generatedSubject || !generatedBody) return;
+    if (!generatedSubject || !generatedBody || !idempotencyKey) return;
     setSaving(true);
     try {
-      const response = await fetch('/api/generate/email', {
+      const response = await fetch('/api/email-messages/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': idempotencyKey,
+        },
         body: JSON.stringify({
-          resumeId: selectedResumeId || undefined,
+          subject: generatedSubject,
+          body: generatedBody,
           messageType,
+          resumeId: selectedResumeId || undefined,
           recipientEmail,
           recipientName: recipientName || undefined,
           recipientPosition: recipientPosition || undefined,
@@ -303,12 +316,10 @@ export default function EmailPage() {
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           parentMessageId: parentMessageId || undefined,
-          extraContent: extraContent || undefined,
           length,
           llmModel,
           requestReferral,
           status,
-          saveToHistory: true, // Save to history
         }),
       });
       if (!response.ok) throw new Error('Failed to save email');
@@ -691,7 +702,6 @@ export default function EmailPage() {
                           value={jobDescription}
                           onChange={(e) => setJobDescription(e.target.value)}
                           minHeight={80}
-                          maxHeight={600}
                         />
                       </div>
                       <div className="space-y-2">
@@ -702,7 +712,6 @@ export default function EmailPage() {
                           value={companyDescription}
                           onChange={(e) => setCompanyDescription(e.target.value)}
                           minHeight={60}
-                          maxHeight={600}
                         />
                       </div>
                     </div>
@@ -726,7 +735,6 @@ export default function EmailPage() {
                       value={extraContent}
                       onChange={(e) => setExtraContent(e.target.value)}
                       minHeight={80}
-                      maxHeight={600}
                     />
                     <p className="text-xs text-slate-500 dark:text-gray-400">
                       This extra context will be used by the AI to enhance your follow-up email with new angles or information
