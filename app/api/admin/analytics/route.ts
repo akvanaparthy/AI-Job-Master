@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 // Mark this route as dynamic to prevent static generation
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes (analytics don't change frequently)
 
 // GET - Get platform analytics (Admin only)
 export async function GET(req: NextRequest) {

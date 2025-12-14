@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +10,15 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Key, Check, X } from 'lucide-react';
 import { logger } from '@/lib/logger';
 
+interface ApiKeyStatus {
+  hasOpenaiKey: boolean;
+  hasAnthropicKey: boolean;
+  hasGeminiKey: boolean;
+}
+
 export default function ApiKeyManager() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [validating, setValidating] = useState(false);
 
@@ -19,55 +26,21 @@ export default function ApiKeyManager() {
   const [anthropicKey, setAnthropicKey] = useState('');
   const [geminiKey, setGeminiKey] = useState('');
 
-  const [hasOpenaiKey, setHasOpenaiKey] = useState(false);
-  const [hasAnthropicKey, setHasAnthropicKey] = useState(false);
-  const [hasGeminiKey, setHasGeminiKey] = useState(false);
-
-  // Only load API key status once on mount
-  useEffect(() => {
-    let mounted = true;
-    
-    const loadApiKeyStatus = async () => {
-      try {
-        const response = await fetch('/api/settings/api-keys');
-        if (response.ok && mounted) {
-          const data = await response.json();
-          setHasOpenaiKey(data.hasOpenaiKey);
-          setHasAnthropicKey(data.hasAnthropicKey);
-          setHasGeminiKey(data.hasGeminiKey);
-        }
-      } catch (error) {
-        if (mounted) {
-          logger.error('Failed to load API key status', error);
-        }
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadApiKeyStatus();
-
-    return () => {
-      mounted = false;
-    };
-  }, []); // Empty dependency array - only run once
-
-  const updateApiKeyStatus = async () => {
-    // Lightweight status update after save/delete
-    try {
+  // Use React Query for API key status
+  const { data: keyStatus, isLoading: loading } = useQuery<ApiKeyStatus>({
+    queryKey: ['api-key-status'],
+    queryFn: async () => {
       const response = await fetch('/api/settings/api-keys');
-      if (response.ok) {
-        const data = await response.json();
-        setHasOpenaiKey(data.hasOpenaiKey);
-        setHasAnthropicKey(data.hasAnthropicKey);
-        setHasGeminiKey(data.hasGeminiKey);
-      }
-    } catch (error) {
-      logger.error('Failed to update API key status', error);
-    }
-  };
+      if (!response.ok) throw new Error('Failed to load API key status');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // Fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // Keep in cache for 10 minutes
+  });
+
+  const hasOpenaiKey = keyStatus?.hasOpenaiKey ?? false;
+  const hasAnthropicKey = keyStatus?.hasAnthropicKey ?? false;
+  const hasGeminiKey = keyStatus?.hasGeminiKey ?? false;
 
   const handleSave = async () => {
     // Check if any key is provided
@@ -109,8 +82,9 @@ export default function ApiKeyManager() {
         description: 'API keys validated and saved successfully! Available models have been fetched.',
       });
 
-      // Update status to reflect changes
-      await updateApiKeyStatus();
+      // Invalidate cache to refresh API key status
+      queryClient.invalidateQueries({ queryKey: ['api-key-status'] });
+      queryClient.invalidateQueries({ queryKey: ['available-models'] });
 
       // Clear input fields
       setOpenaiKey('');
@@ -156,8 +130,9 @@ export default function ApiKeyManager() {
         description: `${provider} API key removed successfully!`,
       });
 
-      // Update status to reflect changes
-      await updateApiKeyStatus();
+      // Invalidate cache to refresh API key status
+      queryClient.invalidateQueries({ queryKey: ['api-key-status'] });
+      queryClient.invalidateQueries({ queryKey: ['available-models'] });
 
     } catch (error: any) {
       logger.error('Failed to remove API key', error);

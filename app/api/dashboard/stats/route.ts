@@ -7,6 +7,7 @@ import { getMonthlyActivityCount, getDaysUntilReset } from '@/lib/activity-track
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 60; // Cache for 1 minute (dashboard stats change frequently)
 
 export async function GET(req: NextRequest) {
   try {

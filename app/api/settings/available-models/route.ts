@@ -8,6 +8,7 @@ import { getAvailableModelsWithNames, decrypt } from '@/lib/encryption';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (models rarely change, prevents expensive external API calls)
 
 export async function GET(req: NextRequest) {
   try {

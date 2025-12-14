@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Footer } from '@/components/Footer';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -38,12 +39,15 @@ export default function DashboardLayout({
   const { toast } = useToast();
   const supabase = createClient();
   const [userEmail, setUserEmail] = useState<string>('');
-  const [userType, setUserType] = useState<string>('FREE');
-  const [isAdmin, setIsAdmin] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+
+  // Use shared hook for user profile
+  const { profile, isLoading: loadingProfile } = useUserProfile();
+  const userType = profile?.userType || 'FREE';
+  const isAdmin = profile?.isAdmin || profile?.userType === 'ADMIN';
 
   // Helper function to format user type for display
   const formatUserType = (type: string) => {
@@ -76,27 +80,6 @@ export default function DashboardLayout({
       const { data: { user } } = await supabase.auth.getUser();
       if (user?.email) {
         setUserEmail(user.email);
-      }
-
-      // Check if user is admin and get user type
-      if (user) {
-        try {
-          const response = await fetch('/api/admin/stats');
-          setIsAdmin(response.ok);
-        } catch (error) {
-          setIsAdmin(false);
-        }
-
-        // Get user type
-        try {
-          const res = await fetch('/api/user/profile');
-          if (res.ok) {
-            const data = await res.json();
-            setUserType(data.userType || 'FREE');
-          }
-        } catch (error) {
-          logger.error('Failed to load user type', error);
-        }
       }
     };
     loadUser();

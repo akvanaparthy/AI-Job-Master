@@ -41,12 +41,8 @@ export default function Home() {
 
         if (session?.user) {
           setIsLoggedIn(true);
-          // Fetch user plan from API
-          const response = await fetch('/api/user/profile');
-          if (response.ok) {
-            const userData = await response.json();
-            setUserPlan(userData.userType || 'FREE');
-          }
+          // User plan will be fetched by dashboard layout when needed
+          setUserPlan('FREE'); // Default assumption
         } else {
           setIsLoggedIn(false);
           setUserPlan(null);

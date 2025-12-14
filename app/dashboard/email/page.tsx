@@ -16,8 +16,26 @@ import { useToast } from '@/hooks/use-toast';
 import { useResumes } from '@/hooks/useResumes';
 import { useAvailableModels } from '@/hooks/useAvailableModels';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useQuery } from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
 import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
+
+// Helper function for debouncing search
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
 
 export default function EmailPage() {
   const { toast } = useToast();
@@ -44,11 +62,27 @@ export default function EmailPage() {
   const [previousMessageBody, setPreviousMessageBody] = useState('');
   const [extraContent, setExtraContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
   const [requestReferral, setRequestReferral] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
+
+  // Debounce search query
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
+
+  // Use React Query for debounced search
+  const { data: searchResults = [] } = useQuery({
+    queryKey: ['email-search', debouncedSearchQuery],
+    queryFn: async () => {
+      if (!debouncedSearchQuery.trim()) return [];
+      const response = await fetch(`/api/messages/search/email?q=${encodeURIComponent(debouncedSearchQuery)}`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.messages || [];
+    },
+    enabled: debouncedSearchQuery.trim().length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
 
   // Use shared hooks for data fetching
   const { resumes, isLoading: loadingResumes, getDefaultResume } = useResumes();
@@ -130,25 +164,6 @@ export default function EmailPage() {
       setIdempotencyKey(Date.now().toString());
     }
   }, [generatedSubject, generatedBody]);
-
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    setSearching(true);
-    try {
-      const response = await fetch(`/api/messages/search/email?q=${encodeURIComponent(searchQuery)}`);
-      if (response.ok) {
-        const data = await response.json();
-        setSearchResults(data.messages || []);
-      }
-    } catch (error) {
-      logger.error('Search failed', error);
-    } finally {
-      setSearching(false);
-    }
-  };
 
   const loadMessageDetails = async (messageId: string) => {
     try {
