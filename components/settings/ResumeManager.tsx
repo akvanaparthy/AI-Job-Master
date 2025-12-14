@@ -1,48 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
+import { useResumes } from '@/hooks/useResumes';
 import { Loader2, Upload, FileText, Trash2, Check } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-interface Resume {
-  id: string;
-  title: string;
-  content: string;
-  isDefault: boolean;
-  createdAt: string;
-}
-
 export default function ResumeManager() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [resumes, setResumes] = useState<Resume[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [resumeTitle, setResumeTitle] = useState('');
 
-  useEffect(() => {
-    loadResumes();
-  }, []);
-
-  const loadResumes = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/settings/resumes');
-      if (response.ok) {
-        const data = await response.json();
-        setResumes(data.resumes);
-      }
-    } catch (error) {
-      logger.error('Failed to load resumes', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Use shared hook for resumes
+  const { resumes, isLoading: loading, invalidateResumes } = useResumes();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -160,8 +134,8 @@ export default function ResumeManager() {
       const fileInput = document.getElementById('resume-file') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
-      // Reload resumes
-      await loadResumes();
+      // Invalidate cache to refresh resumes
+      invalidateResumes();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -193,7 +167,8 @@ export default function ResumeManager() {
         description: 'Resume deleted successfully',
       });
 
-      await loadResumes();
+      // Invalidate cache to refresh resumes
+      invalidateResumes();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -220,7 +195,8 @@ export default function ResumeManager() {
         title: 'Success',
         description: 'Default resume updated',
       });
-
+// Invalidate cache to refresh resumes
+      invalidate
       await loadResumes();
     } catch (error: any) {
       toast({
