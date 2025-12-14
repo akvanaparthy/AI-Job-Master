@@ -69,32 +69,21 @@ export default function AdminDashboard() {
   const [backfilling, setBackfilling] = useState(false);
   const supabase = createClient();
 
-  const loadStats = useCallback(async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/stats');
+      const response = await fetch('/api/admin/dashboard');
       if (response.status === 403) {
         router.push('/dashboard');
         return;
       }
-      if (!response.ok) throw new Error('Failed to load stats');
+      if (!response.ok) throw new Error('Failed to load dashboard data');
       const data = await response.json();
-      setStats(data);
+      setStats(data.stats);
+      setRecentUsers(data.recentUsers);
     } catch (error: any) {
       setError(error.message);
     }
   }, [router]);
-
-  const loadRecentUsers = useCallback(async () => {
-    try {
-      const response = await fetch('/api/admin/users?limit=5');
-      if (response.ok) {
-        const data = await response.json();
-        setRecentUsers(data.users);
-      }
-    } catch (error) {
-      logger.error('Failed to load recent users', error);
-    }
-  }, []);
 
   const handleBackfillActivity = async () => {
     if (!confirm('This will backfill the activity history with all existing cover letters, LinkedIn messages, and email messages. Continue?')) {
@@ -118,8 +107,8 @@ export default function AdminDashboard() {
         description: data.message || `Backfilled ${data.backfilledCount} records`,
       });
 
-      // Reload stats
-      await loadStats();
+      // Reload dashboard data
+      await loadDashboardData();
     } catch (error: any) {
       logger.error('Backfill error', error);
       toast({
@@ -133,8 +122,8 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    Promise.all([loadStats(), loadRecentUsers()]).finally(() => setLoading(false));
-  }, [loadStats, loadRecentUsers]);
+    loadDashboardData().finally(() => setLoading(false));
+  }, [loadDashboardData]);
 
   if (loading) {
     return (
