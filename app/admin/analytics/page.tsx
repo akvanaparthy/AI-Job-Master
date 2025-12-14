@@ -130,7 +130,7 @@ export default function AdminAnalyticsPage() {
                 <h1 className="text-[42px] font-bold text-slate-900 leading-tight">Analytics</h1>
                 <p className="text-lg text-slate-500">Platform insights and trends</p>
               </div>
-              <Button onClick={loadAnalytics} variant="outline">
+              <Button onClick={invalidateAnalytics} variant="outline">
                 <Activity className="w-4 h-4 mr-2" />
                 Refresh
               </Button>
