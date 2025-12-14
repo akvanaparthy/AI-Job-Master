@@ -19,20 +19,11 @@ import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
 import {
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from 'recharts';
+  DailyActivityChart,
+  ContentTypePieChart,
+  UserTypeBarChart,
+  ApiAdoptionBarChart,
+} from '@/components/admin/charts';
 
 interface AnalyticsData {
   userGrowth: {
@@ -252,33 +243,7 @@ export default function AdminAnalyticsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <Card className="bg-white border-slate-200/60 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Daily Activity (Last 30 Days)</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={data.dailyStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  stroke="#64748b"
-                  style={{ fontSize: '12px' }}
-                />
-                <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="count"
-                  stroke="#3b82f6"
-                  strokeWidth={2}
-                  dot={{ fill: '#3b82f6', r: 4 }}
-                  activeDot={{ r: 6 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            <DailyActivityChart data={data.dailyStats} />
           </Card>
         </motion.div>
 
@@ -286,25 +251,7 @@ export default function AdminAnalyticsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
           <Card className="bg-white border-slate-200/60 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Content by Type</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={contentByType}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {contentByType.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+            <ContentTypePieChart data={contentByType} />
           </Card>
         </motion.div>
       </div>
@@ -315,28 +262,7 @@ export default function AdminAnalyticsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}>
           <Card className="bg-white border-slate-200/60 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">Users by Type</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={data.userTypeDistribution}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="userType" stroke="#64748b" style={{ fontSize: '12px' }} />
-                <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-                  {data.userTypeDistribution.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[entry.userType as keyof typeof COLORS] || '#64748b'}
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <UserTypeBarChart data={data.userTypeDistribution} colors={COLORS} />
           </Card>
         </motion.div>
 
@@ -344,21 +270,7 @@ export default function AdminAnalyticsPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}>
           <Card className="bg-white border-slate-200/60 shadow-sm p-6">
             <h3 className="text-lg font-semibold text-slate-900 mb-4">API Key Adoption</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={apiAdoption}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" stroke="#64748b" style={{ fontSize: '12px' }} />
-                <YAxis stroke="#64748b" style={{ fontSize: '12px' }} />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'white',
-                    border: '1px solid #e2e8f0',
-                    borderRadius: '8px',
-                  }}
-                />
-                <Bar dataKey="value" fill="#10b981" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <ApiAdoptionBarChart data={apiAdoption} />
           </Card>
         </motion.div>
       </div>

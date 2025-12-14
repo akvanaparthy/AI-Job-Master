@@ -66,8 +66,7 @@ export const ResizableTextarea = React.forwardRef<
         ref={textareaRef}
         value={value}
         onChange={handleChange}
-        className={`w-full block resize-none border border-slate-300 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all overflow-y-auto ${className}`}
-        style={{
+className={`w-full block resize-none border border-slate-300 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all overflow-y-auto ${className}`}        style={{
           minHeight: `${minHeight}px`,
           maxHeight: `${maxHeight}px`,
           height: 'auto',
