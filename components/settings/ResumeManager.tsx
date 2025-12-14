@@ -195,9 +195,9 @@ export default function ResumeManager() {
         title: 'Success',
         description: 'Default resume updated',
       });
-// Invalidate cache to refresh resumes
-      invalidate
-      await loadResumes();
+
+      // Invalidate cache to refresh resumes
+      invalidateResumes();
     } catch (error: any) {
       toast({
         title: 'Error',
