@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { decrypt, getAvailableModelsWithNames } from '@/lib/encryption';
 import { logger } from '@/lib/logger';
+import { sharedModelsCache } from '@/lib/cache';
 
 export interface SharedModel {
   model: string;
@@ -57,8 +58,17 @@ export async function isSharedModel(model: string): Promise<boolean> {
 
 /**
  * Get all available shared models for PLUS users
+ * Results are cached for 5 minutes
  */
 export async function getAvailableSharedModels(): Promise<SharedModel[]> {
+  const cacheKey = 'shared-models-all';
+
+  // Check cache first
+  const cached = sharedModelsCache.get<SharedModel[]>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   try {
     const sharedKeys = await prisma.sharedApiKey.findMany({
       where: { isActive: true },
@@ -110,6 +120,8 @@ export async function getAvailableSharedModels(): Promise<SharedModel[]> {
       }
     }
 
+    // Cache the result
+    sharedModelsCache.set(cacheKey, allSharedModels);
     return allSharedModels;
   } catch (error) {
     logger.error('Get available shared models error:', error);

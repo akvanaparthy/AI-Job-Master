@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { logger } from './logger';
+import { modelCache } from './cache';
 
 const SALT_ROUNDS = 10;
 
@@ -109,6 +110,7 @@ export async function validateApiKey(apiKey: string, provider: 'openai' | 'anthr
 
 /**
  * Gets available models for a given API key with their display names
+ * Results are cached for 10 minutes to reduce API calls
  */
 export async function getAvailableModelsWithNames(
   apiKey: string,
@@ -116,7 +118,17 @@ export async function getAvailableModelsWithNames(
 ): Promise<Array<{ id: string; displayName: string }>> {
   // Import formatter utility once at the top for fallback
   const { getModelDisplayName } = await import('./utils/modelNames');
-  
+
+  // Create cache key using provider + hash of API key (for security)
+  const keyHash = crypto.createHash('sha256').update(apiKey).digest('hex').slice(0, 16);
+  const cacheKey = `models:${provider}:${keyHash}`;
+
+  // Check cache first
+  const cached = modelCache.get<Array<{ id: string; displayName: string }>>(cacheKey);
+  if (cached) {
+    return cached;
+  }
+
   try {
     switch (provider) {
       case 'openai':
@@ -140,12 +152,14 @@ export async function getAvailableModelsWithNames(
           return false;
         });
         
-        return mainModels
+        const openaiResult = mainModels
           .map(m => ({
             id: m.id,
             displayName: getModelDisplayName(m.id),
           }))
           .sort((a, b) => a.id.localeCompare(b.id));
+        modelCache.set(cacheKey, openaiResult);
+        return openaiResult;
 
       case 'anthropic':
         // Fetch available models from Anthropic API with native display names
@@ -159,17 +173,19 @@ export async function getAvailableModelsWithNames(
           
           if (response.ok) {
             const data = await response.json();
-            return data.data.map((model: any) => ({
+            const anthropicResult = data.data.map((model: any) => ({
               id: model.id,
               displayName: model.display_name,
             }));
+            modelCache.set(cacheKey, anthropicResult);
+            return anthropicResult;
           }
         } catch (error) {
           logger.error('Failed to fetch Anthropic models from API', error);
         }
-        
-        // Fallback with display names
-        return [
+
+        // Fallback with display names (also cache fallback)
+        const anthropicFallback = [
           { id: 'claude-opus-4-5-20251101', displayName: 'Claude Opus 4.5' },
           { id: 'claude-haiku-4-5-20251001', displayName: 'Claude Haiku 4.5' },
           { id: 'claude-sonnet-4-5-20250929', displayName: 'Claude Sonnet 4.5' },
@@ -180,6 +196,8 @@ export async function getAvailableModelsWithNames(
           { id: 'claude-3-5-haiku-20241022', displayName: 'Claude Haiku 3.5' },
           { id: 'claude-3-haiku-20240307', displayName: 'Claude Haiku 3' },
         ];
+        modelCache.set(cacheKey, anthropicFallback);
+        return anthropicFallback;
 
       case 'gemini':
         // Fetch Gemini models with native display names
@@ -199,22 +217,24 @@ export async function getAvailableModelsWithNames(
                 'models/gemini-2.5-pro',
                 'models/gemini-3-pro-preview',
               ];
-              
-              return data.models
+
+              const geminiResult = data.models
                 .filter((m: any) => mainGeminiModels.includes(m.name))
                 .map((m: any) => ({
                   id: m.name.replace('models/', ''),
                   displayName: m.displayName,
                 }))
                 .sort((a: any, b: any) => a.id.localeCompare(b.id));
+              modelCache.set(cacheKey, geminiResult);
+              return geminiResult;
             }
           }
         } catch (error) {
           logger.error('Failed to fetch Gemini models from API', error);
         }
-        
-        // Fallback with formatter
-        return [
+
+        // Fallback with formatter (also cache fallback)
+        const geminiFallback = [
           'gemini-2.0-flash',
           'gemini-2.0-flash-lite',
           'gemini-2.5-flash',
@@ -224,6 +244,8 @@ export async function getAvailableModelsWithNames(
           id,
           displayName: getModelDisplayName(id),
         }));
+        modelCache.set(cacheKey, geminiFallback);
+        return geminiFallback;
 
       default:
         return [];
