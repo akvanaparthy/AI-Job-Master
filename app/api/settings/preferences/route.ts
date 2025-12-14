@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 60; // Cache for 1 minute (preferences change infrequently)
 
 // GET - Fetch user preferences
 export async function GET(req: NextRequest) {

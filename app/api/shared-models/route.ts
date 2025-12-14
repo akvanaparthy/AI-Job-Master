@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (shared models are relatively static)
 
 // GET - Fetch available shared models for PLUS users
 export async function GET(req: NextRequest) {

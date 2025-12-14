@@ -5,6 +5,7 @@ import { authenticateRequest, validateRequest, handleApiError } from '@/lib/api'
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (prompts rarely change)
 
 // Validation schema for POST body
 const savePromptsSchema = z.object({
