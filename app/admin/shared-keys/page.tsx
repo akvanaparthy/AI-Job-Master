@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
+import { useAdminSharedKeys } from '@/hooks/useAdminSharedKeys';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
 import { Plus, Key, Trash2, Power, PowerOff, Crown, ChevronLeft, Edit } from 'lucide-react';
@@ -46,8 +47,7 @@ interface ModelOption {
 export default function SharedKeysPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [keys, setKeys] = useState<SharedKey[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { keys, isLoading, invalidateKeys } = useAdminSharedKeys();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
@@ -63,33 +63,6 @@ export default function SharedKeysPage() {
   // Edit state
   const [editingKey, setEditingKey] = useState<SharedKey | null>(null);
   const [editSelectedModels, setEditSelectedModels] = useState<string[]>([]);
-
-  const loadKeys = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/shared-keys');
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load shared keys');
-
-      const data = await response.json();
-      setKeys(data.keys);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load shared keys',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [router, toast]);
-
-  useEffect(() => {
-    loadKeys();
-  }, [loadKeys]);
 
   // Fetch models when provider or API key changes in Add dialog
   const fetchModelsForKey = async (providerValue: string, apiKeyValue: string, isEdit: boolean) => {
@@ -181,7 +154,7 @@ export default function SharedKeysPage() {
       setApiKey('');
       setSelectedModels([]);
       setAvailableModels([]);
-      loadKeys();
+      invalidateKeys();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -206,7 +179,7 @@ export default function SharedKeysPage() {
         description: `Key ${!isActive ? 'activated' : 'deactivated'} successfully`,
       });
 
-      loadKeys();
+      invalidateKeys();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -231,7 +204,7 @@ export default function SharedKeysPage() {
         description: 'Shared API key deleted successfully',
       });
 
-      loadKeys();
+      invalidateKeys();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -302,7 +275,7 @@ export default function SharedKeysPage() {
       setEditingKey(null);
       setEditSelectedModels([]);
       setEditAvailableModels([]);
-      loadKeys();
+      invalidateKeys();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -450,7 +423,7 @@ export default function SharedKeysPage() {
 
           {/* Keys List */}
           <div className="space-y-4">
-            {loading ? (
+            {isLoading ? (
               <Card className="p-12 text-center">
                 <div className="text-slate-900 text-5xl font-bold">
                   <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
