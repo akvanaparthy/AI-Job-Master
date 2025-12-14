@@ -46,7 +46,7 @@ export function NotificationsBell() {
       const res = await fetch('/api/notifications/unread-count');
       return res.json();
     },
-    refetchInterval: 60000, // Refetch every minute
+    refetchInterval: 300000, // Refetch every 5 minutes
   });
 
   const { data: notificationsData } = useQuery({
