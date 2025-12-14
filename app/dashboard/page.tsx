@@ -65,12 +65,6 @@ export default function DashboardPage() {
   // Use custom hook for dashboard stats with caching
   const { data: stats, isLoading: loading, error, refreshStats } = useDashboardStats();
 
-  // Force refresh on mount to get latest data
-  useEffect(() => {
-    refreshStats();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const totalGenerated = (stats?.totalCoverLetters || 0) + (stats?.totalLinkedInMessages || 0) + (stats?.totalEmails || 0);
 
   // Handle follow-up button click
