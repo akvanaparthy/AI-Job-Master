@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { logger } from '@/lib/logger';
 import { Footer } from '@/components/Footer';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,7 +48,9 @@ export default function DashboardLayout({
   // Use shared hook for user profile
   const { profile, isLoading: loadingProfile } = useUserProfile();
   const userType = profile?.userType || 'FREE';
-  const isAdmin = profile?.isAdmin || profile?.userType === 'ADMIN';
+  
+  // Use shared hook for admin auth
+  const { isAdmin } = useAdminAuth();
 
   // Helper function to format user type for display
   const formatUserType = (type: string) => {

@@ -1,54 +1,32 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { logger } from '@/lib/logger';
+import { useAdminAuth } from '@/hooks/useAdminAuth';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isAdmin, isLoading } = useAdminAuth();
 
   useEffect(() => {
-    const checkAdminAccess = async () => {
-      try {
-        const supabase = createClient();
-        const { data: { user } } = await supabase.auth.getUser();
+    const checkAuth = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
 
-        if (!user) {
-          router.push('/auth/login?redirectTo=/admin');
-          return;
-        }
+      if (!user) {
+        router.push('/auth/login?redirectTo=/admin');
+        return;
+      }
 
-        // Check if user is admin by calling the admin stats API
-        // If it returns 403, user is not admin
-        const response = await fetch('/api/admin/stats');
-
-        if (response.status === 403) {
-          logger.info('Admin access denied - not an admin');
-          router.push('/dashboard');
-          return;
-        }
-
-        if (!response.ok) {
-          logger.error('Error checking admin status');
-          router.push('/dashboard');
-          return;
-        }
-
-        // User is authorized
-        setIsAuthorized(true);
-      } catch (error) {
-        logger.error('Admin layout error', error);
+      // Once auth status is loaded, redirect non-admins
+      if (!isLoading && !isAdmin) {
         router.push('/dashboard');
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    checkAdminAccess();
-  }, [router]);
+    checkAuth();
+  }, [router, isAdmin, isLoading]);
 
   if (isLoading) {
     return (
@@ -62,7 +40,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!isAuthorized) {
+  if (!isAdmin) {
     return null;
   }
 
