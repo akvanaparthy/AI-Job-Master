@@ -11,29 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
+import { useResumes } from '@/hooks/useResumes';
+import { useAvailableModels } from '@/hooks/useAvailableModels';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Loader2, Copy, FileText, Sparkles, CheckCircle2, Save, Trash2 } from 'lucide-react';
-
-interface Resume {
-  id: string;
-  title: string;
-}
-
-interface ModelOption {
-  value: string;
-  label: string;
-  provider: string;
-  isShared?: boolean;
-}
 
 export default function CoverLetterPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [loadingResumes, setLoadingResumes] = useState(true);
-  const [loadingModels, setLoadingModels] = useState(true);
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
-  const [hasAnyApiKey, setHasAnyApiKey] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [llmModel, setLlmModel] = useState('');
   const [jobDescription, setJobDescription] = useState('');
@@ -46,12 +31,29 @@ export default function CoverLetterPage() {
   const [saving, setSaving] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
+  // Use shared hooks for data fetching
+  const { resumes, isLoading: loadingResumes, getDefaultResume } = useResumes();
+  const { models: availableModels, hasAnyKey: hasAnyApiKey, isLoading: loadingModels } = useAvailableModels();
+  const { preferences } = useUserPreferences();
+
+  // Set defaults from preferences and resumes
   useEffect(() => {
-    loadResumes();
-    loadAvailableModels();
-    loadUserPreferences();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const defaultResume = getDefaultResume();
+    if (defaultResume && !selectedResumeId) {
+      setSelectedResumeId(defaultResume.id);
+    }
+  }, [resumes, selectedResumeId, getDefaultResume]);
+
+  useEffect(() => {
+    if (preferences) {
+      if (preferences.defaultLlmModel && !llmModel) {
+        setLlmModel(preferences.defaultLlmModel);
+      }
+      if (preferences.defaultLength) {
+        setLength(preferences.defaultLength);
+      }
+    }
+  }, [preferences, llmModel]);
 
   // Generate idempotency key when content is generated
   useEffect(() => {
@@ -59,59 +61,6 @@ export default function CoverLetterPage() {
       setIdempotencyKey(Date.now().toString());
     }
   }, [generatedLetter]);
-
-  const loadResumes = async () => {
-    try {
-      const response = await fetch('/api/settings/resumes');
-      if (response.ok) {
-        const data = await response.json();
-        setResumes(data.resumes);
-        const defaultResume = data.resumes.find((r: any) => r.isDefault);
-        if (defaultResume) {
-          setSelectedResumeId(defaultResume.id);
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to load resumes', error);
-    } finally {
-      setLoadingResumes(false);
-    }
-  };
-
-  const loadAvailableModels = async () => {
-    try {
-      const response = await fetch('/api/settings/available-models');
-      if (response.ok) {
-        const data = await response.json();
-        setHasAnyApiKey(data.hasAnyKey);
-        setAvailableModels(data.models);
-      }
-    } catch (error) {
-      logger.error('Failed to load available models', error);
-    } finally {
-      setLoadingModels(false);
-    }
-  };
-
-  const loadUserPreferences = async () => {
-    try {
-      const response = await fetch('/api/settings/preferences');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.preferences) {
-          // Set defaults from user preferences
-          if (data.preferences.defaultLlmModel) {
-            setLlmModel(data.preferences.defaultLlmModel);
-          }
-          if (data.preferences.defaultLength) {
-            setLength(data.preferences.defaultLength);
-          }
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to load user preferences', error);
-    }
-  };
 
   const handleGenerate = async () => {
     if (!jobDescription) {

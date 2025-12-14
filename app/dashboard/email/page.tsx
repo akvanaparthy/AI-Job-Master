@@ -13,29 +13,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
+import { useResumes } from '@/hooks/useResumes';
+import { useAvailableModels } from '@/hooks/useAvailableModels';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { logger } from '@/lib/logger';
 import { Loader2, Copy, Mail, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
-
-interface Resume {
-  id: string;
-  title: string;
-}
-
-interface ModelOption {
-  value: string;
-  label: string;
-  provider: string;
-  isShared?: boolean;
-}
 
 export default function EmailPage() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [loadingResumes, setLoadingResumes] = useState(true);
-  const [loadingModels, setLoadingModels] = useState(true);
-  const [resumes, setResumes] = useState<Resume[]>([]);
-  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
-  const [hasAnyApiKey, setHasAnyApiKey] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [llmModel, setLlmModel] = useState('');
   const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP'>('NEW');
@@ -64,18 +50,34 @@ export default function EmailPage() {
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
-  useEffect(() => {
-    loadResumes();
-    loadAvailableModels();
+  // Use shared hooks for data fetching
+  const { resumes, isLoading: loadingResumes, getDefaultResume } = useResumes();
+  const { models: availableModels, hasAnyKey: hasAnyApiKey, isLoading: loadingModels } = useAvailableModels();
+  const { preferences } = useUserPreferences();
 
+  useEffect(() => {
     // Check for followup parameters in URL
     const params = new URLSearchParams(window.location.search);
     const isFollowup = params.get('followup') === 'true';
     const messageId = params.get('id');
 
-    // Load user preferences (will be overridden by URL params if in follow-up mode)
-    if (!isFollowup) {
-      loadUserPreferences();
+    // Set defaults from preferences if not in followup mode
+    if (!isFollowup && preferences) {
+      if (preferences.defaultLlmModel && !llmModel) {
+        setLlmModel(preferences.defaultLlmModel);
+      }
+      if (preferences.defaultLength) {
+        setLength(preferences.defaultLength);
+      }
+      if (preferences.defaultStatus) {
+        setStatus(preferences.defaultStatus);
+      }
+    }
+
+    // Set default resume
+    const defaultResume = getDefaultResume();
+    if (defaultResume && !selectedResumeId) {
+      setSelectedResumeId(defaultResume.id);
     }
 
     if (isFollowup && messageId) {
@@ -120,7 +122,7 @@ export default function EmailPage() {
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [preferences, resumes]);
 
   // Generate idempotency key when content is generated
   useEffect(() => {
@@ -128,60 +130,6 @@ export default function EmailPage() {
       setIdempotencyKey(Date.now().toString());
     }
   }, [generatedSubject, generatedBody]);
-
-  const loadResumes = async () => {
-    try {
-      const response = await fetch('/api/settings/resumes');
-      if (response.ok) {
-        const data = await response.json();
-        setResumes(data.resumes);
-        const defaultResume = data.resumes.find((r: any) => r.isDefault);
-        if (defaultResume) setSelectedResumeId(defaultResume.id);
-      }
-    } catch (error) {
-      logger.error('Failed to load resumes', error);
-    } finally {
-      setLoadingResumes(false);
-    }
-  };
-
-  const loadAvailableModels = async () => {
-    try {
-      const response = await fetch('/api/settings/available-models');
-      if (response.ok) {
-        const data = await response.json();
-        setHasAnyApiKey(data.hasAnyKey);
-        setAvailableModels(data.models);
-      }
-    } catch (error) {
-      logger.error('Failed to load available models', error);
-    } finally {
-      setLoadingModels(false);
-    }
-  };
-
-  const loadUserPreferences = async () => {
-    try {
-      const response = await fetch('/api/settings/preferences');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.preferences) {
-          // Set defaults from user preferences
-          if (data.preferences.defaultLlmModel) {
-            setLlmModel(data.preferences.defaultLlmModel);
-          }
-          if (data.preferences.defaultLength) {
-            setLength(data.preferences.defaultLength);
-          }
-          if (data.preferences.defaultStatus) {
-            setStatus(data.preferences.defaultStatus);
-          }
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to load user preferences', error);
-    }
-  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
