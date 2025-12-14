@@ -1,5 +1,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
+import { usageLimitsCache } from '@/lib/cache';
+import type { UserType } from '@prisma/client';
 
 interface UsageLimits {
   maxActivities: number;
@@ -9,7 +11,32 @@ interface UsageLimits {
 }
 
 /**
+ * Get usage limits for a user type (cached for 5 minutes)
+ */
+async function getCachedUsageLimits(userType: UserType): Promise<UsageLimits | null> {
+  const cacheKey = `limits:${userType}`;
+  const cached = usageLimitsCache.get<UsageLimits>(cacheKey);
+  if (cached) return cached;
+
+  const limits = await prisma.usageLimitSettings.findUnique({
+    where: { userType },
+    select: {
+      maxActivities: true,
+      maxGenerations: true,
+      maxFollowupGenerations: true,
+      includeFollowups: true,
+    },
+  });
+
+  if (limits) {
+    usageLimitsCache.set(cacheKey, limits);
+  }
+  return limits;
+}
+
+/**
  * Check if user has exceeded their usage limits
+ * Optimized: uses cached limits to reduce DB queries
  */
 export async function checkUsageLimits(
   userId: string,
@@ -22,7 +49,6 @@ export async function checkUsageLimits(
         userType: true,
         generationCount: true,
         followupGenerationCount: true,
-        activityCount: true,
         isAdmin: true,
       },
     });
@@ -36,14 +62,8 @@ export async function checkUsageLimits(
       return { allowed: true };
     }
 
-    // Get usage limits for user type
-    const limits = await prisma.usageLimitSettings.findUnique({
-      where: { userType: user.userType },
-      select: {
-        maxGenerations: true,
-        maxFollowupGenerations: true,
-      },
-    });
+    // Get cached usage limits for user type
+    const limits = await getCachedUsageLimits(user.userType);
 
     if (!limits) {
       return { allowed: false, reason: 'Usage limits not configured' };
@@ -112,6 +132,7 @@ export async function trackGeneration(
 
 /**
  * Increment activity count when user saves
+ * Optimized: uses cached limits and combines queries
  */
 export async function trackActivity(
   userId: string,
@@ -122,7 +143,6 @@ export async function trackActivity(
       where: { id: userId },
       select: {
         userType: true,
-        activityCount: true,
         isAdmin: true,
       },
     });
@@ -131,11 +151,8 @@ export async function trackActivity(
       return; // Don't track for admins
     }
 
-    // Get usage limits to check if followups should be included
-    const limits = await prisma.usageLimitSettings.findUnique({
-      where: { userType: user.userType },
-      select: { includeFollowups: true },
-    });
+    // Get cached usage limits to check if followups should be included
+    const limits = await getCachedUsageLimits(user.userType);
 
     // Only increment if not a followup, or if followups are included in count
     if (!isFollowup || limits?.includeFollowups) {
@@ -153,6 +170,7 @@ export async function trackActivity(
 
 /**
  * Check if user can save (activity limit)
+ * Optimized: uses cached limits
  */
 export async function checkActivityLimit(
   userId: string,
@@ -177,14 +195,8 @@ export async function checkActivityLimit(
       return { allowed: true };
     }
 
-    // Get usage limits for user type
-    const limits = await prisma.usageLimitSettings.findUnique({
-      where: { userType: user.userType },
-      select: {
-        maxActivities: true,
-        includeFollowups: true,
-      },
-    });
+    // Get cached usage limits for user type
+    const limits = await getCachedUsageLimits(user.userType);
 
     if (!limits) {
       return { allowed: false, reason: 'Usage limits not configured' };

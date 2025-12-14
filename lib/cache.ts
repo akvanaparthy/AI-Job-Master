@@ -59,3 +59,6 @@ export const sharedModelsCache = new MemoryCache(5 * 60 * 1000);
 
 // Generic cache for other use cases
 export const appCache = new MemoryCache();
+
+// Usage limits cache - 5 minute TTL (limits rarely change)
+export const usageLimitsCache = new MemoryCache(5 * 60 * 1000);

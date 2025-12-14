@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
 import { ApplicationStatus } from '@prisma/client';
+import { usageLimitsCache } from '@/lib/cache';
+import type { UserType } from '@prisma/client';
 
 export type ActivityType = 'COVER_LETTER' | 'LINKEDIN_MESSAGE' | 'EMAIL_MESSAGE';
 
@@ -68,20 +70,48 @@ export async function markActivityDeleted(
 }
 
 /**
- * Get monthly activity count for a user (excluding follow-ups)
+ * Get cached usage limits for a user type
  */
-export async function getMonthlyActivityCount(userId: string): Promise<number> {
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { monthlyResetDate: true },
-    });
+async function getCachedActivityLimits(userType: UserType): Promise<{ maxActivities: number } | null> {
+  const cacheKey = `activity-limits:${userType}`;
+  const cached = usageLimitsCache.get<{ maxActivities: number }>(cacheKey);
+  if (cached) return cached;
 
-    if (!user) return 0;
+  const limits = await prisma.usageLimitSettings.findUnique({
+    where: { userType },
+    select: { maxActivities: true },
+  });
+
+  if (limits) {
+    usageLimitsCache.set(cacheKey, limits);
+  }
+  return limits;
+}
+
+/**
+ * Get monthly activity count for a user (excluding follow-ups)
+ * Accepts optional pre-fetched resetDate to avoid redundant queries
+ */
+export async function getMonthlyActivityCount(
+  userId: string,
+  preloadedResetDate?: Date
+): Promise<number> {
+  try {
+    let resetDate: Date;
+
+    if (preloadedResetDate) {
+      resetDate = preloadedResetDate;
+    } else {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { monthlyResetDate: true },
+      });
+      if (!user) return 0;
+      resetDate = new Date(user.monthlyResetDate);
+    }
 
     // Check if we need to reset the monthly count
     const now = new Date();
-    const resetDate = new Date(user.monthlyResetDate);
     const daysSinceReset = Math.floor((now.getTime() - resetDate.getTime()) / (1000 * 60 * 60 * 24));
 
     // Reset if 30+ days have passed
@@ -112,6 +142,7 @@ export async function getMonthlyActivityCount(userId: string): Promise<number> {
 
 /**
  * Check if user can create new activity based on their monthly limit
+ * Optimized: single user query + cached limits
  */
 export async function canCreateActivity(userId: string): Promise<{
   allowed: boolean;
@@ -129,19 +160,22 @@ export async function canCreateActivity(userId: string): Promise<{
       return { allowed: false, currentCount: 0, limit: 0, resetDate: new Date() };
     }
 
-    // Get usage limit settings
-    const limitSettings = await prisma.usageLimitSettings.findUnique({
-      where: { userType: user.userType },
-    });
-
-    const limit = limitSettings?.maxActivities || 100;
-
-    // Admin or 0 limit means unlimited
-    if (user.userType === 'ADMIN' || limit === 0) {
+    // Admin means unlimited
+    if (user.userType === 'ADMIN') {
       return { allowed: true, currentCount: 0, limit: 0, resetDate: user.monthlyResetDate };
     }
 
-    const currentCount = await getMonthlyActivityCount(userId);
+    // Get cached usage limit settings
+    const limitSettings = await getCachedActivityLimits(user.userType);
+    const limit = limitSettings?.maxActivities || 100;
+
+    // 0 limit means unlimited
+    if (limit === 0) {
+      return { allowed: true, currentCount: 0, limit: 0, resetDate: user.monthlyResetDate };
+    }
+
+    // Pass the preloaded resetDate to avoid re-fetching user
+    const currentCount = await getMonthlyActivityCount(userId, user.monthlyResetDate);
 
     return {
       allowed: currentCount < limit,
