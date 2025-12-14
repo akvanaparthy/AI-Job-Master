@@ -5,11 +5,13 @@ import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Key, FileText, MessageSquare, Settings as SettingsIcon, Lock } from 'lucide-react';
-import ApiKeyManager from '@/components/settings/ApiKeyManager';
-import ResumeManager from '@/components/settings/ResumeManager';
-import CustomPromptsManager from '@/components/settings/CustomPromptsManager';
-import UserPreferencesManager from '@/components/settings/UserPreferencesManager';
-import PasswordManager from '@/components/settings/PasswordManager';
+import {
+  ApiKeyManager,
+  ResumeManager,
+  CustomPromptsManager,
+  UserPreferencesManager,
+  PasswordManager,
+} from '@/components/settings';
 
 function SettingsContent() {
   const searchParams = useSearchParams();
