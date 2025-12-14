@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
 import { Loader2, Save, RotateCcw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -41,34 +41,37 @@ const DEFAULT_PROMPTS = {
 - Includes a professional closing`,
 };
 
+const fetchPrompts = async () => {
+  const response = await fetch('/api/settings/prompts');
+  if (!response.ok) {
+    throw new Error('Failed to fetch prompts');
+  }
+  return response.json();
+};
+
 export default function CustomPromptsManager() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
-  const [prompts, setPrompts] = useState<CustomPrompt>({});
+  const [localPrompts, setLocalPrompts] = useState<CustomPrompt>({});
 
+  // Use React Query for prompts
+  const { data, isLoading } = useQuery({
+    queryKey: ['custom-prompts'],
+    queryFn: fetchPrompts,
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Sync server data to local state
   useEffect(() => {
-    loadPrompts();
-  }, []);
-
-  const loadPrompts = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/settings/prompts');
-      if (response.ok) {
-        const data = await response.json();
-        setPrompts({
-          coverLetter: data.coverLetter || '',
-          linkedIn: data.linkedIn || '',
-          email: data.email || '',
-        });
-      }
-    } catch (error) {
-      logger.error('Failed to load prompts', error);
-    } finally {
-      setLoading(false);
+    if (data) {
+      setLocalPrompts({
+        coverLetter: data.coverLetter || '',
+        linkedIn: data.linkedIn || '',
+        email: data.email || '',
+      });
     }
-  };
+  }, [data]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -76,7 +79,7 @@ export default function CustomPromptsManager() {
       const response = await fetch('/api/settings/prompts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(prompts),
+        body: JSON.stringify(localPrompts),
       });
 
       if (!response.ok) {
@@ -88,6 +91,9 @@ export default function CustomPromptsManager() {
         title: 'Success',
         description: 'Custom prompts saved successfully!',
       });
+
+      // Invalidate cache to refresh prompts
+      queryClient.invalidateQueries({ queryKey: ['custom-prompts'] });
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -100,13 +106,13 @@ export default function CustomPromptsManager() {
   };
 
   const handleReset = (tab: keyof typeof DEFAULT_PROMPTS) => {
-    setPrompts((prev) => ({
+    setLocalPrompts((prev) => ({
       ...prev,
       [tab]: DEFAULT_PROMPTS[tab],
     }));
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -145,9 +151,9 @@ export default function CustomPromptsManager() {
                   </Button>
                 </div>
                 <Textarea
-                  value={prompts.coverLetter || ''}
+                  value={localPrompts.coverLetter || ''}
                   onChange={(e) =>
-                    setPrompts((prev) => ({ ...prev, coverLetter: e.target.value }))
+                    setLocalPrompts((prev) => ({ ...prev, coverLetter: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[200px] font-mono text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
@@ -173,9 +179,9 @@ export default function CustomPromptsManager() {
                   </Button>
                 </div>
                 <Textarea
-                  value={prompts.linkedIn || ''}
+                  value={localPrompts.linkedIn || ''}
                   onChange={(e) =>
-                    setPrompts((prev) => ({ ...prev, linkedIn: e.target.value }))
+                    setLocalPrompts((prev) => ({ ...prev, linkedIn: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
@@ -201,9 +207,9 @@ export default function CustomPromptsManager() {
                   </Button>
                 </div>
                 <Textarea
-                  value={prompts.email || ''}
+                  value={localPrompts.email || ''}
                   onChange={(e) =>
-                    setPrompts((prev) => ({ ...prev, email: e.target.value }))
+                    setLocalPrompts((prev) => ({ ...prev, email: e.target.value }))
                   }
                   placeholder={PLACEHOLDER_TEXT}
                   className="min-h-[150px] sm:min-h-[200px] font-mono text-xs sm:text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"

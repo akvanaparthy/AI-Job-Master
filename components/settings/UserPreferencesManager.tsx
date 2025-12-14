@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { logger } from '@/lib/logger';
+import { useAvailableModels } from '@/hooks/useAvailableModels';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { Loader2, Save } from 'lucide-react';
 
 interface Preferences {
@@ -18,19 +19,10 @@ interface Preferences {
   followupReminderDays: number;
 }
 
-interface ModelOption {
-  value: string;
-  label: string;
-  provider: string;
-  isShared?: boolean;
-}
-
 export default function UserPreferencesManager() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [availableModels, setAvailableModels] = useState<ModelOption[]>([]);
-  const [preferences, setPreferences] = useState<Preferences>({
+  const [localPreferences, setLocalPreferences] = useState<Preferences>({
     defaultLlmModel: '',
     defaultLength: 'MEDIUM',
     autoSave: true,
@@ -38,43 +30,23 @@ export default function UserPreferencesManager() {
     followupReminderDays: 7,
   });
 
+  // Use shared hooks
+  const { models: availableModels, isLoading: loadingModels } = useAvailableModels();
+  const { preferences, isLoading: loadingPreferences, invalidatePreferences } = useUserPreferences();
+
+  // Sync preferences from server to local state
   useEffect(() => {
-    loadPreferences();
-    loadAvailableModels();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const loadPreferences = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/settings/preferences');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.preferences) {
-          setPreferences({
-            ...data.preferences,
-            defaultLlmModel: data.preferences.defaultLlmModel || '',
-          });
-        }
-      }
-    } catch (error) {
-      logger.error('Failed to load preferences', error);
-    } finally {
-      setLoading(false);
+    if (preferences) {
+      setLocalPreferences({
+        ...preferences,
+        defaultLlmModel: preferences.defaultLlmModel || '',
+        defaultLength: preferences.defaultLength || 'MEDIUM',
+        autoSave: true,
+        defaultStatus: preferences.defaultStatus || 'SENT',
+        followupReminderDays: 7,
+      });
     }
-  };
-
-  const loadAvailableModels = async () => {
-    try {
-      const response = await fetch('/api/settings/available-models');
-      if (response.ok) {
-        const data = await response.json();
-        setAvailableModels(data.models || []);
-      }
-    } catch (error) {
-      console.error('Failed to load available models:', error);
-    }
-  };
+  }, [preferences]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -82,7 +54,7 @@ export default function UserPreferencesManager() {
       const response = await fetch('/api/settings/preferences', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(preferences),
+        body: JSON.stringify(localPreferences),
       });
 
       if (!response.ok) {
@@ -94,6 +66,9 @@ export default function UserPreferencesManager() {
         title: 'Success',
         description: 'Preferences saved successfully!',
       });
+
+      // Invalidate cache to refresh preferences
+      invalidatePreferences();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -105,7 +80,7 @@ export default function UserPreferencesManager() {
     }
   };
 
-  if (loading) {
+  if (loadingPreferences || loadingModels) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -126,9 +101,9 @@ export default function UserPreferencesManager() {
           <div className="space-y-2">
             <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Default AI Model</Label>
             <Select
-              value={preferences.defaultLlmModel}
+              value={localPreferences.defaultLlmModel}
               onValueChange={(value) =>
-                setPreferences((prev) => ({ ...prev, defaultLlmModel: value }))
+                setLocalPreferences((prev) => ({ ...prev, defaultLlmModel: value }))
               }
               disabled={availableModels.length === 0}
             >
@@ -169,9 +144,9 @@ export default function UserPreferencesManager() {
           <div className="space-y-2">
             <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Default Content Length</Label>
             <Select
-              value={preferences.defaultLength}
+              value={localPreferences.defaultLength}
               onValueChange={(value) =>
-                setPreferences((prev) => ({ ...prev, defaultLength: value }))
+                setLocalPreferences((prev) => ({ ...prev, defaultLength: value }))
               }
             >
               <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
@@ -191,9 +166,9 @@ export default function UserPreferencesManager() {
           <div className="space-y-2">
             <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Default Status</Label>
             <Select
-              value={preferences.defaultStatus}
+              value={localPreferences.defaultStatus}
               onValueChange={(value) =>
-                setPreferences((prev) => ({ ...prev, defaultStatus: value }))
+                setLocalPreferences((prev) => ({ ...prev, defaultStatus: value }))
               }
             >
               <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
@@ -227,9 +202,9 @@ export default function UserPreferencesManager() {
               </p>
             </div>
             <Switch
-              checked={preferences.autoSave}
+              checked={localPreferences.autoSave}
               onCheckedChange={(checked) =>
-                setPreferences((prev) => ({ ...prev, autoSave: checked }))
+                setLocalPreferences((prev) => ({ ...prev, autoSave: checked }))
               }
             />
           </div>
@@ -237,9 +212,9 @@ export default function UserPreferencesManager() {
           <div className="space-y-2">
             <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Follow-up Reminder Days</Label>
             <Select
-              value={preferences.followupReminderDays.toString()}
+              value={localPreferences.followupReminderDays.toString()}
               onValueChange={(value) =>
-                setPreferences((prev) => ({ ...prev, followupReminderDays: parseInt(value) }))
+                setLocalPreferences((prev) => ({ ...prev, followupReminderDays: parseInt(value) }))
               }
             >
               <SelectTrigger className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100">
