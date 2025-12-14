@@ -66,7 +66,7 @@ export const ResizableTextarea = React.forwardRef<
         ref={textareaRef}
         value={value}
         onChange={handleChange}
-        className={`w-full resize-none border border-slate-300 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all overflow-y-auto ${className}`}
+        className={`w-full block resize-none border border-slate-300 dark:border-gray-600 rounded-lg p-3 text-sm bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all overflow-y-auto ${className}`}
         style={{
           minHeight: `${minHeight}px`,
           maxHeight: `${maxHeight}px`,
@@ -79,8 +79,8 @@ export const ResizableTextarea = React.forwardRef<
         onMouseDown={handleMouseDown}
         className="absolute cursor-se-resize pointer-events-auto hidden md:block"
         style={{
-          bottom: '15px',
-          right: '15px',
+          bottom: '5px',
+          right: '5px',
           width: '10px',
           height: '10px',
           background: 'linear-gradient(135deg, transparent 50%, #b0b8c1 50%)',
