@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useToast } from '@/hooks/use-toast';
+import { useAdminAnalytics } from '@/hooks/useAdminAnalytics';
 import {
   ChevronLeft,
   Loader2,
@@ -76,38 +75,9 @@ const COLORS = {
 
 export default function AdminAnalyticsPage() {
   const router = useRouter();
-  const { toast } = useToast();
-  const [data, setData] = useState<AnalyticsData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useAdminAnalytics();
 
-  const loadAnalytics = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/analytics');
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load analytics');
-
-      const analyticsData = await response.json();
-      setData(analyticsData);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load analytics',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [router, toast]);
-
-  useEffect(() => {
-    loadAnalytics();
-  }, [loadAnalytics]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-full">
