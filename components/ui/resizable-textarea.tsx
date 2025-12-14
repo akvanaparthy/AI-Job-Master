@@ -26,6 +26,7 @@ export const ResizableTextarea = React.forwardRef<
 
   useEffect(() => {
     adjustHeight();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, minHeight, maxHeight]);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
