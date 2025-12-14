@@ -1,29 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { z } from 'zod';
 import { prisma } from '@/lib/db/prisma';
-import { logger } from '@/lib/logger';
+import { authenticateRequest, validateRequest, handleApiError } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+// Validation schema for POST body
+const savePromptsSchema = z.object({
+  coverLetter: z.string().optional(),
+  linkedIn: z.string().optional(),
+  email: z.string().optional(),
+});
+
 // GET - Fetch custom prompts
 export async function GET(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const auth = await authenticateRequest();
+    if (!auth.success) return auth.response;
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // Get all custom prompts for the user
     const prompts = await prisma.customPrompt.findMany({
-      where: { userId: user.id },
+      where: { userId: auth.user.id },
     });
 
-    // Convert array to object keyed by tab
     const promptsMap = prompts.reduce((acc, prompt) => {
       acc[prompt.tabType] = prompt.content;
       return acc;
@@ -35,144 +34,58 @@ export async function GET(req: NextRequest) {
       email: promptsMap['EMAIL'] || '',
     });
   } catch (error) {
-    logger.error('Get prompts error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get prompts' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Get prompts error');
   }
 }
 
 // POST - Save custom prompts
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const result = await validateRequest(req, savePromptsSchema);
+    if (!result.success) return result.response;
 
-    if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await req.json();
+    const { userId, body } = result.context;
     const { coverLetter, linkedIn, email } = body;
 
-    // Update or create prompts
-    const operations = [];
+    const operations: ReturnType<typeof prisma.customPrompt.deleteMany | typeof prisma.customPrompt.upsert>[] = [];
 
-    if (coverLetter !== undefined) {
-      if (coverLetter.trim() === '') {
-        // Delete if empty
+    // Helper to handle prompt upsert/delete
+    const handlePrompt = (
+      content: string | undefined,
+      tabType: 'COVER_LETTER' | 'LINKEDIN' | 'EMAIL',
+      name: string
+    ) => {
+      if (content === undefined) return;
+
+      if (content.trim() === '') {
         operations.push(
           prisma.customPrompt.deleteMany({
-            where: {
-              userId: user.id,
-              tabType: 'COVER_LETTER',
-            },
-          })
-        );
-      } else {
-        // Upsert
-        operations.push(
-          prisma.customPrompt.upsert({
-            where: {
-              userId_name_tabType: {
-                userId: user.id,
-                name: 'Cover Letter Prompt',
-                tabType: 'COVER_LETTER',
-              },
-            },
-            update: {
-              content: coverLetter.trim(),
-            },
-            create: {
-              userId: user.id,
-              name: 'Cover Letter Prompt',
-              tabType: 'COVER_LETTER',
-              content: coverLetter.trim(),
-            },
-          })
-        );
-      }
-    }
-
-    if (linkedIn !== undefined) {
-      if (linkedIn.trim() === '') {
-        operations.push(
-          prisma.customPrompt.deleteMany({
-            where: {
-              userId: user.id,
-              tabType: 'LINKEDIN',
-            },
+            where: { userId, tabType },
           })
         );
       } else {
         operations.push(
           prisma.customPrompt.upsert({
             where: {
-              userId_name_tabType: {
-                userId: user.id,
-                name: 'LinkedIn Prompt',
-                tabType: 'LINKEDIN',
-              },
+              userId_name_tabType: { userId, name, tabType },
             },
-            update: {
-              content: linkedIn.trim(),
-            },
-            create: {
-              userId: user.id,
-              name: 'LinkedIn Prompt',
-              tabType: 'LINKEDIN',
-              content: linkedIn.trim(),
-            },
+            update: { content: content.trim() },
+            create: { userId, name, tabType, content: content.trim() },
           })
         );
       }
-    }
+    };
 
-    if (email !== undefined) {
-      if (email.trim() === '') {
-        operations.push(
-          prisma.customPrompt.deleteMany({
-            where: {
-              userId: user.id,
-              tabType: 'EMAIL',
-            },
-          })
-        );
-      } else {
-        operations.push(
-          prisma.customPrompt.upsert({
-            where: {
-              userId_name_tabType: {
-                userId: user.id,
-                name: 'Email Prompt',
-                tabType: 'EMAIL',
-              },
-            },
-            update: {
-              content: email.trim(),
-            },
-            create: {
-              userId: user.id,
-              name: 'Email Prompt',
-              tabType: 'EMAIL',
-              content: email.trim(),
-            },
-          })
-        );
-      }
-    }
+    handlePrompt(coverLetter, 'COVER_LETTER', 'Cover Letter Prompt');
+    handlePrompt(linkedIn, 'LINKEDIN', 'LinkedIn Prompt');
+    handlePrompt(email, 'EMAIL', 'Email Prompt');
 
-    await prisma.$transaction(operations);
+    if (operations.length > 0) {
+      await prisma.$transaction(operations);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Save prompts error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to save prompts' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Save prompts error');
   }
 }
