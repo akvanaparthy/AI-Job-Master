@@ -39,7 +39,6 @@ export default function DashboardLayout({
   const router = useRouter();
   const { toast } = useToast();
   const supabase = createClient();
-  const [userEmail, setUserEmail] = useState<string>('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -77,16 +76,6 @@ export default function DashboardLayout({
       localStorage.setItem('sidebarCollapsed', String(isSidebarCollapsed));
     }
   }, [isSidebarCollapsed, isMounted]);
-
-  useEffect(() => {
-    const loadUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user?.email) {
-        setUserEmail(user.email);
-      }
-    };
-    loadUser();
-  }, [supabase]);
 
   const handleLogout = async () => {
     try {
@@ -259,13 +248,13 @@ export default function DashboardLayout({
                 isSidebarCollapsed ? "justify-center p-2" : "gap-3 px-3 py-2.5"
               )}>
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center flex-shrink-0 shadow-md">
-                  <span className="text-white font-bold text-sm">{userEmail ? userEmail[0].toUpperCase() : 'U'}</span>
+                  <span className="text-white font-bold text-sm">{profile?.email ? profile.email[0].toUpperCase() : 'U'}</span>
                 </div>
                 <div className={cn(
                   "flex-1 min-w-0 text-left transition-all duration-300 ease-in-out",
                   isSidebarCollapsed ? "opacity-0 w-0 overflow-hidden" : "opacity-100 w-auto"
                 )}>
-                  <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate whitespace-nowrap">{userEmail || 'Loading...'}</p>
+                  <p className="text-[13px] font-semibold text-gray-900 dark:text-gray-100 truncate whitespace-nowrap">{profile?.email || 'Loading...'}</p>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600 flex-shrink-0" strokeWidth={2.5} />}
                     {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600 flex-shrink-0" strokeWidth={2.5} />}
@@ -286,7 +275,7 @@ export default function DashboardLayout({
               {isSidebarCollapsed && (
                 <>
                   <div className="px-2 py-2 text-sm border-b border-gray-200">
-                    <p className="font-semibold text-gray-900 truncate">{userEmail || 'Loading...'}</p>
+                    <p className="font-semibold text-gray-900 truncate">{profile?.email || 'Loading...'}</p>
                     <div className="flex items-center gap-1.5 mt-1">
                       {userType === 'ADMIN' && <Shield className="w-3 h-3 text-red-600" strokeWidth={2.5} />}
                       {userType === 'PLUS' && <Crown className="w-3 h-3 text-purple-600" strokeWidth={2.5} />}
