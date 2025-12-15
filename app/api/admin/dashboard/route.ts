@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes
 
 // GET - Get combined dashboard data (stats + recent users) for admin
 export async function GET(req: NextRequest) {

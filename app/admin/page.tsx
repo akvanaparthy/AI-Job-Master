@@ -9,6 +9,8 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { LiveClock } from '@/components/admin/LiveClock';
 import { logger } from '@/lib/logger';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminDashboard } from '@/hooks/useAdminDashboard';
+import { useQueryClient } from '@tanstack/react-query';
 
 // Animated number component
 function AnimatedNumber({ value }: { value: number }) {
@@ -16,6 +18,7 @@ function AnimatedNumber({ value }: { value: number }) {
   const display = useTransform(spring, (current) => Math.round(current));
   const [displayValue, setDisplayValue] = useState(0);
 
+  // Re-add useEffect import for AnimatedNumber
   useEffect(() => {
     spring.set(value);
     const unsubscribe = display.on('change', (latest) => {
@@ -27,63 +30,17 @@ function AnimatedNumber({ value }: { value: number }) {
   return <>{displayValue}</>;
 }
 
-interface Stats {
-  users: {
-    total: number;
-    free: number;
-    plus: number;
-    admin: number;
-  };
-  content: {
-    resumes: number;
-    coverLetters: number;
-    linkedInMessages: number;
-    emailMessages: number;
-    totalGenerated: number;
-  };
-  apiKeys: {
-    openai: number;
-    anthropic: number;
-    gemini: number;
-  };
-}
-
-interface RecentUser {
-  id: string;
-  email: string;
-  userType: string;
-  createdAt: string;
-  stats: {
-    totalMessages: number;
-  };
-}
-
 export default function AdminDashboard() {
   const router = useRouter();
   const { toast } = useToast();
-  const [stats, setStats] = useState<Stats | null>(null);
-  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [userEmail, setUserEmail] = useState<string>('');
+  const queryClient = useQueryClient();
   const [backfilling, setBackfilling] = useState(false);
   const supabase = createClient();
 
-  const loadDashboardData = useCallback(async () => {
-    try {
-      const response = await fetch('/api/admin/dashboard');
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load dashboard data');
-      const data = await response.json();
-      setStats(data.stats);
-      setRecentUsers(data.recentUsers);
-    } catch (error: any) {
-      setError(error.message);
-    }
-  }, [router]);
+  const { data, isLoading, error: queryError } = useAdminDashboard();
+  const stats = data?.stats || null;
+  const recentUsers = data?.recentUsers || [];
+  const error = queryError?.message || '';
 
   const handleBackfillActivity = async () => {
     if (!confirm('This will backfill the activity history with all existing cover letters, LinkedIn messages, and email messages. Continue?')) {
@@ -101,14 +58,14 @@ export default function AdminDashboard() {
         throw new Error(error.error || 'Failed to backfill activity history');
       }
 
-      const data = await response.json();
+      const result = await response.json();
       toast({
         title: 'Success',
-        description: data.message || `Backfilled ${data.backfilledCount} records`,
+        description: result.message || `Backfilled ${result.backfilledCount} records`,
       });
 
-      // Reload dashboard data
-      await loadDashboardData();
+      // Invalidate and refetch dashboard data
+      queryClient.invalidateQueries({ queryKey: ['admin', 'dashboard'] });
     } catch (error: any) {
       logger.error('Backfill error', error);
       toast({
@@ -121,11 +78,7 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => {
-    loadDashboardData().finally(() => setLoading(false));
-  }, [loadDashboardData]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-full">
