@@ -167,7 +167,7 @@ export default function HistoryPage() {
       if (!response.ok) throw new Error('Failed to delete item');
 
       toast({ title: 'Success', description: `${item.type} deleted successfully` });
-      await loadHistory();
+      invalidateHistory();
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to delete item', variant: 'destructive' });
     }
@@ -231,7 +231,7 @@ export default function HistoryPage() {
       if (!response.ok) throw new Error('Failed to update status');
 
       toast({ title: 'Success', description: 'Status updated successfully' });
-      await loadHistory(); // Refresh the list
+      invalidateHistory(); // Refresh the list
     } catch (error) {
       toast({ title: 'Error', description: 'Failed to update status', variant: 'destructive' });
     }
