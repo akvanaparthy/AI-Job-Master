@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes (admin viewing user activity, heavy query)
 
 // GET - Get user activity history (Admin only)
 export async function GET(

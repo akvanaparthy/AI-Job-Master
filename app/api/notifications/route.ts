@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 60; // Cache for 1 minute (notifications change moderately)
 
 // GET all notifications for user
 export async function GET(req: NextRequest) {

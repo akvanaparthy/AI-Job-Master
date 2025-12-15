@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes (stats don't need real-time updates, expensive query)
 
 // GET - Get platform statistics (Admin only)
 export async function GET(req: NextRequest) {

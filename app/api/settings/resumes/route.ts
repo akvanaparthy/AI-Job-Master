@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes (resumes change infrequently)
 
 // GET - Fetch all resumes for the user
 export async function GET(req: NextRequest) {

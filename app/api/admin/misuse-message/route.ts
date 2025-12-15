@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (configuration data rarely changes)
 
 // GET current misuse message
 export async function GET(req: NextRequest) {

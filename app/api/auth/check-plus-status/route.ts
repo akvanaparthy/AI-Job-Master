@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (user type rarely changes)
 
 export async function GET(request: NextRequest) {
   try {

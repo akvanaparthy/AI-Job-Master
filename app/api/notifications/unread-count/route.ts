@@ -4,6 +4,7 @@ import { authenticateRequest, handleApiError } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 60; // Cache for 1 minute
 
 export async function GET(req: NextRequest) {
   try {

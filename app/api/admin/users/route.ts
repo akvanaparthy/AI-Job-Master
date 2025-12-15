@@ -5,6 +5,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 60; // Cache for 1 minute (user list changes moderately)
 
 // GET - List all users (Admin only)
 export async function GET(req: NextRequest) {

@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 300; // Cache for 5 minutes (model lists rarely change, prevents expensive external API calls)
 
 export async function GET(req: NextRequest) {
   try {

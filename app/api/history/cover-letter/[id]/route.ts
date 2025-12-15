@@ -6,6 +6,7 @@ import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+export const revalidate = 120; // Cache for 2 minutes (cover letter content is static)
 
 // GET - Fetch a single cover letter
 export async function GET(
