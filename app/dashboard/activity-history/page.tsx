@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useActivityHistory } from '@/hooks/useActivityHistory';
 import { 
   Search, 
   FileText, 
@@ -46,49 +47,23 @@ interface Pagination {
 
 export default function ActivityHistoryPage() {
   const { toast } = useToast();
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [pagination, setPagination] = useState<Pagination>({
+
+  const { data, isLoading } = useActivityHistory({
+    page: currentPage,
+    search,
+    type: typeFilter,
+  });
+
+  const activities = data?.activities || [];
+  const pagination = data?.pagination || {
     page: 1,
     limit: 50,
     totalCount: 0,
     totalPages: 0,
-  });
-
-  const loadActivities = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: currentPage.toString(),
-        limit: '50',
-      });
-
-      if (search) params.append('search', search);
-      if (typeFilter) params.append('type', typeFilter);
-
-      const response = await fetch(`/api/activity-history?${params}`);
-      if (!response.ok) throw new Error('Failed to load activity history');
-
-      const data = await response.json();
-      setActivities(data.activities);
-      setPagination(data.pagination);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load activity history',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [search, typeFilter, currentPage, toast]);
-
-  useEffect(() => {
-    loadActivities();
-  }, [loadActivities]);
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -204,7 +179,7 @@ export default function ActivityHistoryPage() {
               </h2>
             </div>
 
-            {loading ? (
+            {isLoading ? (
               <div className="text-center py-12">
                 <div className="text-gray-900 text-5xl font-bold">
                   <span className="inline-block animate-bounce" style={{ animationDelay: '0ms' }}>.</span>
