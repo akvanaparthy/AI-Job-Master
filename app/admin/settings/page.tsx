@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import { useAdminSettings } from '@/hooks/useAdminSettings';
 import { Settings, ChevronLeft, Save, Loader2, Users, Crown, Shield, ShieldAlert } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '@/components/admin/AdminLayout';
@@ -28,64 +29,29 @@ interface UsageLimit {
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
-  const [limits, setLimits] = useState<UsageLimit[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { limits: initialLimits, misuseMessage: initialMisuseMessage, isLoading, invalidateSettings } = useAdminSettings();
+  const [limits, setLimits] = useState(initialLimits);
   const [saving, setSaving] = useState(false);
-  const [misuseMessage, setMisuseMessage] = useState('');
+  const [misuseMessage, setMisuseMessage] = useState(initialMisuseMessage);
   const [savingMisuse, setSavingMisuse] = useState(false);
 
-  const loadLimits = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/usage-limits');
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load usage limits');
-
-      const data = await response.json();
-      setLimits(data.limits);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load usage limits',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+  // Sync local state with fetched data
+  useEffect(() => {
+    if (initialLimits.length > 0) {
+      setLimits(initialLimits);
     }
-  }, [router, toast]);
-
-  const loadMisuseMessage = useCallback(async () => {
-    try {
-      const response = await fetch('/api/admin/misuse-message');
-      if (response.status === 403) {
-        router.push('/dashboard');
-        return;
-      }
-      if (!response.ok) throw new Error('Failed to load misuse message');
-
-      const data = await response.json();
-      setMisuseMessage(data.message);
-    } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Failed to load misuse message',
-        variant: 'destructive',
-      });
-    }
-  }, [router, toast]);
+  }, [initialLimits]);
 
   useEffect(() => {
-    loadLimits();
-    loadMisuseMessage();
-  }, [loadLimits, loadMisuseMessage]);
+    if (initialMisuseMessage) {
+      setMisuseMessage(initialMisuseMessage);
+    }
+  }, [initialMisuseMessage]);
 
   const updateLimit = async (userType: string, maxActivities: number, maxGenerations: number, maxFollowupGenerations: number, includeFollowups: boolean) => {
     setSaving(true);
     try {
-      const response = await fetch('/api/admin/usage-limits', {
+      const response = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userType, maxActivities, maxGenerations, maxFollowupGenerations, includeFollowups }),
@@ -101,7 +67,7 @@ export default function AdminSettingsPage() {
         description: 'Usage limit updated successfully',
       });
 
-      loadLimits();
+      invalidateSettings();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -160,8 +126,8 @@ export default function AdminSettingsPage() {
 
     setSavingMisuse(true);
     try {
-      const response = await fetch('/api/admin/misuse-message', {
-        method: 'PUT',
+      const response = await fetch('/api/admin/settings', {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: misuseMessage }),
       });
@@ -175,6 +141,8 @@ export default function AdminSettingsPage() {
         title: 'Success',
         description: 'Misuse message updated successfully',
       });
+
+      invalidateSettings();
     } catch (error: any) {
       toast({
         title: 'Error',
@@ -228,7 +196,7 @@ export default function AdminSettingsPage() {
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center h-full">
