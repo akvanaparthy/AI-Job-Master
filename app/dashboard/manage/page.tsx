@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import { useHistory } from '@/hooks/useHistory';
 import { logger } from '@/lib/logger';
 import { History as HistoryIcon, Search, Download, Filter, FileText, MessageSquare, Mail, Loader2, Eye, Trash2, RefreshCw } from 'lucide-react';
 import {
@@ -64,9 +65,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
 
 export default function HistoryPage() {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(true);
-  const [history, setHistory] = useState<HistoryItem[]>([]);
-  const [filteredHistory, setFilteredHistory] = useState<HistoryItem[]>([]);
+  const { history, isLoading, invalidateHistory } = useHistory();
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState<string>('ALL');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -75,32 +74,8 @@ export default function HistoryPage() {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [loadingItem, setLoadingItem] = useState(false);
 
-  useEffect(() => {
-    loadHistory();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    filterHistory();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, typeFilter, statusFilter, history]);
-
-  const loadHistory = async () => {
-    try {
-      const response = await fetch('/api/history');
-      if (response.ok) {
-        const data = await response.json();
-        setHistory(data.history || []);
-      }
-    } catch (error) {
-      logger.error('Failed to load history', error);
-      toast({ title: 'Error', description: 'Failed to load history', variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterHistory = () => {
+  // Client-side filtering using useMemo
+  const filteredHistory = useMemo(() => {
     let filtered = history;
 
     if (typeFilter !== 'ALL') {
@@ -119,8 +94,8 @@ export default function HistoryPage() {
       );
     }
 
-    setFilteredHistory(filtered);
-  };
+    return filtered;
+  }, [history, typeFilter, statusFilter, searchQuery]);
 
   const handleExport = async () => {
     setExporting(true);
@@ -372,7 +347,7 @@ export default function HistoryPage() {
           </div>
 
           <div className="divide-y divide-slate-100 dark:divide-gray-700">
-            {loading ? (
+            {isLoading ? (
               <div className="flex items-center justify-center p-8 sm:p-12">
                 <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-slate-400" />
               </div>
