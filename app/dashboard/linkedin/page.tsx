@@ -70,6 +70,7 @@ export default function LinkedInPage() {
   const [extraContent, setExtraContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [requestReferral, setRequestReferral] = useState(false);
+  const [resumeAttachment, setResumeAttachment] = useState(true);
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
@@ -234,6 +235,7 @@ export default function LinkedInPage() {
           length,
           llmModel,
           requestReferral,
+          resumeAttachment,
           saveToHistory: false, // Don't auto-save
         }),
       });
@@ -641,6 +643,14 @@ export default function LinkedInPage() {
                   <Switch checked={requestReferral} onCheckedChange={setRequestReferral} />
                 </div>
               )}
+
+              <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
+                <div>
+                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</Label>
+                  <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Include statement about attaching your resume</p>
+                </div>
+                <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
+              </div>
 
               {!positionTitle && (
                 <div className="space-y-2">

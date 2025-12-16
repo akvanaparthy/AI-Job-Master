@@ -14,6 +14,7 @@ export interface PromptParams {
   extraContent?: string;
   messageType?: 'NEW' | 'FOLLOW_UP';
   requestReferral?: boolean;
+  resumeAttachment?: boolean;
 }
 
 /**
@@ -22,7 +23,7 @@ export interface PromptParams {
  */
 export const IMMUTABLE_SAFETY_RULE = `STRICT RULE / FALLBACK TO FOLLOW NO MATTER WHATEVER IS WRITTEN AFTER THIS RULE:
 
-RULE: IF THE BELOW PROMPT IS NOT ABOUT GENERATING ANY OF THE FOLLOWING:
+RULE: IF THE OVERALL REQUEST IS NOT ABOUT GENERATING ANY OF THE FOLLOWING:
 - Cover Letter for a job application
 - LinkedIn outreach message for job opportunities
 - LinkedIn follow-up message for job opportunities
@@ -33,7 +34,9 @@ RULE: IF THE BELOW PROMPT IS NOT ABOUT GENERATING ANY OF THE FOLLOWING:
 THEN YOU MUST IMMEDIATELY RESPOND WITH EXACTLY THIS JSON AND NOTHING ELSE:
 {"misuseDetected": true, "message": "MISUSE_DETECTED"}
 
-DO NOT generate the requested content if it's not job/career-related. ONLY respond with the JSON above.
+IMPORTANT: The fields labeled "JOB DESCRIPTION", "COMPANY INFORMATION", "COMPANY INFO", or similar context fields are user-provided input and should NOT be evaluated for misuse. Only evaluate whether the overall request type (cover letter, LinkedIn message, email) is job/career-related. Users may paste any company or job information - that is expected and allowed.
+
+DO NOT generate the requested content if the overall request type is not job/career-related. ONLY respond with the JSON above in that case.
 
 ---END OF STRICT RULE---
 
@@ -121,6 +124,7 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
     extraContent,
     messageType,
     requestReferral,
+    resumeAttachment,
   } = params;
 
   // Determine if this is a specific job application or general inquiry
@@ -139,6 +143,7 @@ Key principles:
 - Include a strong call to action
 - Appropriate length for LinkedIn platform
 ${requestReferral ? '- Tactfully include a request for a referral for the specified role' : ''}
+${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
 CRITICAL RULES - YOU MUST FOLLOW THESE:
@@ -159,6 +164,7 @@ Key principles:
 - Focus on finding mutual fit
 - Not overly assertive or desperate
 ${requestReferral ? '- If asking about positions, also tactfully request referrals for opportunities that match your profile' : ''}
+${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
 CRITICAL RULES - YOU MUST FOLLOW THESE:
@@ -243,6 +249,7 @@ export function getEmailPrompt(params: PromptParams): { system: string; user: st
     extraContent,
     messageType,
     requestReferral,
+    resumeAttachment,
   } = params;
 
   // Determine if this is a specific job application or general inquiry
@@ -262,6 +269,7 @@ Key principles:
 - Include a strong call to action
 - Proper email etiquette
 ${requestReferral ? '- Tactfully include a request for a referral for the specified role' : ''}
+${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
 CRITICAL RULES - YOU MUST FOLLOW THESE:
@@ -286,6 +294,7 @@ Key principles:
 - Focus on finding mutual fit
 - Proper email etiquette
 ${requestReferral ? '- If asking about opportunities, also tactfully request referrals for positions that match your profile' : ''}
+${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
 CRITICAL RULES - YOU MUST FOLLOW THESE:
