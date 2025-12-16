@@ -13,10 +13,26 @@ const DEFAULT_MISUSE_MESSAGE = `I built the platform you are using 😊, now go 
 export const MISUSE_MESSAGE_KEY = 'misuse_detection_message';
 
 /**
- * Check if AI-generated content contains the misuse marker
+ * Check if AI-generated content is a misuse response.
+ * This requires the response to be primarily the JSON misuse object,
+ * not just containing the marker somewhere in normal content.
+ * This prevents false positives when the AI generates valid career content.
  */
 export function detectMisuse(content: string): boolean {
-  return content.includes(MISUSE_MARKER);
+  // Trim and check if response is very short (misuse response should be just the JSON)
+  const trimmed = content.trim();
+  
+  // The misuse response should be short (under 200 chars) and contain the marker
+  // Normal career-related responses will be much longer
+  if (trimmed.length > 200) {
+    return false;
+  }
+  
+  // Check for the JSON structure with misuseDetected: true
+  const hasMisuseMarker = content.includes(MISUSE_MARKER);
+  const hasMisuseJsonPattern = /\{\s*"misuseDetected"\s*:\s*true/i.test(trimmed);
+  
+  return hasMisuseMarker && hasMisuseJsonPattern;
 }
 
 /**

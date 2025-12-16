@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
-import { LinkedInMessageType } from '@prisma/client';
+import { LinkedInMessageType, Length, ApplicationStatus } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 import { logger } from '@/lib/logger';
 import { trackActivity as trackActivityCount } from '@/lib/usage-tracking';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+
+// Valid enum values for validation
+const VALID_LENGTHS: string[] = ['CONCISE', 'MEDIUM', 'LONG'];
+const VALID_STATUSES: string[] = ['DRAFT', 'SENT', 'DONE', 'GHOST'];
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,6 +51,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Validate and default length
+    const validLength = (length && VALID_LENGTHS.includes(length)) ? length : 'MEDIUM';
+    // Validate and default status
+    const validStatus = (status && VALID_STATUSES.includes(status)) ? status : 'SENT';
+
     let messageId = null;
     try {
       messageId = generateMessageId('linkedin');
@@ -68,9 +77,9 @@ export async function POST(req: NextRequest) {
         jobDescription,
         companyDescription,
         content,
-        length,
+        length: validLength as Length,
         llmModel,
-        status,
+        status: validStatus as ApplicationStatus,
         requestReferral,
         parentMessageId: parentMessageId || null,
         messageId: messageId || null,
