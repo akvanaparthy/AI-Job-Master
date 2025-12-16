@@ -54,7 +54,6 @@ export interface LinkedInMessage {
   id: string;
   userId: string;
   resumeId?: string | null;
-  recipientUsername: string;
   recipientName?: string | null;
   linkedinUrl: string;
   positionTitle: string;

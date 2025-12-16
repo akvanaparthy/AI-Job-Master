@@ -41,13 +41,13 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         resumeId: resumeId || null,
-        companyName,
-        positionTitle,
+        companyName: companyName || null,
+        positionTitle: positionTitle || null,
         jobDescription,
-        companyDescription,
+        companyDescription: companyDescription || null,
         content,
-        length,
-        llmModel,
+        length: length || null,
+        llmModel: llmModel || null,
       },
     });
 

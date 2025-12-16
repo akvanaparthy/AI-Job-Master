@@ -247,10 +247,10 @@ export async function POST(req: NextRequest) {
         data: {
           userId: user.id,
           resumeId: resumeId || null,
-          companyName,
-          positionTitle,
+          companyName: companyName || null,
+          positionTitle: positionTitle || null,
           jobDescription,
-          companyDescription,
+          companyDescription: companyDescription || null,
           content: generatedContent,
           length: length as Length,
           llmModel: actualModel, // Store actual model name

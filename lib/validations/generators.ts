@@ -17,8 +17,7 @@ export const linkedInMessageSchema = z.object({
   resumeId: z.string().min(1, 'Resume is required'),
 
   // For new messages
-  linkedinUrl: z.string().url('Invalid LinkedIn URL').optional(),
-  recipientUsername: z.string().optional(),
+  linkedinUrl: z.string().optional(),
   recipientName: z.string().optional(),
   positionTitle: z.string().optional(),
   areasOfInterest: z.string().optional(),
@@ -35,9 +34,6 @@ export const linkedInMessageSchema = z.object({
   status: z.nativeEnum(ApplicationStatus),
   customPromptId: z.string().optional(),
 }).refine((data) => {
-  if (data.messageType === 'NEW') {
-    return data.linkedinUrl && data.recipientUsername;
-  }
   if (data.messageType === 'FOLLOW_UP') {
     return data.parentMessageId;
   }
