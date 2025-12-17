@@ -142,7 +142,7 @@ Key principles:
 - Show clear value proposition for this particular role
 - Include a strong call to action
 - Appropriate length for LinkedIn platform
-${requestReferral ? '- Tactfully include a request for a referral for the specified role' : ''}
+${requestReferral ? '- Directly and tactfully ask the recipient to provide you with a referral for the specified role' : ''}
 ${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
@@ -163,7 +163,7 @@ Key principles:
 - Ask about suitable open positions that match your profile
 - Focus on finding mutual fit
 - Not overly assertive or desperate
-${requestReferral ? '- If asking about positions, also tactfully request referrals for opportunities that match your profile' : ''}
+${requestReferral ? '- Directly and tactfully ask the recipient to provide you with a referral for opportunities that match your profile' : ''}
 ${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
@@ -206,7 +206,7 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
 
-Create a compelling message that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to respond and consider your application.${requestReferral ? `\n\nIMPORTANT: Include a tactful request for a referral for the ${positionTitle} position. You might say something like "If you know anyone at ${companyName} who could refer me, I'd greatly appreciate it" or ask if they'd be willing to refer you internally.` : ''}`;
+Create a compelling message that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to respond and consider your application.${requestReferral ? `\n\nIMPORTANT: Directly ask the recipient to provide you with a referral for the ${positionTitle} position. Be tactful but clear that you are asking THEM specifically to refer you for this role at ${companyName}. For example, ask if they would be willing to refer you or submit your profile internally.` : ''}`;
   } else {
     // General inquiry - exploratory/relationship-building approach
     user = `Please write a professional LinkedIn outreach message for a general opportunity inquiry:
@@ -225,7 +225,7 @@ Create a compelling message that:
 2. Highlights your relevant background and skills${areasOfInterest ? ` (especially in: ${areasOfInterest})` : ''}
 3. Asks about suitable open positions that match your profile
 4. Maintains an exploratory, relationship-building tone
-5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities${requestReferral ? `\n6. IMPORTANT: Tactfully request referrals for opportunities that match your background. You might say something like "If you know of any suitable opportunities at ${companyName} and could refer me, I'd be very grateful" or ask if they'd be open to referring you for matching roles.` : ''}`;
+5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities${requestReferral ? `\n6. IMPORTANT: Directly ask the recipient to provide you with a referral for opportunities that match your background. Be tactful but clear that you are asking THEM specifically to refer you for suitable roles at ${companyName}. For example, ask if they would be willing to refer you or help submit your profile internally for matching positions.` : ''}`;
   }
 
   return { system, user };
@@ -268,7 +268,7 @@ Key principles:
 - Show clear value proposition for this particular role
 - Include a strong call to action
 - Proper email etiquette
-${requestReferral ? '- Tactfully include a request for a referral for the specified role' : ''}
+${requestReferral ? '- Directly and tactfully ask the recipient to provide you with a referral for the specified role' : ''}
 ${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
@@ -293,7 +293,7 @@ Key principles:
 - Ask about suitable opportunities that match your profile
 - Focus on finding mutual fit
 - Proper email etiquette
-${requestReferral ? '- If asking about opportunities, also tactfully request referrals for positions that match your profile' : ''}
+${requestReferral ? '- Directly and tactfully ask the recipient to provide you with a referral for opportunities that match your profile' : ''}
 ${resumeAttachment ? '- Include a statement mentioning that you are attaching your resume for their reference' : ''}
 - ${lengthInstructions[length]}
 
@@ -338,7 +338,7 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
 
-Create a compelling email (with subject line) that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to review your application and invite you for an interview.${requestReferral ? `\n\nIMPORTANT: Include a tactful request for a referral for the ${positionTitle} position. You might mention something like "If you or anyone in your network could refer me for this role, I'd greatly appreciate it" or ask if they'd be willing to refer you internally.` : ''}`;
+Create a compelling email (with subject line) that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to review your application and invite you for an interview.${requestReferral ? `\n\nIMPORTANT: Directly ask the recipient to provide you with a referral for the ${positionTitle} position. Be tactful but clear that you are asking THEM specifically to refer you for this role at ${companyName}. For example, ask if they would be willing to refer you or submit your profile through their internal referral system.` : ''}`;
   } else {
     // General inquiry - exploratory/relationship-building approach
     user = `Please write a professional opportunity inquiry email:
@@ -357,7 +357,7 @@ Create a compelling email (with subject line) that:
 2. Highlights your relevant background and skills${areasOfInterest ? ` (especially in: ${areasOfInterest})` : ''}
 3. Asks about suitable open positions that match your profile
 4. Maintains an exploratory, relationship-building tone
-5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities${requestReferral ? `\n6. IMPORTANT: Tactfully request referrals for opportunities that match your background. You might mention something like "If you know of any suitable opportunities at ${companyName} and could refer me, I'd greatly appreciate it" or ask if they'd be open to referring you for positions that align with your skills.` : ''}`;
+5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities${requestReferral ? `\n6. IMPORTANT: Directly ask the recipient to provide you with a referral for opportunities that match your background. Be tactful but clear that you are asking THEM specifically to refer you for suitable roles at ${companyName}. For example, ask if they would be willing to refer you or help submit your profile through their internal referral system for matching positions.` : ''}`;
   }
 
   return { system, user };
