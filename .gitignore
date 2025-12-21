@@ -114,3 +114,6 @@ next-env.d.ts
 
 # documentation folder
 /documentation/
+
+# Issues tracking (internal)
+ISSUES.md
