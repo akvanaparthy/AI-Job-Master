@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { EmailMessageType } from '@prisma/client';
 import { generateMessageId } from '@/lib/utils/message-id';
 import { logger } from '@/lib/logger';
-import { trackActivity as trackActivityCount } from '@/lib/usage-tracking';
+import { trackActivityCount } from '@/lib/tracking';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
 import { logger } from '@/lib/logger';
-import { getMonthlyActivityCount, getDaysUntilReset } from '@/lib/activity-tracker';
+import { getMonthlyActivityCount, getDaysUntilReset } from '@/lib/tracking';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
