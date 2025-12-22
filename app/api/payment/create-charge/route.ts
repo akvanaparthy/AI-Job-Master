@@ -3,13 +3,9 @@ import { createPlusCharge } from '@/lib/coinbase-commerce';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('POST /api/payment/create-charge called');
     const { email } = await request.json();
 
-    console.log('Email received:', email);
-
     if (!email) {
-      console.warn('Email missing from request');
       return NextResponse.json(
         { error: 'Email is required' },
         { status: 400 }
@@ -28,18 +24,11 @@ export async function POST(request: NextRequest) {
     // Generate redirect URL for after payment
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${request.headers.get('host')}`;
     const redirectUrl = `${appUrl}/auth/payment-success?email=${encodeURIComponent(email)}`;
-    console.log('Redirect URL:', redirectUrl);
-    console.log('App URL:', appUrl);
 
-    console.log('Creating Coinbase Commerce payment charge');
     const hostedUrl = await createPlusCharge(email, redirectUrl);
 
-    console.log('Charge created successfully, hosted URL:', hostedUrl);
     return NextResponse.json({ success: true, url: hostedUrl });
   } catch (error: any) {
-    console.error('Create charge error:', error?.message || error);
-    console.error('Full error:', error);
-
     // Return more specific error messages
     const errorMessage = error?.message || 'Failed to create payment charge';
     const status = error?.message?.includes('401') ? 401 : 500;
