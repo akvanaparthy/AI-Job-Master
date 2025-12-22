@@ -12,6 +12,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
 import { checkUsageLimits, trackGeneration, trackGenerationHistory, trackActivity as trackActivityCount } from '@/lib/usage-tracking';
+import { sanitizeApiInputs } from '@/lib/input-sanitization';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -53,9 +54,34 @@ export async function POST(req: NextRequest) {
 
     // Parse request body
     const body = await req.json();
-    let {
+    const {
       resumeId,
       messageType,
+      length,
+      llmModel,
+      requestReferral,
+      resumeAttachment,
+      status,
+      saveToHistory = true, // Default to true for backward compatibility
+    } = body;
+
+    // Use let for parentMessageId since it may be reassigned later
+    let parentMessageId = body.parentMessageId;
+
+    // Sanitize all user inputs to prevent prompt injection and XSS
+    const sanitized = sanitizeApiInputs({
+      linkedinUrl: body.linkedinUrl,
+      recipientName: body.recipientName,
+      recipientPosition: body.recipientPosition,
+      positionTitle: body.positionTitle,
+      areasOfInterest: body.areasOfInterest,
+      companyName: body.companyName,
+      jobDescription: body.jobDescription,
+      companyDescription: body.companyDescription,
+      extraContent: body.extraContent,
+    });
+
+    const {
       linkedinUrl,
       recipientName,
       recipientPosition,
@@ -64,15 +90,8 @@ export async function POST(req: NextRequest) {
       companyName,
       jobDescription,
       companyDescription,
-      parentMessageId,
       extraContent,
-      length,
-      llmModel,
-      requestReferral,
-      resumeAttachment,
-      status,
-      saveToHistory = true, // Default to true for backward compatibility
-    } = body;
+    } = sanitized;
 
     // Validate required fields
     if (!companyName || !llmModel || !messageType) {

@@ -11,6 +11,7 @@ import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { canCreateActivity, trackActivity, getDaysUntilReset } from '@/lib/activity-tracker';
 import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
 import { checkUsageLimits, trackGeneration, trackGenerationHistory, trackActivity as trackActivityCount } from '@/lib/usage-tracking';
+import { sanitizeApiInputs } from '@/lib/input-sanitization';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -58,14 +59,20 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       resumeId,
-      jobDescription,
-      companyName,
-      positionTitle,
-      companyDescription,
       length,
       llmModel,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
+
+    // Sanitize all user inputs to prevent prompt injection and XSS
+    const sanitized = sanitizeApiInputs({
+      jobDescription: body.jobDescription,
+      companyName: body.companyName,
+      positionTitle: body.positionTitle,
+      companyDescription: body.companyDescription,
+    });
+
+    const { jobDescription, companyName, positionTitle, companyDescription } = sanitized;
 
     // Validate required fields
     if (!jobDescription || !llmModel) {
@@ -233,7 +240,7 @@ export async function POST(req: NextRequest) {
       user.id,
       'COVER_LETTER',
       companyName || 'Unknown Company',
-      positionTitle,
+      positionTitle || null,
       null,
       actualModel,
       false, // Not saved yet
