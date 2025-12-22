@@ -31,8 +31,10 @@ interface HistoryItem {
   content?: string;
   subject?: string;
   body?: string;
+  message?: string;
   messageType?: string;
   hasFollowUp?: boolean;
+  llmModel?: string;
 }
 
 const TYPE_CONFIG = {
@@ -71,7 +73,7 @@ export default function HistoryPage() {
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [exporting, setExporting] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [loadingItem, setLoadingItem] = useState(false);
 
   // Client-side filtering using useMemo
@@ -511,15 +513,7 @@ export default function HistoryPage() {
                   <Select
                     value={selectedItem.status}
                     onValueChange={(newStatus) => {
-                      const itemType = selectedItem.content ? 'Cover Letter' : selectedItem.subject ? 'Email' : 'LinkedIn';
-                      handleStatusChange({
-                        id: selectedItem.id,
-                        type: itemType as any,
-                        company: selectedItem.company,
-                        position: selectedItem.position,
-                        status: selectedItem.status,
-                        createdAt: selectedItem.createdAt
-                      }, newStatus);
+                      handleStatusChange(selectedItem, newStatus);
                       setSelectedItem({ ...selectedItem, status: newStatus });
                     }}
                   >
