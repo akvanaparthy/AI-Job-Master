@@ -53,22 +53,30 @@ export function requireCsrfValidation(req: NextRequest, userId?: string): boolea
 
 /**
  * Rate limiting implementation
- * Uses Redis if REDIS_URL is configured, falls back to in-memory for development
+ * Currently uses in-memory store (suitable for single-instance deployments)
  *
- * To use Redis in production:
- * 1. Set REDIS_URL environment variable (e.g., Upstash Redis URL)
- * 2. Install: npm install ioredis
+ * To enable Redis for production (multi-instance deployments):
+ * 1. Install: npm install ioredis
+ * 2. Set REDIS_URL environment variable (e.g., Upstash Redis URL)
+ * 3. Uncomment the Redis implementation below
  */
 
-// In-memory fallback store for development
+// In-memory store for rate limiting
 const rateLimitStore = new Map<string, { count: number; resetAt: number }>();
 
-// Redis client (lazy loaded)
-let redisClient: any = null;
+export interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+}
+
+/* REDIS IMPLEMENTATION - Uncomment after installing ioredis package
+
+import type Redis from 'ioredis';
+
+let redisClient: Redis | null = null;
 let redisAvailable = false;
 
-// Initialize Redis connection if URL is provided
-async function getRedisClient() {
+async function getRedisClient(): Promise<Redis | null> {
   if (redisClient !== null) {
     return redisAvailable ? redisClient : null;
   }
@@ -80,9 +88,8 @@ async function getRedisClient() {
   }
 
   try {
-    // Dynamically import Redis to make it optional
-    const Redis = (await import('ioredis')).default;
-    redisClient = new Redis(redisUrl, {
+    const { default: RedisClient } = await import('ioredis');
+    redisClient = new RedisClient(redisUrl, {
       maxRetriesPerRequest: 3,
       enableReadyCheck: false,
       lazyConnect: true,
@@ -99,14 +106,6 @@ async function getRedisClient() {
   }
 }
 
-export interface RateLimitConfig {
-  maxRequests: number;
-  windowMs: number;
-}
-
-/**
- * Check if request should be rate limited using Redis
- */
 async function checkRateLimitRedis(
   identifier: string,
   config: RateLimitConfig
@@ -119,7 +118,6 @@ async function checkRateLimitRedis(
     const key = `ratelimit:${identifier}`;
     const windowSeconds = Math.ceil(config.windowMs / 1000);
 
-    // Use Redis pipeline for atomic operations
     const pipeline = redis.pipeline();
     pipeline.incr(key);
     pipeline.ttl(key);
@@ -132,7 +130,6 @@ async function checkRateLimitRedis(
     const count = results[0][1] as number;
     const ttl = results[1][1] as number;
 
-    // Set expiry on first request
     if (ttl === -1) {
       await redis.expire(key, windowSeconds);
     }
@@ -149,6 +146,8 @@ async function checkRateLimitRedis(
     return null;
   }
 }
+
+*/ // END REDIS IMPLEMENTATION
 
 /**
  * Check if request should be rate limited using in-memory store
@@ -190,19 +189,13 @@ function checkRateLimitMemory(
 
 /**
  * Check if request should be rate limited
- * Uses Redis if available, falls back to in-memory
+ * Currently uses in-memory store
+ * (Uncomment Redis implementation above and modify this function to use Redis)
  */
-export async function checkRateLimit(
+export function checkRateLimit(
   identifier: string,
   config: RateLimitConfig
-): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
-  // Try Redis first
-  const redisResult = await checkRateLimitRedis(identifier, config);
-  if (redisResult !== null) {
-    return redisResult;
-  }
-
-  // Fallback to in-memory
+): { allowed: boolean; remaining: number; resetAt: number } {
   return checkRateLimitMemory(identifier, config);
 }
 

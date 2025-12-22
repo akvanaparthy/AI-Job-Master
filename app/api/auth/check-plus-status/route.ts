@@ -1,23 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
-export const revalidate = 300; // Cache for 5 minutes (user type rarely changes)
 
 export async function GET(request: NextRequest) {
   try {
-    const email = request.nextUrl.searchParams.get('email');
+    // Require authentication
+    const supabase = await createClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
 
-    if (!email) {
+    if (!authUser?.email) {
       return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
+        { error: 'Unauthorized' },
+        { status: 401 }
       );
     }
 
+    // Only allow checking own status
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: authUser.email },
       select: {
         userType: true,
       },
@@ -37,7 +42,6 @@ export async function GET(request: NextRequest) {
       userType: user.userType,
     });
   } catch (error) {
-    console.error('Error checking PLUS status:', error);
     return NextResponse.json(
       { error: 'Failed to check user status' },
       { status: 500 }

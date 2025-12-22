@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting check - stricter for password changes
-    const rateLimitResult = await checkRateLimit(
+    const rateLimitResult = checkRateLimit(
       `password-change:${user.id}`,
       RATE_LIMITS.auth
     );

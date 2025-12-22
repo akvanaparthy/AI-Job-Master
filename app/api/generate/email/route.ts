@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Rate limiting check
-    const rateLimitResult = await checkRateLimit(
+    const rateLimitResult = checkRateLimit(
       `email-gen:${user.id}`,
       RATE_LIMITS.generation
     );
