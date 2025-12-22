@@ -27,11 +27,6 @@ export function generateCsrfToken(userId: string): string {
  * Checks both header and cookie for token presence
  */
 export function validateCsrfToken(req: NextRequest, userId: string): boolean {
-  // For now, we'll skip CSRF validation since we're using Supabase Auth
-  // which provides built-in CSRF protection via JWT tokens
-  // 
-  // If you implement custom session management, enable this:
-  /*
   const tokenFromHeader = req.headers.get(CSRF_HEADER_NAME);
   const tokenFromCookie = req.cookies.get(CSRF_COOKIE_NAME)?.value;
 
@@ -51,11 +46,6 @@ export function validateCsrfToken(req: NextRequest, userId: string): boolean {
   } catch {
     return false;
   }
-  */
-
-  // Since we're using Supabase Auth with JWT, CSRF protection is handled
-  // by the authentication middleware. Return true for now.
-  return true;
 }
 
 /**
