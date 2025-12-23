@@ -1,5 +1,7 @@
 // Centralized logging service
-// In production, this can be extended to send logs to external services like Sentry, LogRocket, etc.
+// In production, logs are sent to error tracking service (Sentry)
+
+import { errorTracking } from './error-tracking';
 
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
@@ -19,15 +21,17 @@ class Logger {
   info(message: string, context?: LogContext): void {
     if (this.isDevelopment) {
       console.log(this.formatMessage('info', message, context));
+    } else {
+      errorTracking.captureMessage(message, 'info', context);
     }
-    // In production, send to logging service
   }
 
   warn(message: string, context?: LogContext): void {
     if (this.isDevelopment) {
       console.warn(this.formatMessage('warn', message, context));
+    } else {
+      errorTracking.captureMessage(message, 'warning', context);
     }
-    // In production, send to logging service
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
@@ -41,8 +45,13 @@ class Logger {
 
     if (this.isDevelopment) {
       console.error(this.formatMessage('error', message, errorContext));
+    } else {
+      if (error instanceof Error) {
+        errorTracking.captureException(error, errorContext);
+      } else {
+        errorTracking.captureMessage(message, 'error', errorContext);
+      }
     }
-    // In production, send to error tracking service (e.g., Sentry)
   }
 
   debug(message: string, context?: LogContext): void {

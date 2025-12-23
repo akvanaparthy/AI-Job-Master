@@ -4,6 +4,7 @@ import React, { Component, ReactNode } from 'react';
 import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logger } from '@/lib/logger';
+import { errorTracking } from '@/lib/error-tracking';
 
 interface Props {
   children: ReactNode;
@@ -47,11 +48,12 @@ export class ErrorBoundary extends Component<Props, State> {
       errorInfo,
     });
 
-    // In production, send to error tracking service (e.g., Sentry)
-    if (process.env.NODE_ENV === 'production') {
-      // TODO: Send to error tracking service
-      // Example: Sentry.captureException(error, { contexts: { react: { componentStack: errorInfo.componentStack } } });
-    }
+    // Send to error tracking service in production
+    errorTracking.captureException(error, {
+      react: {
+        componentStack: errorInfo.componentStack,
+      },
+    });
   }
 
   handleReset = () => {
