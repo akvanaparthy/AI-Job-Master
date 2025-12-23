@@ -1,24 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
-import { decrypt } from '@/lib/encryption';
-import { generateContent, getProviderFromModel } from '@/lib/ai/providers';
-import { getCoverLetterPrompt } from '@/lib/ai/prompts';
-import { detectMisuse, getMisuseMessage } from '@/lib/ai/misuse-detection';
 import { Length } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
-import { getSharedApiKey, isSharedModel } from '@/lib/shared-keys';
 import { sanitizeApiInputs } from '@/lib/input-sanitization';
-import {
-  canCreateActivity,
-  trackActivity,
-  getDaysUntilReset,
-  checkUsageLimits,
-  trackGeneration,
-  trackGenerationHistory,
-  trackActivityCount,
-} from '@/lib/tracking';
+import { canCreateActivity, getDaysUntilReset, checkUsageLimits } from '@/lib/tracking';
+import { generateCoverLetter } from '@/lib/services/cover-letter-service';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -27,9 +15,7 @@ export async function POST(req: NextRequest) {
   try {
     // Get authenticated user
     const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -58,20 +44,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Note: Generation limit check moved below after determining if using shared key
-    // Users with their own API keys are NOT subject to generation limits
-    // However, activity limits always apply when saving
-
-    // Parse request body
+    // Parse and validate request body
     const body = await req.json();
-    const {
-      resumeId,
-      length,
-      llmModel,
-      saveToHistory = true, // Default to true for backward compatibility
-    } = body;
+    const { resumeId, length, llmModel, saveToHistory = true } = body;
 
-    // Sanitize all user inputs to prevent prompt injection and XSS
+    // Sanitize all user inputs
     const sanitized = sanitizeApiInputs({
       jobDescription: body.jobDescription,
       companyName: body.companyName,
@@ -89,95 +66,31 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get user's API keys and type
+    // Get user type for API key resolution
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: {
-        openaiApiKey: true,
-        anthropicApiKey: true,
-        geminiApiKey: true,
-        userType: true,
-      },
+      select: { userType: true },
     });
 
     if (!dbUser) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Check if user selected a shared/sponsored model (prefixed with 'shared:')
-    const isSharedModelSelected = llmModel.startsWith('shared:');
-    const actualModel = isSharedModelSelected ? llmModel.replace('shared:', '') : llmModel;
-    
-    // Determine provider from the actual model name
-    const provider = getProviderFromModel(actualModel);
-    let apiKey: string | null = null;
-    let usingSharedKey = false;
+    // Check if using shared key (only for limit checking)
+    const usingSharedKey = llmModel.startsWith('shared:');
 
-    // If user explicitly selected shared model, use shared key
-    if (isSharedModelSelected && (dbUser.userType === 'PLUS' || dbUser.userType === 'ADMIN')) {
-      const sharedKey = await getSharedApiKey(actualModel);
-      if (sharedKey) {
-        apiKey = sharedKey;
-        usingSharedKey = true;
-      } else {
-        return NextResponse.json(
-          { error: 'Selected shared model is not available' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // If not using shared key, use user's own key
-    if (!apiKey) {
-      switch (provider) {
-        case 'openai':
-          if (!dbUser.openaiApiKey) {
-            return NextResponse.json(
-              { error: 'OpenAI API key not configured' },
-              { status: 400 }
-            );
-          }
-          apiKey = decrypt(dbUser.openaiApiKey);
-          break;
-        case 'anthropic':
-          if (!dbUser.anthropicApiKey) {
-            return NextResponse.json(
-              { error: 'Anthropic API key not configured' },
-              { status: 400 }
-            );
-          }
-          apiKey = decrypt(dbUser.anthropicApiKey);
-          break;
-        case 'gemini':
-          if (!dbUser.geminiApiKey) {
-            return NextResponse.json(
-              { error: 'Gemini API key not configured' },
-              { status: 400 }
-            );
-          }
-          apiKey = decrypt(dbUser.geminiApiKey);
-          break;
-        default:
-          return NextResponse.json({ error: 'Invalid model' }, { status: 400 });
-      }
-    }
-
-    // Check generation limit ONLY if using shared/sponsored key
-    // Users with their own API keys are NOT subject to generation limits
+    // Check generation limit ONLY if using shared key
     if (usingSharedKey) {
       const generationCheck = await checkUsageLimits(user.id, false);
       if (!generationCheck.allowed) {
         return NextResponse.json(
-          {
-            error: generationCheck.reason,
-            limitReached: true,
-          },
+          { error: generationCheck.reason, limitReached: true },
           { status: 429 }
         );
       }
     }
 
-    // Check activity limit when saving (always applies)
+    // Check activity limit when saving
     const activityCheck = await canCreateActivity(user.id);
     if (!activityCheck.allowed) {
       const daysLeft = getDaysUntilReset(activityCheck.resetDate);
@@ -193,109 +106,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get resume content if provided
-    let resumeContent = '';
-    if (resumeId) {
-      const resume = await prisma.resume.findFirst({
-        where: {
-          id: resumeId,
-          userId: user.id,
-        },
-      });
-      if (resume) {
-        resumeContent = resume.content;
-      }
-    }
-
-    // Build prompts
-    const { system, user: userPrompt } = getCoverLetterPrompt({
-      resumeContent,
+    // Generate cover letter using service
+    const result = await generateCoverLetter({
+      userId: user.id,
+      userType: dbUser.userType,
+      resumeId,
       jobDescription,
-      companyDescription,
       companyName,
       positionTitle,
+      companyDescription,
       length: length as Length,
+      llmModel,
+      saveToHistory,
     });
 
-    // Generate cover letter
-    const generatedContent = await generateContent({
-      provider,
-      apiKey,
-      model: actualModel, // Use actual model name without prefix
-      systemPrompt: system,
-      userPrompt,
-      maxTokens: 2000,
-      temperature: 0.7,
-    });
-
-    // Check for misuse
-    if (detectMisuse(generatedContent)) {
-      const misuseMessage = await getMisuseMessage();
-      return NextResponse.json({
-        success: true,
-        content: misuseMessage,
-        id: null,
-        saved: false,
-      });
-    }
-
-    // Track generation (increment counter) - only if using shared key
-    await trackGeneration(user.id, false, usingSharedKey);
-
-    // Track in generation history (not saved yet)
-    await trackGenerationHistory(
-      user.id,
-      'COVER_LETTER',
-      companyName || 'Unknown Company',
-      positionTitle || null,
-      null,
-      actualModel,
-      false, // Not saved yet
-      false  // Not a followup
-    );
-
-    // Save to database only if requested
-    let coverLetterId = null;
-    if (saveToHistory) {
-      const coverLetter = await prisma.coverLetter.create({
-        data: {
-          userId: user.id,
-          resumeId: resumeId || null,
-          companyName: companyName || null,
-          positionTitle: positionTitle || null,
-          jobDescription,
-          companyDescription: companyDescription || null,
-          content: generatedContent,
-          length: length as Length,
-          llmModel: actualModel, // Store actual model name
-        },
-      });
-      coverLetterId = coverLetter.id;
-
-      // Track activity count (new system)
-      await trackActivityCount(user.id, false);
-
-      // Track activity in history (old system, keeping for compatibility)
-      await trackActivity({
-        userId: user.id,
-        activityType: 'COVER_LETTER',
-        companyName: companyName || 'Unknown Company',
-        positionTitle,
-        llmModel: actualModel, // Store actual model name
-      });
-    }
-
-    return NextResponse.json({
-      success: true,
-      content: generatedContent,
-      id: coverLetterId,
-      saved: saveToHistory,
-    });
+    return NextResponse.json(result);
   } catch (error) {
     logger.error('Cover letter generation error', error);
-    return NextResponse.json(
-      { error: 'Failed to generate cover letter' },
-      { status: 500 }
-    );
+
+    const errorMessage = error instanceof Error ? error.message : 'Failed to generate cover letter';
+    const statusCode = errorMessage.includes('not configured') || errorMessage.includes('not available') ? 400 : 500;
+
+    return NextResponse.json({ error: errorMessage }, { status: statusCode });
   }
 }
