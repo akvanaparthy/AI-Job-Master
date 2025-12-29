@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
 import { encrypt, decrypt } from '@/lib/encryption';
+import { invalidateSharedModelsCache } from '@/lib/cache';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -96,6 +97,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Invalidate caches to reflect new shared models
+    invalidateSharedModelsCache();
+
     return NextResponse.json({
       key: {
         ...sharedKey,
@@ -145,6 +149,9 @@ export async function DELETE(req: NextRequest) {
       where: { id },
     });
 
+    // Invalidate caches since shared models changed
+    invalidateSharedModelsCache();
+
     return NextResponse.json({ success: true });
   } catch (error) {
     logger.error('Delete shared key error:', error);
@@ -191,6 +198,9 @@ export async function PATCH(req: NextRequest) {
       where: { id },
       data: { isActive },
     });
+
+    // Invalidate caches since key status changed
+    invalidateSharedModelsCache();
 
     return NextResponse.json({ key: updated });
   } catch (error) {
