@@ -153,27 +153,49 @@ export async function getMonthlyActivityCount(
   }
 }
 
+interface UserLimitData {
+  userType: UserType;
+  monthlyResetDate: Date;
+  activityCount: number;
+  isAdmin?: boolean;
+}
+
 /**
  * Check if user can create new activity based on their monthly limit
+ * Optimized version that accepts pre-fetched user data to avoid N+1 queries
  */
-export async function canCreateActivity(userId: string): Promise<{
+export async function canCreateActivity(
+  userIdOrData: string | UserLimitData
+): Promise<{
   allowed: boolean;
   currentCount: number;
   limit: number;
   resetDate: Date;
 }> {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { userType: true, monthlyResetDate: true },
-    });
+    let user: UserLimitData;
+    let userId: string;
 
-    if (!user) {
-      return { allowed: false, currentCount: 0, limit: 0, resetDate: new Date() };
+    // If string ID provided, fetch user data (legacy behavior)
+    if (typeof userIdOrData === 'string') {
+      userId = userIdOrData;
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { userType: true, monthlyResetDate: true, activityCount: true, isAdmin: true },
+      });
+
+      if (!dbUser) {
+        return { allowed: false, currentCount: 0, limit: 0, resetDate: new Date() };
+      }
+      user = dbUser;
+    } else {
+      // Use provided user data (optimized path)
+      user = userIdOrData;
+      userId = ''; // Not needed for this path
     }
 
     // Admin means unlimited
-    if (user.userType === 'ADMIN') {
+    if (user.isAdmin || user.userType === 'ADMIN') {
       return { allowed: true, currentCount: 0, limit: 0, resetDate: user.monthlyResetDate };
     }
 
@@ -186,7 +208,8 @@ export async function canCreateActivity(userId: string): Promise<{
       return { allowed: true, currentCount: 0, limit: 0, resetDate: user.monthlyResetDate };
     }
 
-    const currentCount = await getMonthlyActivityCount(userId, user.monthlyResetDate);
+    // Use activityCount from user object if available, otherwise fetch
+    const currentCount = user.activityCount ?? (userId ? await getMonthlyActivityCount(userId, user.monthlyResetDate) : 0);
 
     return {
       allowed: currentCount < limit,
@@ -212,26 +235,43 @@ export function getDaysUntilReset(resetDate: Date): number {
   return Math.max(0, daysLeft);
 }
 
+interface UserGenerationData {
+  userType: UserType;
+  generationCount: number;
+  followupGenerationCount: number;
+  isAdmin: boolean;
+}
+
 /**
  * Check if user has exceeded their generation limits
+ * Optimized version that accepts pre-fetched user data to avoid N+1 queries
  */
 export async function checkUsageLimits(
-  userId: string,
+  userIdOrData: string | UserGenerationData,
   isFollowup: boolean = false
 ): Promise<{ allowed: boolean; reason?: string }> {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        userType: true,
-        generationCount: true,
-        followupGenerationCount: true,
-        isAdmin: true,
-      },
-    });
+    let user: UserGenerationData;
 
-    if (!user) {
-      return { allowed: false, reason: 'User not found' };
+    // If string ID provided, fetch user data (legacy behavior)
+    if (typeof userIdOrData === 'string') {
+      const dbUser = await prisma.user.findUnique({
+        where: { id: userIdOrData },
+        select: {
+          userType: true,
+          generationCount: true,
+          followupGenerationCount: true,
+          isAdmin: true,
+        },
+      });
+
+      if (!dbUser) {
+        return { allowed: false, reason: 'User not found' };
+      }
+      user = dbUser;
+    } else {
+      // Use provided user data (optimized path)
+      user = userIdOrData;
     }
 
     // Admins have unlimited access

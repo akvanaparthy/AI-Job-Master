@@ -15,6 +15,7 @@ export interface CoverLetterInput {
   userId: string;
   userType: 'FREE' | 'PLUS' | 'ADMIN';
   resumeId?: string;
+  resumeContent?: string;
   jobDescription: string;
   companyName?: string;
   positionTitle?: string;
@@ -38,6 +39,7 @@ export async function generateCoverLetter(
     userId,
     userType,
     resumeId,
+    resumeContent: preloadedResumeContent,
     jobDescription,
     companyName,
     positionTitle,
@@ -56,9 +58,9 @@ export async function generateCoverLetter(
 
   const provider = getProviderFromModel(actualModel);
 
-  // Get resume content if provided
-  let resumeContent = '';
-  if (resumeId) {
+  // Use pre-fetched resume content or fetch if not provided
+  let resumeContent = preloadedResumeContent || '';
+  if (!resumeContent && resumeId) {
     const resume = await prisma.resume.findFirst({
       where: { id: resumeId, userId },
     });

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { prisma } from '@/lib/db/prisma';
 import { Length } from '@prisma/client';
 import { logger } from '@/lib/logger';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/csrf-protection';
 import { sanitizeApiInputs } from '@/lib/input-sanitization';
 import { canCreateActivity, getDaysUntilReset, checkUsageLimits } from '@/lib/tracking';
 import { generateCoverLetter } from '@/lib/services/cover-letter-service';
+import { getUserGenerationData } from '@/lib/services/user-data-service';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -66,22 +66,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Get user type for API key resolution
-    const dbUser = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { userType: true },
-    });
+    // Fetch all user data in ONE optimized query (prevents N+1)
+    const userData = await getUserGenerationData(user.id, { resumeId });
 
-    if (!dbUser) {
+    if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if using shared key (only for limit checking)
     const usingSharedKey = llmModel.startsWith('shared:');
 
-    // Check generation limit ONLY if using shared key
+    // Check generation limit ONLY if using shared key (use pre-fetched data)
     if (usingSharedKey) {
-      const generationCheck = await checkUsageLimits(user.id, false);
+      const generationCheck = await checkUsageLimits(userData, false);
       if (!generationCheck.allowed) {
         return NextResponse.json(
           { error: generationCheck.reason, limitReached: true },
@@ -90,8 +87,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check activity limit when saving
-    const activityCheck = await canCreateActivity(user.id);
+    // Check activity limit when saving (use pre-fetched data)
+    const activityCheck = await canCreateActivity(userData);
     if (!activityCheck.allowed) {
       const daysLeft = getDaysUntilReset(activityCheck.resetDate);
       return NextResponse.json(
@@ -106,11 +103,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate cover letter using service
+    // Generate cover letter using service (with pre-fetched data)
     const result = await generateCoverLetter({
       userId: user.id,
-      userType: dbUser.userType,
+      userType: userData.userType,
       resumeId,
+      resumeContent: userData.resume?.content,
       jobDescription,
       companyName,
       positionTitle,
