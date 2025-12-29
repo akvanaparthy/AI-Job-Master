@@ -226,6 +226,7 @@ model ActivityHistory {
 
   @@index([userId, createdAt])
   @@index([userId, activityType])
+  @@index([userId, isDeleted])
   @@map("activity_history")
 }
 

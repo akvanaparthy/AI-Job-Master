@@ -11,6 +11,17 @@ interface ErrorTrackingConfig {
   enabled: boolean;
 }
 
+// Helper to safely import Sentry only if it exists
+async function loadSentry() {
+  try {
+    // Use dynamic module name to prevent webpack from bundling
+    const moduleName = '@sentry/nextjs';
+    return await import(/* webpackIgnore: true */ moduleName);
+  } catch {
+    return null;
+  }
+}
+
 class ErrorTracking {
   private config: ErrorTrackingConfig;
   private sentryInitialized = false;
@@ -31,13 +42,17 @@ class ErrorTracking {
     if (this.sentryInitialized || !this.config.dsn) return;
 
     try {
-      const Sentry = await import('@sentry/nextjs');
+      const Sentry = await loadSentry();
+      if (!Sentry) {
+        console.warn('Sentry is not installed. Error tracking will use console fallback.');
+        return;
+      }
 
       Sentry.init({
         dsn: this.config.dsn,
         environment: this.config.environment,
         tracesSampleRate: 0.1,
-        beforeSend(event, hint) {
+        beforeSend(event: any, hint: any) {
           if (event.exception) {
             console.error('[Sentry]', hint.originalException || hint.syntheticException);
           }
@@ -63,15 +78,17 @@ class ErrorTracking {
       return;
     }
 
-    import('@sentry/nextjs').then(({ captureException, setContext }) => {
+    loadSentry().then((Sentry) => {
+      if (!Sentry) {
+        console.error('Sentry not available:', error, context);
+        return;
+      }
       if (context) {
         Object.entries(context).forEach(([key, value]) => {
-          setContext(key, value as Record<string, unknown>);
+          Sentry.setContext(key, value as Record<string, unknown>);
         });
       }
-      captureException(error);
-    }).catch(err => {
-      console.error('Failed to capture exception:', err);
+      Sentry.captureException(error);
     });
   }
 
@@ -83,50 +100,52 @@ class ErrorTracking {
       return;
     }
 
-    import('@sentry/nextjs').then(({ captureMessage, setContext }) => {
+    loadSentry().then((Sentry) => {
+      if (!Sentry) {
+        console.log(`Sentry not available [${level}]:`, message, context);
+        return;
+      }
       if (context) {
         Object.entries(context).forEach(([key, value]) => {
-          setContext(key, value as Record<string, unknown>);
+          Sentry.setContext(key, value as Record<string, unknown>);
         });
       }
-      captureMessage(message, level);
-    }).catch(err => {
-      console.error('Failed to capture message:', err);
+      Sentry.captureMessage(message, level);
     });
   }
 
   setUser(user: { id: string; email?: string; username?: string }): void {
     if (!this.config.enabled) return;
 
-    import('@sentry/nextjs').then(({ setUser }) => {
-      setUser(user);
-    }).catch(err => {
-      console.error('Failed to set user:', err);
+    loadSentry().then((Sentry) => {
+      if (Sentry) {
+        Sentry.setUser(user);
+      }
     });
   }
 
   clearUser(): void {
     if (!this.config.enabled) return;
 
-    import('@sentry/nextjs').then(({ setUser }) => {
-      setUser(null);
-    }).catch(err => {
-      console.error('Failed to clear user:', err);
+    loadSentry().then((Sentry) => {
+      if (Sentry) {
+        Sentry.setUser(null);
+      }
     });
   }
 
   addBreadcrumb(message: string, category?: string, data?: ErrorContext): void {
     if (!this.config.enabled) return;
 
-    import('@sentry/nextjs').then(({ addBreadcrumb }) => {
-      addBreadcrumb({
-        message,
-        category,
-        data: data as Record<string, unknown>,
-        timestamp: Date.now() / 1000,
-      });
-    }).catch(err => {
-      console.error('Failed to add breadcrumb:', err);
+    loadSentry().then((Sentry) => {
+      if (Sentry) {
+        Sentry.addBreadcrumb({
+          message,
+          category,
+          data: data as Record<string, unknown>,
+          timestamp: Date.now() / 1000,
+        });
+      }
     });
   }
 }
