@@ -98,6 +98,28 @@ export default function EmailPage() {
   const { models: availableModels, hasAnyKey: hasAnyApiKey, isLoading: loadingModels } = useAvailableModels();
   const { preferences } = useUserPreferences();
 
+  // Load toggle preferences from localStorage on mount
+  useEffect(() => {
+    const savedRequestReferral = localStorage.getItem('email_requestReferral');
+    const savedResumeAttachment = localStorage.getItem('email_resumeAttachment');
+
+    if (savedRequestReferral !== null) {
+      setRequestReferral(savedRequestReferral === 'true');
+    }
+    if (savedResumeAttachment !== null) {
+      setResumeAttachment(savedResumeAttachment === 'true');
+    }
+  }, []);
+
+  // Save toggle preferences to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('email_requestReferral', String(requestReferral));
+  }, [requestReferral]);
+
+  useEffect(() => {
+    localStorage.setItem('email_resumeAttachment', String(resumeAttachment));
+  }, [resumeAttachment]);
+
   useEffect(() => {
     // Check for followup parameters in URL
     const params = new URLSearchParams(window.location.search);

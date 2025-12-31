@@ -113,6 +113,36 @@ export default function LinkedInPage() {
   const { models: availableModels, hasAnyKey: hasAnyApiKey, isLoading: loadingModels } = useAvailableModels();
   const { preferences } = useUserPreferences();
 
+  // Load toggle preferences from localStorage on mount
+  useEffect(() => {
+    const savedRequestReferral = localStorage.getItem('linkedin_requestReferral');
+    const savedResumeAttachment = localStorage.getItem('linkedin_resumeAttachment');
+    const savedSimpleFormat = localStorage.getItem('linkedin_simpleFormat');
+
+    if (savedRequestReferral !== null) {
+      setRequestReferral(savedRequestReferral === 'true');
+    }
+    if (savedResumeAttachment !== null) {
+      setResumeAttachment(savedResumeAttachment === 'true');
+    }
+    if (savedSimpleFormat !== null) {
+      setSimpleFormat(savedSimpleFormat === 'true');
+    }
+  }, []);
+
+  // Save toggle preferences to localStorage when changed
+  useEffect(() => {
+    localStorage.setItem('linkedin_requestReferral', String(requestReferral));
+  }, [requestReferral]);
+
+  useEffect(() => {
+    localStorage.setItem('linkedin_resumeAttachment', String(resumeAttachment));
+  }, [resumeAttachment]);
+
+  useEffect(() => {
+    localStorage.setItem('linkedin_simpleFormat', String(simpleFormat));
+  }, [simpleFormat]);
+
   useEffect(() => {
     // Check for followup parameters in URL
     const params = new URLSearchParams(window.location.search);
