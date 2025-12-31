@@ -86,11 +86,28 @@ export async function validateApiKey(apiKey: string, provider: 'openai' | 'anthr
         return true;
 
       case 'anthropic':
-        // Test Anthropic API key
+        // Test Anthropic API key with actual API call
         const { default: Anthropic } = await import('@anthropic-ai/sdk');
         const anthropic = new Anthropic({ apiKey });
-        // Anthropic doesn't have a simple test endpoint, so we'll just check format
-        return apiKey.startsWith('sk-ant-');
+        // Make a minimal API call to validate the key
+        // Use a very small max_tokens to minimize cost
+        try {
+          await anthropic.messages.create({
+            model: 'claude-3-haiku-20240307', // Use cheapest model
+            max_tokens: 1,
+            messages: [{ role: 'user', content: 'test' }],
+          });
+          return true;
+        } catch (error: any) {
+          // Check if it's an authentication error
+          if (error?.status === 401 || error?.message?.includes('authentication')) {
+            return false;
+          }
+          // If it's a different error (rate limit, etc.), the key might still be valid
+          // but we can't verify it right now
+          logger.warn('Anthropic validation inconclusive', error);
+          return true; // Assume valid if not auth error
+        }
 
       case 'gemini':
         // Test Gemini API key
