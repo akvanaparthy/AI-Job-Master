@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
+import { UserType } from '@prisma/client';
 import { logger } from '@/lib/logger';
 
 export const dynamic = 'force-dynamic';
@@ -141,12 +142,24 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 });
     }
 
-    // Update user
+    // Validate userType if provided
+    if (userType && !Object.values(UserType).includes(userType)) {
+      return NextResponse.json(
+        { error: 'Invalid userType. Must be one of: FREE, PLUS, ADMIN' },
+        { status: 400 }
+      );
+    }
+
+    // Build update data object with only whitelisted fields
+    const updateData: { userType?: UserType } = {};
+    if (userType) {
+      updateData.userType = userType as UserType;
+    }
+
+    // Update user with explicitly whitelisted fields only
     const updated = await prisma.user.update({
       where: { id: userId },
-      data: {
-        ...(userType && { userType }),
-      },
+      data: updateData,
       select: {
         id: true,
         email: true,
