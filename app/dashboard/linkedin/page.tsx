@@ -51,7 +51,7 @@ export default function LinkedInPage() {
   const [loading, setLoading] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [llmModel, setLlmModel] = useState('');
-  const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP' | 'CONNECTION_NOTE'>('NEW');
+  const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP' | 'CONNECTION_NOTE'>('CONNECTION_NOTE');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [positionTitle, setPositionTitle] = useState('');
@@ -461,6 +461,13 @@ export default function LinkedInPage() {
         <Tabs value={messageType} onValueChange={(v: any) => setMessageType(v)}>
           <TabsList className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
             <TabsTrigger
+              value="CONNECTION_NOTE"
+              className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
+            >
+              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
+              Connection Note
+            </TabsTrigger>
+            <TabsTrigger
               value="NEW"
               className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
@@ -472,13 +479,6 @@ export default function LinkedInPage() {
             >
               <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
               Follow-up
-            </TabsTrigger>
-            <TabsTrigger
-              value="CONNECTION_NOTE"
-              className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
-            >
-              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
-              Connection Note
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -615,9 +615,9 @@ export default function LinkedInPage() {
           {/* Search for Connection Requested - Only shown in NEW mode */}
           {messageType === 'NEW' && (
             <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
-              <div className="bg-gradient-to-br from-pink-50 to-purple-50/80 dark:from-pink-900/20 dark:to-purple-900/20 border-b border-pink-100/50 dark:border-pink-800/50 px-4 sm:px-6 py-3 sm:py-4">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
                 <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
-                  <UserPlus className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                  <UserPlus className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   Search Connection Requests
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Load details from a saved connection request</p>
@@ -633,7 +633,7 @@ export default function LinkedInPage() {
                   <Button
                     onClick={() => setConnectionSearchQuery('')}
                     disabled={!connectionSearchQuery.trim()}
-                    className="h-10 sm:h-11 px-4 sm:px-6 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm sm:text-base"
+                    className="h-10 sm:h-11 px-4 sm:px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm sm:text-base"
                   >
                     <Search className="h-4 w-4" />
                   </Button>
@@ -645,7 +645,7 @@ export default function LinkedInPage() {
                       <div
                         key={msg.id}
                         onClick={() => loadConnectionDetails(msg.id)}
-                        className="p-3 bg-slate-50 hover:bg-pink-50 dark:bg-gray-900/50 dark:hover:bg-pink-900/20 border border-slate-200 hover:border-pink-200 dark:border-gray-700 dark:hover:border-pink-800 rounded-lg cursor-pointer transition-all"
+                        className="p-3 bg-slate-50 hover:bg-blue-50 dark:bg-gray-900/50 dark:hover:bg-blue-900/20 border border-slate-200 hover:border-blue-200 dark:border-gray-700 dark:hover:border-blue-800 rounded-lg cursor-pointer transition-all"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
@@ -658,7 +658,7 @@ export default function LinkedInPage() {
                             </p>
                           </div>
                           <div className="flex-shrink-0">
-                            <span className="text-xs px-2 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded">
+                            <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded">
                               {msg.status}
                             </span>
                           </div>
@@ -741,7 +741,7 @@ export default function LinkedInPage() {
 
           {/* Message Details Card */}
           <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
-            <div className={`bg-gradient-to-br ${messageType === 'CONNECTION_NOTE' ? 'from-pink-50 to-purple-50/80 dark:from-pink-900/20 dark:to-purple-900/20 border-b border-pink-100/50 dark:border-pink-800/50' : 'from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50'} px-4 sm:px-6 py-3 sm:py-4`}>
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
               <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">
                 {messageType === 'CONNECTION_NOTE' ? 'Connection Request Details' : 'Message Details'}
               </h2>
@@ -762,7 +762,7 @@ export default function LinkedInPage() {
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
-                          LinkedIn URL {messageType === 'CONNECTION_NOTE' && <span className="text-pink-600 dark:text-pink-400">*</span>}
+                          LinkedIn URL {messageType === 'CONNECTION_NOTE' && <span className="text-blue-600 dark:text-blue-400">*</span>}
                         </Label>
                         <Input
                           placeholder="https://linkedin.com/in/username"
@@ -773,7 +773,7 @@ export default function LinkedInPage() {
                       </div>
                       <div className="space-y-2">
                         <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
-                          Recipient Name {messageType === 'CONNECTION_NOTE' && <span className="text-pink-600 dark:text-pink-400">*</span>}
+                          Recipient Name {messageType === 'CONNECTION_NOTE' && <span className="text-blue-600 dark:text-blue-400">*</span>}
                         </Label>
                         <Input
                           placeholder="John Doe"
@@ -843,7 +843,7 @@ export default function LinkedInPage() {
               )}
 
               {(messageType === 'NEW' || messageType === 'FOLLOW_UP') && (
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/50 rounded-lg">
+                <div className="flex items-center justify-between p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg">
                   <div>
                     <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Simple Format</Label>
                     <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Use a predefined simple message template</p>
@@ -928,7 +928,7 @@ export default function LinkedInPage() {
                 <Button
                   onClick={handleSaveConnectionNote}
                   disabled={saving || !linkedinUrl || !recipientName}
-                  className="w-full h-11 sm:h-12 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+                  className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
                 >
                   {saving ? (
                     <>
