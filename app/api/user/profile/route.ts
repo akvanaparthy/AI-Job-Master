@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ensureUserExists } from '@/lib/auth-helpers';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -40,10 +41,6 @@ export async function GET(req: NextRequest) {
       email: dbUser.email,
     });
   } catch (error) {
-    logger.error('User profile error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to fetch user profile' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'User profile error');
   }
 }

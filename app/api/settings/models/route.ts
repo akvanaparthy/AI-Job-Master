@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { decrypt } from '@/lib/encryption';
 import { getAvailableModels } from '@/lib/encryption';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -74,10 +75,6 @@ export async function GET(req: NextRequest) {
       models,
     });
   } catch (error) {
-    logger.error('Get models error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get available models' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Get models error');
   }
 }

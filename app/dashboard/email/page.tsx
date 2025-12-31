@@ -634,9 +634,9 @@ export default function EmailPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {messageType === 'NEW' && (
-                  <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <span className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Request Referral</span>
+                  <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100 whitespace-nowrap">Request Referral</span>
                       <div className="group relative">
                         <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -647,13 +647,13 @@ export default function EmailPage() {
                         </div>
                       </div>
                     </div>
-                    <Switch checked={requestReferral} onCheckedChange={setRequestReferral} />
+                    <Switch checked={requestReferral} onCheckedChange={setRequestReferral} className="flex-shrink-0" />
                   </div>
                 )}
 
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <span className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</span>
+                <div className="flex items-center justify-between gap-3 p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100 whitespace-nowrap">Resume Attachment</span>
                     <div className="group relative">
                       <svg className="w-3.5 h-3.5 text-green-600 dark:text-green-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -664,7 +664,7 @@ export default function EmailPage() {
                       </div>
                     </div>
                   </div>
-                  <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
+                  <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} className="flex-shrink-0" />
                 </div>
               </div>
 

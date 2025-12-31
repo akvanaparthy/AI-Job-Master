@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -56,11 +57,7 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Get preferences error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get preferences' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Get preferences error');
   }
 }
 
@@ -103,10 +100,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Save preferences error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to save preferences' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Save preferences error');
   }
 }

@@ -5,6 +5,7 @@ import { getModelProvider } from '@/lib/utils/modelNames';
 import { logger } from '@/lib/logger';
 import { getAvailableSharedModels } from '@/lib/shared-keys';
 import { getAvailableModelsWithNames, decrypt } from '@/lib/encryption';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -122,10 +123,6 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Get available models error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get available models' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Get available models error');
   }
 }

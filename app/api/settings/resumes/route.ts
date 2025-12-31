@@ -5,6 +5,7 @@ import { ensureUserExists } from '@/lib/auth-helpers';
 import pdf from 'pdf-parse';
 import mammoth from 'mammoth';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -36,11 +37,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ resumes });
   } catch (error) {
-    logger.error('Get resumes error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get resumes' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Get resumes error');
   }
 }
 
@@ -172,11 +169,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Upload resume error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to upload resume' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Upload resume error');
   }
 }
 
@@ -255,11 +248,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Delete resume error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to delete resume' },
-      { status: 500 }
-    );
+    return handleApiError(error, 'Delete resume error');
   }
 }
 
