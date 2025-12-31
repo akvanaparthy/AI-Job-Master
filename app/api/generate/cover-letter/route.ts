@@ -7,6 +7,7 @@ import { sanitizeApiInputs } from '@/lib/input-sanitization';
 import { canCreateActivity, getDaysUntilReset, checkUsageLimits } from '@/lib/tracking';
 import { generateCoverLetter } from '@/lib/services/cover-letter-service';
 import { getUserGenerationData } from '@/lib/services/user-data-service';
+import { isEmailVerified, getVerificationError } from '@/lib/email-verification';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -19,6 +20,11 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Check email verification
+    if (!isEmailVerified(user)) {
+      return NextResponse.json(getVerificationError(), { status: 403 });
     }
 
     // Rate limiting check
