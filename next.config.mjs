@@ -5,6 +5,12 @@ const nextConfig = {
       bodySizeLimit: '10mb',
     },
   },
+  // API Routes configuration
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb', // Limit request body size to prevent memory exhaustion
+    },
+  },
   images: {
     remotePatterns: [
       {
