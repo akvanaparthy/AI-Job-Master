@@ -72,6 +72,7 @@ export default function LinkedInPage() {
   const [connectionSearchQuery, setConnectionSearchQuery] = useState('');
   const [requestReferral, setRequestReferral] = useState(false);
   const [resumeAttachment, setResumeAttachment] = useState(true);
+  const [simpleFormat, setSimpleFormat] = useState(false);
   const [recipientPosition, setRecipientPosition] = useState('');
   const [idempotencyKey, setIdempotencyKey] = useState<string>('');
 
@@ -344,6 +345,7 @@ export default function LinkedInPage() {
           llmModel,
           requestReferral,
           resumeAttachment,
+          simpleFormat,
           saveToHistory: false, // Don't auto-save
         }),
       });
@@ -837,6 +839,16 @@ export default function LinkedInPage() {
                     <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Include statement about attaching your resume</p>
                   </div>
                   <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
+                </div>
+              )}
+
+              {(messageType === 'NEW' || messageType === 'FOLLOW_UP') && (
+                <div className="flex items-center justify-between p-3 sm:p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/50 rounded-lg">
+                  <div>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Simple Format</Label>
+                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Use a predefined simple message template</p>
+                  </div>
+                  <Switch checked={simpleFormat} onCheckedChange={setSimpleFormat} />
                 </div>
               )}
 

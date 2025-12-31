@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       llmModel,
       requestReferral,
       resumeAttachment,
+      simpleFormat,
       status,
       saveToHistory = true, // Default to true for backward compatibility
     } = body;
@@ -287,6 +288,7 @@ export async function POST(req: NextRequest) {
       length: length as Length,
       requestReferral,
       resumeAttachment,
+      simpleFormat,
     });
 
     // Generate message

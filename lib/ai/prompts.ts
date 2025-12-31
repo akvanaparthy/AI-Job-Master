@@ -16,6 +16,7 @@ export interface PromptParams {
   messageType?: 'NEW' | 'FOLLOW_UP' | 'CONNECTION_NOTE';
   requestReferral?: boolean;
   resumeAttachment?: boolean;
+  simpleFormat?: boolean;
 }
 
 /**
@@ -127,6 +128,7 @@ export function getLinkedInPrompt(params: PromptParams): { system: string; user:
     messageType,
     requestReferral,
     resumeAttachment,
+    simpleFormat,
   } = params;
 
   // Determine if this is a specific job application or general inquiry
@@ -218,7 +220,28 @@ Generate a similar concise note using the actual name, company, and my relevant 
   }
 
   if (messageType === 'FOLLOW_UP' && previousMessage) {
-    user = `Write a professional follow-up LinkedIn message.
+    // Simple format for follow-up
+    if (simpleFormat) {
+      user = `Write a simple follow-up LinkedIn message following this EXACT format:
+
+Hi {name}
+
+Following up on my previous message, Could you kindly let me know if my resume and skillset are good enough to be considered for {position}? I am happy to receive any answer.
+
+CONTEXT:
+- Recipient: ${recipientName || 'there'}
+${positionTitle ? `- Position: ${positionTitle}` : '- Position: the role'}
+- Company: ${companyName}
+
+PREVIOUS MESSAGE:
+${previousMessage}
+
+MY BACKGROUND:
+${resumeContent || 'Not provided'}
+
+Generate the follow-up using the actual name and position. Keep it simple and concise, following the format above.`;
+    } else {
+      user = `Write a professional follow-up LinkedIn message.
 
 PREVIOUS MESSAGE:
 ${previousMessage}
@@ -234,9 +257,39 @@ Write a polite follow-up that:
 2. ${extraContent ? 'Incorporates the additional context provided above' : 'Adds value or new information'}
 3. Gently prompts for a response
 4. Maintains professional courtesy`;
+    }
   } else if (isSpecificRole) {
     // Specific job title - confident/targeted approach
-    user = `Please write a professional LinkedIn outreach message for the following opportunity:
+    if (simpleFormat) {
+      // Simple format for NEW message with referral
+      user = `Write a professional LinkedIn message following this EXACT format:
+
+Hello {Name},
+
+This is {My name}, working as {Current position} with around {mention years of experience} year of experience in the {Tech stack}. I am efficient in {Skills and achievements}. I am looking for {Positions to join for} and found job roles on {company name} careers page that matches my skillset. Hence, I would like to take this opportunity to speak to you a bit about the role and request a referral for the same, if you deem my profile fit.
+
+Req Id / Job id / Job position name {mention job Id}
+
+Job Link: {job link from careers page}
+
+Coding profile / github - {Link}
+
+Resume link: {resume link}
+
+Please do let me know, if you'll be interested in referring me for this role.
+
+CONTEXT:
+- Recipient: ${recipientName || 'there'}
+- Position: ${positionTitle} at ${companyName}
+${jobDescription ? `- Job Description: ${jobDescription}` : ''}
+${resumeLink ? `- Resume Link: ${resumeLink}` : ''}
+
+MY BACKGROUND:
+${resumeContent || 'Not provided'}
+
+Generate the message using the actual name, position, company, and my skills/experience from the resume. Extract relevant years of experience, tech stack, skills, achievements from my resume. Keep the format similar to the template above.`;
+    } else {
+      user = `Please write a professional LinkedIn outreach message for the following opportunity:
 
 RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 POSITION: ${positionTitle} at ${companyName}
@@ -248,9 +301,33 @@ ${resumeContent || 'Not provided'}
 ${messageType === 'NEW' && resumeLink ? `\nPUBLIC RESUME LINK: ${resumeLink}` : ''}
 
 Create a compelling message that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to respond and consider your application.${requestReferral ? `\n\nIMPORTANT: Directly ask the recipient to provide you with a referral for the ${positionTitle} position. Be tactful but clear that you are asking THEM specifically to refer you for this role at ${companyName}. For example, ask if they would be willing to refer you or submit your profile internally.` : ''}`;
+    }
   } else {
     // General inquiry - exploratory/relationship-building approach
-    user = `Please write a professional LinkedIn outreach message for a general opportunity inquiry:
+    if (simpleFormat) {
+      // Simple format for general inquiry
+      user = `Write a professional LinkedIn message following a simple format similar to this:
+
+Hello {Name},
+
+This is {My name}, working as {Current position} with around {mention years of experience} year of experience in the {Tech stack}. I am efficient in {Skills and achievements}. I am looking for opportunities at {company name} in areas such as {areas of interest} that match my skillset. I would like to take this opportunity to connect and discuss potential opportunities.
+
+${resumeLink ? `Resume link: {resume link}` : ''}
+
+Please let me know if there are any suitable positions at ${companyName}.
+
+CONTEXT:
+- Recipient: ${recipientName || 'there'}
+- Company: ${companyName}
+${areasOfInterest ? `- Areas of Interest: ${areasOfInterest}` : ''}
+${resumeLink ? `- Resume Link: ${resumeLink}` : ''}
+
+MY BACKGROUND:
+${resumeContent || 'Not provided'}
+
+Generate the message using the actual name, company, and my skills/experience from the resume. Keep the format simple and concise.`;
+    } else {
+      user = `Please write a professional LinkedIn outreach message for a general opportunity inquiry:
 
 RECIPIENT: ${recipientName || 'Hiring Manager'}${recipientPosition ? ` (${recipientPosition})` : ''}
 COMPANY: ${companyName}
@@ -268,6 +345,7 @@ Create a compelling message that:
 3. Asks about suitable open positions that match your profile
 4. Maintains an exploratory, relationship-building tone
 5. Encourages ${recipientName || 'them'} to respond and discuss potential opportunities${requestReferral ? `\n6. IMPORTANT: Directly ask the recipient to provide you with a referral for opportunities that match your background. Be tactful but clear that you are asking THEM specifically to refer you for suitable roles at ${companyName}. For example, ask if they would be willing to refer you or help submit your profile internally for matching positions.` : ''}`;
+    }
   }
 
   return { system, user };
