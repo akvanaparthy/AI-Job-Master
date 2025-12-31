@@ -25,7 +25,6 @@ interface RecentUser {
   id: string;
   email: string;
   userType: string;
-  isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
   hasOpenaiKey: boolean;

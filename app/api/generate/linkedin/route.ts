@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Get user's API keys and userType
+    // Get user's API keys, userType, and resumeLink
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
       select: {
@@ -153,6 +153,7 @@ export async function POST(req: NextRequest) {
         anthropicApiKey: true,
         geminiApiKey: true,
         userType: true,
+        resumeLink: true,
       },
     });
 
@@ -273,6 +274,7 @@ export async function POST(req: NextRequest) {
     const { system, user: userPrompt } = getLinkedInPrompt({
       messageType: messageType as LinkedInMessageType,
       resumeContent,
+      resumeLink: dbUser.resumeLink || undefined,
       recipientName,
       recipientPosition,
       positionTitle,

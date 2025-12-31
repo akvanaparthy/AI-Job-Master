@@ -4,6 +4,7 @@ export interface UserPreferences {
   defaultLlmModel?: string;
   defaultLength?: 'CONCISE' | 'MEDIUM' | 'LONG';
   defaultStatus?: 'DRAFT' | 'SENT' | 'DONE' | 'GHOST';
+  resumeLink?: string;
 }
 
 interface PreferencesResponse {

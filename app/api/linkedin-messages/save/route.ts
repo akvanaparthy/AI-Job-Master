@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 
 // Valid enum values for validation
 const VALID_LENGTHS: string[] = ['CONCISE', 'MEDIUM', 'LONG'];
-const VALID_STATUSES: string[] = ['DRAFT', 'SENT', 'DONE', 'GHOST'];
+const VALID_STATUSES: string[] = ['DRAFT', 'SENT', 'DONE', 'GHOST', 'REQUESTED'];
 
 export async function POST(req: NextRequest) {
   try {
@@ -44,9 +44,18 @@ export async function POST(req: NextRequest) {
       requestReferral = false,
     } = body;
 
-    if (!content || !companyName || !messageType) {
+    // For CONNECTION_NOTE, company name is optional
+    if (!content || !messageType) {
       return NextResponse.json(
-        { error: 'Content, company name, and message type are required' },
+        { error: 'Content and message type are required' },
+        { status: 400 }
+      );
+    }
+
+    // For non-CONNECTION_NOTE types, company name is required
+    if (messageType !== 'CONNECTION_NOTE' && !companyName) {
+      return NextResponse.json(
+        { error: 'Company name is required' },
         { status: 400 }
       );
     }
@@ -73,7 +82,7 @@ export async function POST(req: NextRequest) {
         recipientPosition: recipientPosition || null,
         positionTitle: positionTitle || null,
         areasOfInterest: areasOfInterest || null,
-        companyName,
+        companyName: companyName || 'Unknown',
         jobDescription: jobDescription || null,
         companyDescription: companyDescription || null,
         content,

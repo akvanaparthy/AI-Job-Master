@@ -2,6 +2,7 @@ import { Length } from '@prisma/client';
 
 export interface PromptParams {
   resumeContent?: string;
+  resumeLink?: string;
   jobDescription?: string;
   companyDescription?: string;
   length: Length;
@@ -12,7 +13,7 @@ export interface PromptParams {
   companyName?: string;
   previousMessage?: string;
   extraContent?: string;
-  messageType?: 'NEW' | 'FOLLOW_UP';
+  messageType?: 'NEW' | 'FOLLOW_UP' | 'CONNECTION_NOTE';
   requestReferral?: boolean;
   resumeAttachment?: boolean;
 }
@@ -112,6 +113,7 @@ Do NOT use placeholders like [Your Address] or [Date]. Extract actual informatio
 export function getLinkedInPrompt(params: PromptParams): { system: string; user: string } {
   const {
     resumeContent,
+    resumeLink,
     jobDescription,
     companyDescription,
     length,
@@ -205,6 +207,7 @@ ${jobDescription ? `JOB DESCRIPTION:\n${jobDescription}\n` : ''}
 ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
+${resumeLink ? `\nPUBLIC RESUME LINK: ${resumeLink}` : ''}
 
 Create a compelling message that demonstrates your strong fit for this specific role and encourages ${recipientName || 'them'} to respond and consider your application.${requestReferral ? `\n\nIMPORTANT: Directly ask the recipient to provide you with a referral for the ${positionTitle} position. Be tactful but clear that you are asking THEM specifically to refer you for this role at ${companyName}. For example, ask if they would be willing to refer you or submit your profile internally.` : ''}`;
   } else {
@@ -219,6 +222,7 @@ ${companyDescription ? `COMPANY INFORMATION:\n${companyDescription}\n` : ''}
 ${jobDescription ? `RELEVANT CONTEXT:\n${jobDescription}\n` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
+${resumeLink ? `\nPUBLIC RESUME LINK: ${resumeLink}` : ''}
 
 Create a compelling message that:
 1. Expresses genuine interest in ${companyName} and their mission/culture/recent work

@@ -11,7 +11,6 @@ export interface UserGenerationData {
   followupGenerationCount: number;
   activityCount: number;
   monthlyResetDate: Date;
-  isAdmin: boolean;
   resume?: {
     id: string;
     content: string;
@@ -55,7 +54,6 @@ export async function getUserGenerationData(
       followupGenerationCount: true,
       activityCount: true,
       monthlyResetDate: true,
-      isAdmin: true,
       // Include resume if resumeId is provided
       ...(resumeId && {
         resumes: {
@@ -105,7 +103,6 @@ export async function getUserGenerationData(
     followupGenerationCount: user.followupGenerationCount,
     activityCount: user.activityCount,
     monthlyResetDate: user.monthlyResetDate,
-    isAdmin: user.isAdmin,
     resume: resumeId && 'resumes' in user ? user.resumes[0] : undefined,
     parentEmailMessage: parentEmailMessageId && 'emailMessages' in user ? user.emailMessages[0] : undefined,
     parentLinkedInMessage: parentLinkedInMessageId && 'linkedinMessages' in user ? user.linkedinMessages[0] : undefined,

@@ -15,7 +15,6 @@ export interface ValidatedContext<T = unknown> {
   dbUser?: {
     id: string;
     userType: 'FREE' | 'PLUS' | 'ADMIN';
-    isAdmin: boolean;
     openaiApiKey: string | null;
     anthropicApiKey: string | null;
     geminiApiKey: string | null;
@@ -91,7 +90,6 @@ export async function authenticateRequest(
       select: {
         id: true,
         userType: true,
-        isAdmin: true,
         ...(fetchApiKeys && {
           openaiApiKey: true,
           anthropicApiKey: true,
@@ -107,13 +105,12 @@ export async function authenticateRequest(
     dbUser = {
       id: userData.id,
       userType: userData.userType,
-      isAdmin: userData.isAdmin,
       openaiApiKey: (userData as any).openaiApiKey ?? null,
       anthropicApiKey: (userData as any).anthropicApiKey ?? null,
       geminiApiKey: (userData as any).geminiApiKey ?? null,
     };
 
-    if (requireAdmin && !userData.isAdmin && userData.userType !== 'ADMIN') {
+    if (requireAdmin && userData.userType !== 'ADMIN') {
       return { success: false, response: ApiErrors.forbidden() };
     }
   }

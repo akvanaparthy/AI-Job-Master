@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { useAvailableModels } from '@/hooks/useAvailableModels';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Link } from 'lucide-react';
 
 interface Preferences {
   defaultLlmModel: string;
@@ -17,6 +18,7 @@ interface Preferences {
   autoSave: boolean;
   defaultStatus: string;
   followupReminderDays: number;
+  resumeLink: string;
 }
 
 export default function UserPreferencesManager() {
@@ -28,6 +30,7 @@ export default function UserPreferencesManager() {
     autoSave: true,
     defaultStatus: 'SENT',
     followupReminderDays: 7,
+    resumeLink: '',
   });
 
   // Use shared hooks
@@ -44,6 +47,7 @@ export default function UserPreferencesManager() {
         autoSave: true,
         defaultStatus: preferences.defaultStatus || 'SENT',
         followupReminderDays: 7,
+        resumeLink: preferences.resumeLink || '',
       });
     }
   }, [preferences]);
@@ -181,6 +185,34 @@ export default function UserPreferencesManager() {
             </Select>
             <p className="text-xs text-muted-foreground">
               Default status when saving generated content
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700">
+        <CardHeader className="px-4 sm:px-6 py-3 sm:py-4">
+          <CardTitle className="text-base sm:text-lg text-slate-900 dark:text-gray-100 flex items-center gap-2">
+            <Link className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
+            Public Resume Link
+          </CardTitle>
+          <CardDescription className="text-sm text-slate-600 dark:text-gray-400">
+            Add a link to your public resume (Google Drive, Dropbox, etc.)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+          <div className="space-y-2">
+            <Label className="text-sm sm:text-base text-slate-900 dark:text-gray-100">Resume URL</Label>
+            <Input
+              placeholder="https://drive.google.com/file/d/..."
+              value={localPreferences.resumeLink}
+              onChange={(e) =>
+                setLocalPreferences((prev) => ({ ...prev, resumeLink: e.target.value }))
+              }
+              className="h-10 sm:h-11 text-sm sm:text-base bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100"
+            />
+            <p className="text-xs text-muted-foreground">
+              This link will be shared with the AI when generating messages, enabling it to reference your publicly hosted resume
             </p>
           </div>
         </CardContent>

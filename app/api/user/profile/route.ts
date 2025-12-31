@@ -27,7 +27,6 @@ export async function GET(req: NextRequest) {
       where: { id: user.id },
       select: {
         userType: true,
-        isAdmin: true,
         email: true,
       },
     });
@@ -38,7 +37,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       userType: dbUser.userType,
-      isAdmin: dbUser.isAdmin,
       email: dbUser.email,
     });
   } catch (error) {

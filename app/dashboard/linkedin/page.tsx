@@ -18,7 +18,7 @@ import { useAvailableModels } from '@/hooks/useAvailableModels';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import { useQuery } from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
-import { Loader2, Copy, MessageSquare, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search } from 'lucide-react';
+import { Loader2, Copy, MessageSquare, Sparkles, CheckCircle2, RefreshCw, Save, Trash2, Search, UserPlus } from 'lucide-react';
 
 // Helper function for debouncing search
 function useDebouncedValue<T>(value: T, delay: number): T {
@@ -51,7 +51,7 @@ export default function LinkedInPage() {
   const [loading, setLoading] = useState(false);
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [llmModel, setLlmModel] = useState('');
-  const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP'>('NEW');
+  const [messageType, setMessageType] = useState<'NEW' | 'FOLLOW_UP' | 'CONNECTION_NOTE'>('NEW');
   const [linkedinUrl, setLinkedinUrl] = useState('');
   const [recipientName, setRecipientName] = useState('');
   const [positionTitle, setPositionTitle] = useState('');
@@ -69,6 +69,7 @@ export default function LinkedInPage() {
   const [previousMessageContent, setPreviousMessageContent] = useState('');
   const [extraContent, setExtraContent] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [connectionSearchQuery, setConnectionSearchQuery] = useState('');
   const [requestReferral, setRequestReferral] = useState(false);
   const [resumeAttachment, setResumeAttachment] = useState(true);
   const [recipientPosition, setRecipientPosition] = useState('');
@@ -76,6 +77,7 @@ export default function LinkedInPage() {
 
   // Debounce search query
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 400);
+  const debouncedConnectionSearchQuery = useDebouncedValue(connectionSearchQuery, 400);
 
   // Use React Query for debounced search
   const { data: searchResults = [], isLoading: searchLoading } = useQuery<LinkedInSearchResult[]>({
@@ -88,6 +90,20 @@ export default function LinkedInPage() {
       return data.messages || [];
     },
     enabled: debouncedSearchQuery.trim().length > 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+
+  // Use React Query for connection request search
+  const { data: connectionResults = [], isLoading: connectionSearchLoading } = useQuery<LinkedInSearchResult[]>({
+    queryKey: ['linkedin-connection-search', debouncedConnectionSearchQuery],
+    queryFn: async () => {
+      if (!debouncedConnectionSearchQuery.trim()) return [];
+      const response = await fetch(`/api/messages/search/linkedin/connections?q=${encodeURIComponent(debouncedConnectionSearchQuery)}`);
+      if (!response.ok) return [];
+      const data = await response.json();
+      return data.messages || [];
+    },
+    enabled: debouncedConnectionSearchQuery.trim().length > 0,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 
@@ -204,6 +220,98 @@ export default function LinkedInPage() {
         description: 'Failed to load message details',
         variant: 'destructive',
       });
+    }
+  };
+
+  const loadConnectionDetails = async (messageId: string) => {
+    try {
+      const response = await fetch(`/api/messages/search/linkedin?messageId=${encodeURIComponent(messageId)}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.message) {
+          const msg = data.message;
+          setCompanyName(msg.companyName || '');
+          setPositionTitle(msg.positionTitle || '');
+          setRecipientName(msg.recipientName || '');
+          setRecipientPosition(msg.recipientPosition || '');
+          setLinkedinUrl(msg.linkedinUrl || '');
+          setJobDescription(msg.jobDescription || '');
+          setCompanyDescription(msg.companyDescription || '');
+          setAreasOfInterest(msg.areasOfInterest || '');
+          if (msg.resumeId) setSelectedResumeId(msg.resumeId);
+          if (msg.length) setLength(msg.length);
+          if (msg.llmModel) setLlmModel(msg.llmModel);
+          setConnectionSearchQuery('');
+          toast({
+            title: 'Connection Loaded',
+            description: 'Connection request details loaded successfully',
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load connection details:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to load connection details',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleSaveConnectionNote = async () => {
+    if (!linkedinUrl || !recipientName) {
+      toast({
+        title: 'Error',
+        description: 'LinkedIn URL and Recipient Name are required',
+        variant: 'destructive'
+      });
+      return;
+    }
+    setSaving(true);
+    try {
+      const response = await fetch('/api/linkedin-messages/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          content: generatedMessage || `Connection request sent to ${recipientName}`,
+          messageType: 'CONNECTION_NOTE',
+          resumeId: selectedResumeId || undefined,
+          linkedinUrl,
+          recipientName,
+          recipientPosition: recipientPosition || undefined,
+          positionTitle: positionTitle || undefined,
+          areasOfInterest: areasOfInterest || undefined,
+          companyName: companyName || 'Unknown',
+          jobDescription: jobDescription || undefined,
+          companyDescription: companyDescription || undefined,
+          length,
+          llmModel: llmModel || undefined,
+          requestReferral: false,
+          status: 'REQUESTED',
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to save connection note');
+      const data = await response.json();
+      setSavedId(data.id);
+      setSavedMessageId(data.messageId);
+      // Clear form after save
+      setLinkedinUrl('');
+      setRecipientName('');
+      setRecipientPosition('');
+      setPositionTitle('');
+      setAreasOfInterest('');
+      setCompanyName('');
+      setJobDescription('');
+      setCompanyDescription('');
+      setGeneratedMessage('');
+      toast({
+        title: 'Connection Note Saved',
+        description: 'Connection request saved with REQUESTED status'
+      });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message || 'Failed to save connection note', variant: 'destructive' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -352,16 +460,23 @@ export default function LinkedInPage() {
           <TabsList className="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 p-1 sm:p-1.5 rounded-xl shadow-sm w-full sm:w-auto">
             <TabsTrigger
               value="NEW"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
+              className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
               New Message
             </TabsTrigger>
             <TabsTrigger
               value="FOLLOW_UP"
-              className="rounded-lg px-4 sm:px-6 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
+              className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
             >
-              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
               Follow-up
+            </TabsTrigger>
+            <TabsTrigger
+              value="CONNECTION_NOTE"
+              className="rounded-lg px-3 sm:px-5 text-xs sm:text-sm data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-md transition-all duration-300 ease-in-out flex-1 sm:flex-none dark:data-[state=inactive]:text-gray-300"
+            >
+              <UserPlus className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1 sm:mr-1.5" />
+              Connection Note
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -375,7 +490,8 @@ export default function LinkedInPage() {
           transition={{ delay: 0.15 }}
           className="space-y-4 sm:space-y-6"
         >
-          {/* Configuration Card */}
+          {/* Configuration Card - Hidden for Connection Note */}
+          {messageType !== 'CONNECTION_NOTE' && (
           <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
               <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
@@ -492,6 +608,70 @@ export default function LinkedInPage() {
 
             </div>
           </Card>
+          )}
+
+          {/* Search for Connection Requested - Only shown in NEW mode */}
+          {messageType === 'NEW' && (
+            <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
+              <div className="bg-gradient-to-br from-pink-50 to-purple-50/80 dark:from-pink-900/20 dark:to-purple-900/20 border-b border-pink-100/50 dark:border-pink-800/50 px-4 sm:px-6 py-3 sm:py-4">
+                <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
+                  <UserPlus className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+                  Search Connection Requests
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-gray-400 mt-0.5">Load details from a saved connection request</p>
+              </div>
+              <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Search by name, company..."
+                    value={connectionSearchQuery}
+                    onChange={(e) => setConnectionSearchQuery(e.target.value)}
+                    className="h-10 sm:h-11 bg-white dark:bg-gray-800 border-slate-200 dark:border-gray-600 rounded-lg hover:border-slate-300 dark:hover:border-gray-500 transition-colors text-sm sm:text-base"
+                  />
+                  <Button
+                    onClick={() => setConnectionSearchQuery('')}
+                    disabled={!connectionSearchQuery.trim()}
+                    className="h-10 sm:h-11 px-4 sm:px-6 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-sm sm:text-base"
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {connectionResults.length > 0 && (
+                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                    {connectionResults.map((msg) => (
+                      <div
+                        key={msg.id}
+                        onClick={() => loadConnectionDetails(msg.id)}
+                        className="p-3 bg-slate-50 hover:bg-pink-50 dark:bg-gray-900/50 dark:hover:bg-pink-900/20 border border-slate-200 hover:border-pink-200 dark:border-gray-700 dark:hover:border-pink-800 rounded-lg cursor-pointer transition-all"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 dark:text-gray-100 truncate">
+                              {msg.recipientName || 'Unknown'} {msg.companyName && `@ ${msg.companyName}`}
+                            </p>
+                            <p className="text-xs text-slate-500 dark:text-gray-400 mt-1">
+                              {msg.positionTitle && `${msg.positionTitle} • `}
+                              {new Date(msg.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <span className="text-xs px-2 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded">
+                              {msg.status}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {connectionSearchQuery && connectionResults.length === 0 && !connectionSearchLoading && (
+                  <p className="text-sm text-slate-500 dark:text-gray-400 text-center py-4">No connection requests found</p>
+                )}
+              </div>
+            </Card>
+          )}
 
           {/* Search for Previous Messages - Only shown in follow-up mode */}
           {messageType === 'FOLLOW_UP' && (
@@ -559,17 +739,19 @@ export default function LinkedInPage() {
 
           {/* Message Details Card */}
           <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">Message Details</h2>
+            <div className={`bg-gradient-to-br ${messageType === 'CONNECTION_NOTE' ? 'from-pink-50 to-purple-50/80 dark:from-pink-900/20 dark:to-purple-900/20 border-b border-pink-100/50 dark:border-pink-800/50' : 'from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50'} px-4 sm:px-6 py-3 sm:py-4`}>
+              <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100">
+                {messageType === 'CONNECTION_NOTE' ? 'Connection Request Details' : 'Message Details'}
+              </h2>
               <p className="text-sm text-slate-600 dark:text-gray-400 mt-0.5">
-                {messageType === 'NEW' ? 'Enter recipient and job information' : 'Following up on a previous message'}
+                {messageType === 'NEW' ? 'Enter recipient and job information' : messageType === 'CONNECTION_NOTE' ? 'Save connection request info for later outreach' : 'Following up on a previous message'}
               </p>
             </div>
             <div className="p-4 sm:p-6 space-y-4 sm:space-y-5">
               <AnimatePresence mode="wait">
-                {messageType === 'NEW' && (
+                {(messageType === 'NEW' || messageType === 'CONNECTION_NOTE') && (
                   <motion.div
-                    key="new-linkedin-recipient-fields"
+                    key="linkedin-recipient-fields"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -577,7 +759,9 @@ export default function LinkedInPage() {
                   >
                     <div className="space-y-4 sm:space-y-5">
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">LinkedIn URL</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
+                          LinkedIn URL {messageType === 'CONNECTION_NOTE' && <span className="text-pink-600 dark:text-pink-400">*</span>}
+                        </Label>
                         <Input
                           placeholder="https://linkedin.com/in/username"
                           value={linkedinUrl}
@@ -586,7 +770,9 @@ export default function LinkedInPage() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Recipient Name</Label>
+                        <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
+                          Recipient Name {messageType === 'CONNECTION_NOTE' && <span className="text-pink-600 dark:text-pink-400">*</span>}
+                        </Label>
                         <Input
                           placeholder="John Doe"
                           value={recipientName}
@@ -623,7 +809,7 @@ export default function LinkedInPage() {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">
-                    Company <span className="text-blue-600 dark:text-blue-400">*</span>
+                    Company {messageType !== 'CONNECTION_NOTE' && <span className="text-blue-600 dark:text-blue-400">*</span>}
                   </Label>
                   <Input
                     placeholder="Tech Corp"
@@ -644,15 +830,17 @@ export default function LinkedInPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
-                <div>
-                  <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</Label>
-                  <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Include statement about attaching your resume</p>
+              {messageType !== 'CONNECTION_NOTE' && (
+                <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
+                  <div>
+                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</Label>
+                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Include statement about attaching your resume</p>
+                  </div>
+                  <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
                 </div>
-                <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
-              </div>
+              )}
 
-              {!positionTitle && (
+              {!positionTitle && messageType !== 'CONNECTION_NOTE' && (
                 <div className="space-y-2">
                   <Label className="text-sm font-medium text-slate-900 dark:text-gray-100">Areas of Interest</Label>
                     <Input
@@ -724,24 +912,45 @@ export default function LinkedInPage() {
                 </motion.div>
               )}
 
-              <Button
-                onClick={handleGenerate}
-                disabled={loading || !companyName || !hasAnyApiKey || !llmModel}
-                className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                    <span className="hidden sm:inline">Generating message...</span>
-                    <span className="sm:hidden">Generating...</span>
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                    Generate Message
-                  </>
-                )}
-              </Button>
+              {messageType === 'CONNECTION_NOTE' ? (
+                <Button
+                  onClick={handleSaveConnectionNote}
+                  disabled={saving || !linkedinUrl || !recipientName}
+                  className="w-full h-11 sm:h-12 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                      <span className="hidden sm:inline">Saving connection note...</span>
+                      <span className="sm:hidden">Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      Save Connection Note
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleGenerate}
+                  disabled={loading || !companyName || !hasAnyApiKey || !llmModel}
+                  className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                      <span className="hidden sm:inline">Generating message...</span>
+                      <span className="sm:hidden">Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      Generate Message
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
           </Card>
         </motion.div>

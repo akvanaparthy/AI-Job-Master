@@ -157,7 +157,6 @@ interface UserLimitData {
   userType: UserType;
   monthlyResetDate: Date;
   activityCount: number;
-  isAdmin?: boolean;
 }
 
 /**
@@ -181,7 +180,7 @@ export async function canCreateActivity(
       userId = userIdOrData;
       const dbUser = await prisma.user.findUnique({
         where: { id: userId },
-        select: { userType: true, monthlyResetDate: true, activityCount: true, isAdmin: true },
+        select: { userType: true, monthlyResetDate: true, activityCount: true },
       });
 
       if (!dbUser) {
@@ -195,7 +194,7 @@ export async function canCreateActivity(
     }
 
     // Admin means unlimited
-    if (user.isAdmin || user.userType === 'ADMIN') {
+    if (user.userType === 'ADMIN') {
       return { allowed: true, currentCount: 0, limit: 0, resetDate: user.monthlyResetDate };
     }
 
@@ -239,7 +238,6 @@ interface UserGenerationData {
   userType: UserType;
   generationCount: number;
   followupGenerationCount: number;
-  isAdmin: boolean;
 }
 
 /**
@@ -261,7 +259,6 @@ export async function checkUsageLimits(
           userType: true,
           generationCount: true,
           followupGenerationCount: true,
-          isAdmin: true,
         },
       });
 
@@ -275,7 +272,7 @@ export async function checkUsageLimits(
     }
 
     // Admins have unlimited access
-    if (user.isAdmin || user.userType === 'ADMIN') {
+    if (user.userType === 'ADMIN') {
       return { allowed: true };
     }
 
@@ -357,11 +354,10 @@ export async function trackActivityCount(
       where: { id: userId },
       select: {
         userType: true,
-        isAdmin: true,
       },
     });
 
-    if (!user || user.isAdmin || user.userType === 'ADMIN') {
+    if (!user || user.userType === 'ADMIN') {
       return; // Don't track for admins
     }
 
@@ -394,7 +390,6 @@ export async function checkActivityLimit(
       select: {
         userType: true,
         activityCount: true,
-        isAdmin: true,
       },
     });
 
@@ -403,7 +398,7 @@ export async function checkActivityLimit(
     }
 
     // Admins have unlimited access
-    if (user.isAdmin || user.userType === 'ADMIN') {
+    if (user.userType === 'ADMIN') {
       return { allowed: true };
     }
 

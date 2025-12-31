@@ -22,10 +22,10 @@ export async function GET(req: NextRequest) {
     // Check if user is admin
     const dbUser = await prisma.user.findUnique({
       where: { id: user.id },
-      select: { userType: true, isAdmin: true },
+      select: { userType: true },
     });
 
-    if (!dbUser || (dbUser.userType !== 'ADMIN' && !dbUser.isAdmin)) {
+    if (!dbUser || dbUser.userType !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
@@ -61,7 +61,6 @@ export async function GET(req: NextRequest) {
           id: true,
           email: true,
           userType: true,
-          isAdmin: true,
           createdAt: true,
           updatedAt: true,
           openaiApiKey: true,
@@ -86,7 +85,6 @@ export async function GET(req: NextRequest) {
       id: u.id,
       email: u.email,
       userType: u.userType,
-      isAdmin: u.isAdmin,
       createdAt: u.createdAt,
       updatedAt: u.updatedAt,
       hasOpenaiKey: !!u.openaiApiKey,

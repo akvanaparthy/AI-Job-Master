@@ -4,7 +4,6 @@ interface UserProfile {
   id: string;
   email: string;
   userType: 'FREE' | 'PLUS' | 'ADMIN';
-  isAdmin: boolean;
   createdAt: string;
   updatedAt: string;
 }

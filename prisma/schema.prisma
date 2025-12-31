@@ -25,12 +25,12 @@ model User {
   geminiModels         String[]          @default([])
   openaiModels         String[]          @default([])
   userType             UserType          @default(FREE)
-  isAdmin              Boolean           @default(false)
   followupReminderDays Int               @default(7)
   monthlyResetDate     DateTime          @default(now())
   generationCount      Int               @default(0)
   activityCount        Int               @default(0)
   followupGenerationCount Int            @default(0)
+  resumeLink           String?
   coverLetters         CoverLetter[]
   customPrompts        CustomPrompt[]
   emailMessages        EmailMessage[]
@@ -274,6 +274,7 @@ enum TabType {
 enum LinkedInMessageType {
   NEW
   FOLLOW_UP
+  CONNECTION_NOTE
 }
 
 enum EmailMessageType {
@@ -286,6 +287,7 @@ enum ApplicationStatus {
   SENT
   DONE
   GHOST
+  REQUESTED
 }
 
 enum Length {
