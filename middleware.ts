@@ -3,8 +3,21 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
+  // Security: Limit request body size for API routes to prevent memory exhaustion
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    const contentLength = req.headers.get('content-length');
+    const maxSize = 5 * 1024 * 1024; // 5MB limit for API routes
+
+    if (contentLength && parseInt(contentLength) > maxSize) {
+      return NextResponse.json(
+        { error: 'Request payload too large' },
+        { status: 413 }
+      );
+    }
+  }
+
   const res = NextResponse.next();
-  
+
   const supabase = createMiddlewareClient({ req, res });
 
   // Check if user is authenticated
@@ -49,5 +62,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/settings/:path*', '/auth/:path*', '/admin/:path*'],
+  matcher: ['/dashboard/:path*', '/settings/:path*', '/auth/:path*', '/admin/:path*', '/api/:path*'],
 };
