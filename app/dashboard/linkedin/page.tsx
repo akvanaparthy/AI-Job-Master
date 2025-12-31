@@ -822,35 +822,61 @@ export default function LinkedInPage() {
                 </div>
               </div>
 
-              {messageType === 'NEW' && (
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
-                  <div>
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Request Referral</Label>
-                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Modify message to ask for a referral</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {messageType === 'NEW' && (
+                  <div className="flex items-center justify-between p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Request Referral</Label>
+                      <div className="group relative">
+                        <svg className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-10 pointer-events-none">
+                          Modify message to ask for a referral
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45 -mt-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <Switch checked={requestReferral} onCheckedChange={setRequestReferral} />
                   </div>
-                  <Switch checked={requestReferral} onCheckedChange={setRequestReferral} />
-                </div>
-              )}
+                )}
 
-              {messageType !== 'CONNECTION_NOTE' && (
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
-                  <div>
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</Label>
-                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Include statement about attaching your resume</p>
+                {messageType !== 'CONNECTION_NOTE' && (
+                  <div className="flex items-center justify-between p-3 sm:p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Resume Attachment</Label>
+                      <div className="group relative">
+                        <svg className="w-3.5 h-3.5 text-green-600 dark:text-green-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-10 pointer-events-none">
+                          Include statement about attaching your resume
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45 -mt-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
                   </div>
-                  <Switch checked={resumeAttachment} onCheckedChange={setResumeAttachment} />
-                </div>
-              )}
+                )}
 
-              {(messageType === 'NEW' || messageType === 'FOLLOW_UP') && (
-                <div className="flex items-center justify-between p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg">
-                  <div>
-                    <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Simple Format</Label>
-                    <p className="text-xs text-slate-600 dark:text-gray-400 mt-1">Use a predefined simple message template</p>
+                {(messageType === 'NEW' || messageType === 'FOLLOW_UP') && (
+                  <div className="flex items-center justify-between p-3 sm:p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Label className="text-xs sm:text-sm font-medium text-slate-900 dark:text-gray-100">Simple Format</Label>
+                      <div className="group relative">
+                        <svg className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 cursor-help" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-10 pointer-events-none">
+                          Use a predefined simple message template
+                          <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-gray-900 dark:bg-gray-700 rotate-45 -mt-1"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <Switch checked={simpleFormat} onCheckedChange={setSimpleFormat} />
                   </div>
-                  <Switch checked={simpleFormat} onCheckedChange={setSimpleFormat} />
-                </div>
-              )}
+                )}
+              </div>
 
               {!positionTitle && messageType !== 'CONNECTION_NOTE' && (
                 <div className="space-y-2">

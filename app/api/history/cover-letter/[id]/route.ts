@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -39,12 +40,8 @@ export async function GET(
     }
 
     return NextResponse.json({ coverLetter });
-  } catch (error: any) {
-    console.error('Fetch cover letter error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch cover letter' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Fetch cover letter error');
   }
 }
 
@@ -101,12 +98,8 @@ export async function PATCH(
         updatedAt: updated.updatedAt,
       },
     });
-  } catch (error: any) {
-    console.error('Update cover letter status error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to update cover letter status' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Update cover letter status error');
   }
 }
 
@@ -146,11 +139,7 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error: any) {
-    console.error('Delete cover letter error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to delete cover letter' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Delete cover letter error');
   }
 }
