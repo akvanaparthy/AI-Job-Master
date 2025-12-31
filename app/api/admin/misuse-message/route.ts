@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { getMisuseMessage, setMisuseMessage } from '@/lib/ai/misuse-detection';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -34,12 +35,8 @@ export async function GET(req: NextRequest) {
     const message = await getMisuseMessage();
 
     return NextResponse.json({ message });
-  } catch (error: any) {
-    logger.error('Get misuse message error', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch misuse message' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Get misuse message error');
   }
 }
 
@@ -80,11 +77,7 @@ export async function PUT(req: NextRequest) {
     await setMisuseMessage(message);
 
     return NextResponse.json({ success: true, message });
-  } catch (error: any) {
-    logger.error('Update misuse message error', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to update misuse message' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Update misuse message error');
   }
 }

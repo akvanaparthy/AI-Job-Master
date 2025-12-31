@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { ApplicationStatus } from '@prisma/client';
 import { logger } from '@/lib/logger';
+import { handleApiError } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -160,12 +161,8 @@ export async function GET(req: NextRequest) {
         'Content-Disposition': `attachment; filename="job-applications-${new Date().toISOString().split('T')[0]}.csv"`,
       },
     });
-  } catch (error: any) {
-    logger.error('Export history error', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to export history' },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, 'Export history error');
   }
 }
 
