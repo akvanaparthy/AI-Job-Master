@@ -347,10 +347,19 @@ export default function LinkedInPage() {
   };
 
   const handleGenerate = async () => {
-    if (!companyName) {
-      toast({ title: 'Error', description: 'Please fill in company name', variant: 'destructive' });
-      return;
+    // Validate required fields based on message type
+    if (messageType === 'CONNECTION_NOTE') {
+      if (!linkedinUrl || !recipientName) {
+        toast({ title: 'Error', description: 'LinkedIn URL and Recipient Name are required for connection notes', variant: 'destructive' });
+        return;
+      }
+    } else {
+      if (!companyName) {
+        toast({ title: 'Error', description: 'Please fill in company name', variant: 'destructive' });
+        return;
+      }
     }
+
     setLoading(true);
     setSavedId(null); // Reset saved state
     setSavedMessageId(null);
@@ -366,7 +375,7 @@ export default function LinkedInPage() {
           recipientPosition: recipientPosition || undefined,
           positionTitle: positionTitle || undefined,
           areasOfInterest: areasOfInterest || undefined,
-          companyName,
+          companyName: companyName || 'Unknown',
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           parentMessageId: parentMessageId || undefined,
@@ -382,7 +391,12 @@ export default function LinkedInPage() {
       if (!response.ok) throw new Error((await response.json()).error || 'Failed to generate message');
       const data = await response.json();
       setGeneratedMessage(data.content);
-      toast({ title: 'Success', description: 'LinkedIn message generated successfully!' });
+      toast({
+        title: 'Success',
+        description: messageType === 'CONNECTION_NOTE'
+          ? 'LinkedIn connection note generated successfully!'
+          : 'LinkedIn message generated successfully!'
+      });
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to generate message', variant: 'destructive' });
     } finally {
@@ -418,14 +432,14 @@ export default function LinkedInPage() {
           recipientPosition: recipientPosition || undefined,
           positionTitle: positionTitle || undefined,
           areasOfInterest: areasOfInterest || undefined,
-          companyName,
+          companyName: companyName || 'Unknown',
           jobDescription: jobDescription || undefined,
           companyDescription: companyDescription || undefined,
           parentMessageId: parentMessageId || undefined,
           length,
           llmModel,
           requestReferral,
-          status,
+          status: messageType === 'CONNECTION_NOTE' ? 'REQUESTED' : status,
         }),
       });
       if (!response.ok) throw new Error('Failed to save message');
@@ -434,7 +448,9 @@ export default function LinkedInPage() {
       setSavedMessageId(data.messageId);
       toast({
         title: 'Saved',
-        description: data.messageId ? `LinkedIn message saved! Message ID: ${data.messageId}` : 'LinkedIn message saved to history!'
+        description: messageType === 'CONNECTION_NOTE'
+          ? 'Connection note saved with REQUESTED status'
+          : (data.messageId ? `LinkedIn message saved! Message ID: ${data.messageId}` : 'LinkedIn message saved to history!')
       });
     } catch (error: any) {
       toast({ title: 'Error', description: error.message || 'Failed to save message', variant: 'destructive' });
@@ -522,8 +538,7 @@ export default function LinkedInPage() {
           transition={{ delay: 0.15 }}
           className="space-y-4 sm:space-y-6"
         >
-          {/* Configuration Card - Hidden for Connection Note */}
-          {messageType !== 'CONNECTION_NOTE' && (
+          {/* Configuration Card */}
           <Card className="bg-white dark:bg-gray-800 border-slate-200/60 dark:border-gray-700 shadow-sm overflow-hidden">
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/50 px-4 sm:px-6 py-3 sm:py-4">
               <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
@@ -640,7 +655,6 @@ export default function LinkedInPage() {
 
             </div>
           </Card>
-          )}
 
           {/* Search for Connection Requested - Only shown in NEW mode */}
           {messageType === 'NEW' && (
@@ -980,45 +994,24 @@ export default function LinkedInPage() {
                 </motion.div>
               )}
 
-              {messageType === 'CONNECTION_NOTE' ? (
-                <Button
-                  onClick={handleSaveConnectionNote}
-                  disabled={saving || !linkedinUrl || !recipientName}
-                  className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
-                >
-                  {saving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                      <span className="hidden sm:inline">Saving connection note...</span>
-                      <span className="sm:hidden">Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                      Save Connection Note
-                    </>
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  onClick={handleGenerate}
-                  disabled={loading || !companyName || !hasAnyApiKey || !llmModel}
-                  className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
-                      <span className="hidden sm:inline">Generating message...</span>
-                      <span className="sm:hidden">Generating...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                      Generate Message
-                    </>
-                  )}
-                </Button>
-              )}
+              <Button
+                onClick={handleGenerate}
+                disabled={loading || (messageType === 'CONNECTION_NOTE' ? (!linkedinUrl || !recipientName || !hasAnyApiKey || !llmModel) : (!companyName || !hasAnyApiKey || !llmModel))}
+                className="w-full h-11 sm:h-12 bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg disabled:opacity-50 text-sm sm:text-base"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                    <span className="hidden sm:inline">{messageType === 'CONNECTION_NOTE' ? 'Generating note...' : 'Generating message...'}</span>
+                    <span className="sm:hidden">Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                    {messageType === 'CONNECTION_NOTE' ? 'Generate Connection Note' : 'Generate Message'}
+                  </>
+                )}
+              </Button>
             </div>
           </Card>
         </motion.div>
@@ -1037,10 +1030,19 @@ export default function LinkedInPage() {
                     <div>
                       <h2 className="text-base sm:text-lg font-semibold text-slate-900 dark:text-gray-100 flex items-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        Your LinkedIn Message
+                        {messageType === 'CONNECTION_NOTE' ? 'Your Connection Note' : 'Your LinkedIn Message'}
                       </h2>
                       <p className="text-sm text-slate-600 dark:text-gray-400 mt-0.5">
-                        {savedId ? 'Saved to history' : 'Review and save if needed'}
+                        {messageType === 'CONNECTION_NOTE' ? (
+                          <>
+                            <span className={generatedMessage.length > 280 ? 'text-red-600 dark:text-red-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400'}>
+                              {generatedMessage.length}/280 characters
+                            </span>
+                            {generatedMessage.length > 280 && ' - Too long! Please edit to fit LinkedIn\'s limit'}
+                          </>
+                        ) : (
+                          savedId ? 'Saved to history' : 'Review and save if needed'
+                        )}
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2 w-full sm:w-auto">
@@ -1066,15 +1068,17 @@ export default function LinkedInPage() {
                         </Button>
                       ) : (
                         <div className="flex gap-2">
-                          <Select value={status} onValueChange={(value: any) => setStatus(value)}>
-                            <SelectTrigger className="h-9 sm:h-8 w-[90px] sm:w-[100px] border-emerald-200 text-xs sm:text-sm">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="SENT">Sent</SelectItem>
-                              <SelectItem value="DRAFT">Draft</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          {messageType !== 'CONNECTION_NOTE' && (
+                            <Select value={status} onValueChange={(value: any) => setStatus(value)}>
+                              <SelectTrigger className="h-9 sm:h-8 w-[90px] sm:w-[100px] border-emerald-200 text-xs sm:text-sm">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="SENT">Sent</SelectItem>
+                                <SelectItem value="DRAFT">Draft</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
                           <Button
                             onClick={handleSave}
                             disabled={saving}

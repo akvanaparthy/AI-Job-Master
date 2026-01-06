@@ -107,10 +107,26 @@ export async function POST(req: NextRequest) {
       extraContent,
     } = sanitized;
 
-    // Validate required fields
-    if (!companyName || !llmModel || !messageType) {
+    // Validate required fields based on message type
+    if (!llmModel || !messageType) {
       return NextResponse.json(
-        { error: 'Company name, message type, and LLM model are required' },
+        { error: 'Message type and LLM model are required' },
+        { status: 400 }
+      );
+    }
+
+    // For CONNECTION_NOTE, validate linkedin URL and recipient name
+    if (messageType === 'CONNECTION_NOTE') {
+      if (!linkedinUrl || !recipientName) {
+        return NextResponse.json(
+          { error: 'LinkedIn URL and recipient name are required for connection notes' },
+          { status: 400 }
+        );
+      }
+    } else if (!companyName) {
+      // For other message types, company name is required
+      return NextResponse.json(
+        { error: 'Company name is required' },
         { status: 400 }
       );
     }
@@ -356,7 +372,7 @@ export async function POST(req: NextRequest) {
           recipientPosition: recipientPosition || null,
           positionTitle: positionTitle || null,
           areasOfInterest: areasOfInterest || null,
-          companyName,
+          companyName: companyName || 'Unknown',
           jobDescription: jobDescription || null,
           companyDescription: companyDescription || null,
           content: generatedContent,

@@ -183,10 +183,10 @@ CRITICAL RULES - YOU MUST FOLLOW THESE:
 
   // Handle CONNECTION_NOTE - a short connection request note
   if (messageType === 'CONNECTION_NOTE') {
-    const connectionNoteSystem = IMMUTABLE_SAFETY_RULE + `You are an expert at writing professional LinkedIn connection request notes. These notes have a strict character limit (around 300 characters), so they must be extremely concise yet professional.
+    const connectionNoteSystem = IMMUTABLE_SAFETY_RULE + `You are an expert at writing professional LinkedIn connection request notes. These notes have a strict character limit of 280 characters (LinkedIn's limit), so they must be extremely concise yet professional.
 
 Key principles:
-- Keep it very brief - under 300 characters total
+- Keep it very brief - under 280 characters total (including greeting and closing)
 - Professional and personable tone
 - Be direct about your intent
 - Mention the opportunity or company
@@ -195,15 +195,15 @@ Key principles:
 
 CRITICAL RULES:
 1. Output ONLY the connection note message - NO preambles or explanations
-2. Keep it under 300 characters
-3. Start directly with "Hi {name}," 
+2. Keep it STRICTLY under 280 characters total
+3. Start directly with "Hi {name},"
 4. Be concise but professional`;
 
-    const connectionNoteUser = `Write a brief LinkedIn connection request note (under 300 characters) following this format:
+    const connectionNoteUser = `Write a brief LinkedIn connection request note (under 280 characters) following this format:
 
 Hi {Their name},
 
-I'd like to connect with you to explore an opportunity with {company name}. I'm a {role/position} with experience in {relevant skills from resume}. Please accept my request for more info as I am not able to share more due to this message limit.
+I'd like to connect to explore opportunities at {company name}. I'm a {role/position} with experience in {relevant skills from resume}. Please accept for more details.
 
 CONTEXT:
 - Recipient: ${recipientName || 'there'}
@@ -214,7 +214,7 @@ ${areasOfInterest ? `- Areas of interest: ${areasOfInterest}` : ''}
 MY BACKGROUND:
 ${resumeContent || 'Not provided'}
 
-Generate a similar concise note using the actual name, company, and my relevant experience/skills from the resume. Keep it under 300 characters.`;
+Generate a similar concise note using the actual name, company, and my relevant experience/skills from the resume. Keep it STRICTLY under 280 characters total.`;
 
     return { system: connectionNoteSystem, user: connectionNoteUser };
   }
