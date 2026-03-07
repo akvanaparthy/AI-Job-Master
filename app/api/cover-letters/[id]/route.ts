@@ -29,7 +29,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 'P2025') {
+      return NextResponse.json({ error: 'Cover letter not found' }, { status: 404 });
+    }
     logger.error('Delete cover letter error', error);
     return NextResponse.json(
       { error: 'Failed to delete cover letter' },

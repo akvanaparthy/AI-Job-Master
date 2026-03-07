@@ -23,9 +23,12 @@ export async function encryptApiKey(apiKey: string): Promise<string> {
 
 const ALGORITHM = 'aes-256-cbc';
 // AES-256 requires exactly 32 bytes (256 bits). If hex string is provided, convert it.
-const ENCRYPTION_KEY_RAW = process.env.ENCRYPTION_KEY || 'your-32-character-secret-key!!';
+const ENCRYPTION_KEY_RAW = process.env.ENCRYPTION_KEY;
+if (!ENCRYPTION_KEY_RAW) {
+  throw new Error('ENCRYPTION_KEY environment variable is required');
+}
 // If the key is a hex string (64 chars = 32 bytes in hex), convert it to buffer
-const ENCRYPTION_KEY = ENCRYPTION_KEY_RAW.length === 64 
+const ENCRYPTION_KEY = ENCRYPTION_KEY_RAW.length === 64
   ? Buffer.from(ENCRYPTION_KEY_RAW, 'hex')
   : Buffer.from(ENCRYPTION_KEY_RAW.padEnd(32, '0').slice(0, 32));
 const IV_LENGTH = 16;

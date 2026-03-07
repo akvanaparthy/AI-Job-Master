@@ -3,8 +3,10 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname;
+
   // Security: Limit request body size for API routes to prevent memory exhaustion
-  if (req.nextUrl.pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api/')) {
     const contentLength = req.headers.get('content-length');
     const maxSize = 5 * 1024 * 1024; // 5MB limit for API routes
 
@@ -14,48 +16,39 @@ export async function middleware(req: NextRequest) {
         { status: 413 }
       );
     }
+    // Don't check session for API routes - they handle their own auth
+    return NextResponse.next();
+  }
+
+  // Determine if we actually need a session check
+  const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/settings') || pathname.startsWith('/admin');
+  const isAuthRoute = pathname.startsWith('/auth');
+
+  // Skip Supabase session check for routes that don't need it
+  if (!isProtectedRoute && !isAuthRoute) {
+    return NextResponse.next();
   }
 
   const res = NextResponse.next();
-
   const supabase = createMiddlewareClient({ req, res });
 
-  // Check if user is authenticated
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  // Protect admin routes - require authentication (admin check happens in the page)
-  if (req.nextUrl.pathname.startsWith('/admin')) {
-    if (!session) {
-      // Redirect to login if not authenticated
-      const redirectUrl = req.nextUrl.clone();
-      redirectUrl.pathname = '/auth/login';
-      redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
-    // Admin role check is now done in the admin layout component
-  }
-
-  // Protect dashboard and settings routes
-  if (req.nextUrl.pathname.startsWith('/dashboard') || req.nextUrl.pathname.startsWith('/settings')) {
-    if (!session) {
-      // Redirect to login if not authenticated
-      const redirectUrl = req.nextUrl.clone();
-      redirectUrl.pathname = '/auth/login';
-      redirectUrl.searchParams.set('redirectTo', req.nextUrl.pathname);
-      return NextResponse.redirect(redirectUrl);
-    }
+  // Protect admin, dashboard, settings routes
+  if (isProtectedRoute && !session) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = '/auth/login';
+    redirectUrl.searchParams.set('redirectTo', pathname);
+    return NextResponse.redirect(redirectUrl);
   }
 
   // Redirect authenticated users away from auth pages
-  if (req.nextUrl.pathname.startsWith('/auth')) {
-    if (session) {
-      // Redirect to dashboard if already authenticated
-      const redirectUrl = req.nextUrl.clone();
-      redirectUrl.pathname = '/dashboard';
-      return NextResponse.redirect(redirectUrl);
-    }
+  if (isAuthRoute && session) {
+    const redirectUrl = req.nextUrl.clone();
+    redirectUrl.pathname = '/dashboard';
+    return NextResponse.redirect(redirectUrl);
   }
 
   return res;

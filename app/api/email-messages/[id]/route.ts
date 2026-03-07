@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/db/prisma';
 import { logger } from '@/lib/logger';
-import { handleApiError } from '@/lib/api/errors';
+import { handleApiError, ApiErrors } from '@/lib/api/errors';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -30,7 +30,10 @@ export async function DELETE(
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.code === 'P2025') {
+      return ApiErrors.notFound('Email message');
+    }
     return handleApiError(error, 'Delete email message error');
   }
 }
